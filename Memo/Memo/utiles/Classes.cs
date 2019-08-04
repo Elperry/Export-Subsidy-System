@@ -42,7 +42,11 @@ namespace Memo
             {
                 // login success
                 MessageBox.Show("Login Successfull");
-                
+                main m = new main();
+                m.Show();
+                ((Window)window).Hide();
+                Global.removeWindow(window);
+
             }
             else
             {
@@ -145,7 +149,7 @@ namespace Memo
         public string nameAr { get; set; }
         public bool nolon { get; set; }
         public bool manifest { get; set; }
-        public Window window { get; set; }
+        private Window window { get; set; }
         public Country(Window W = null)
         {
             window = W;
@@ -167,23 +171,30 @@ namespace Memo
             Mysqldb sql = new Mysqldb();
             string n = (nolon) ? "1" : "0";
             string m = (manifest) ? "1" : "0";
+            
             string q = "INSERT INTO `countries` (`id`, `nameEn`, `nameAr`, `nolon`, `manifest`) VALUES (NULL, '"+nameEn+"', '"+nameAr+"', '"+n+"', '"+m+"');";
-            DataTable dt = sql.Select(q);
+           
+            sql.Select(q); id = (sql.nextAutoIncrement("countries") - 1).ToString();
+            Global.countries.Add(this);
         }
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `countries` ";
+            string n = (nolon) ? "1" : "0";
+            string m = (manifest) ? "1" : "0";
+            string q = "UPDATE `countries` SET `nameEn` = '"+nameEn+"', `nameAr` = '"+nameAr+"', `nolon` = '"+n+"', `manifest` = '"+m+"' WHERE `countries`.`id` = "+id+";";
             DataTable dt = sql.Select(q);
         }
         public void del(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `countries` ";
-            DataTable dt = sql.Select(q);
+            string q = "DELETE FROM `countries` WHERE `countries`.`id` = "+id;
+            sql.Select(q);
+            Global.countries.Remove(this);
         }
         public void close(object sender, RoutedEventArgs e)
         {
+            Global.windows.Remove(window);
             window.Close();
         }
         public static ObservableCollection<object> getTable()
@@ -225,6 +236,59 @@ namespace Memo
         public string address { get; set; }
         public string note { get; set; }
         public int rating { get; set; }
+        private Window window { get; set; }
+        public ShippingCompany(Window w = null)
+        {
+            window = w;
+        }
+        public void add(object sender, RoutedEventArgs e)
+        {
+            Mysqldb sql = new Mysqldb();
+            string q = "INSERT INTO `shippingcompanies` (`id`, `name`, `email`, `phone`, `fax`, `address`, `notes`) VALUES (NULL, '"+name+"', '"+email+"', '"+phone+"', '"+fax+"', '"+address+"', '"+note+"');";
+            DataTable dt = sql.Select(q);
+        }
+        public void edit(object sender, RoutedEventArgs e)
+        {
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `countries` ";
+            DataTable dt = sql.Select(q);
+        }
+        public void del(object sender, RoutedEventArgs e)
+        {
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `countries` ";
+            DataTable dt = sql.Select(q);
+        }
+        public void close(object sender, RoutedEventArgs e)
+        {
+            window.Close();
+        }
+        public static ObservableCollection<object> getTable()
+        {
+            ObservableCollection<object> c = new ObservableCollection<object>();
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `shippingcompanies`  ";
+            DataTable dt = sql.Select(q);
+            if (dt.Rows.Count == 0)
+            {
+                return c;
+            }
+            foreach (DataRow r in dt.Rows)
+            {
+                ShippingCompany temp = new ShippingCompany();
+                temp.id = r["id"].ToString();
+                temp.name = r["name"].ToString();
+                temp.email = r["email"].ToString();
+                temp.phone = r["phone"].ToString();
+                temp.fax = r["fax"].ToString();
+                temp.address = r["address"].ToString();
+                temp.note = r["note"].ToString();
+
+                c.Add(temp);
+            }
+
+            return c;
+        }
     }
     public class Brand
     {

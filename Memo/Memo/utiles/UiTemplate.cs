@@ -91,7 +91,7 @@ namespace Memo
         }
         public static int appHeight
         {
-            get { if(APPHeight == 0) { return Convert.ToInt32(System.Windows.SystemParameters.PrimaryScreenHeight) - 20; }
+            get { if(APPHeight == 0) { return Convert.ToInt32(System.Windows.SystemParameters.PrimaryScreenHeight); }
                 else { return APPHeight; }
             }
             set
@@ -187,8 +187,8 @@ namespace Memo
         private void Execute()
         {
             //MessageBox.Show("Clicked at " + Header);
-            
         }
+
     }
     public class CommandViewModel : ICommand
     {
@@ -396,7 +396,7 @@ namespace Memo
             }
             return s;
         }
-        public ScrollViewer scroller(bool center = true)
+        public ScrollViewer scroller(bool center = true , int width=0 , int height=0)
         {
             ScrollViewer s = new ScrollViewer();
             if (translate.lang == "EN")
@@ -412,9 +412,11 @@ namespace Memo
             s.CanContentScroll = true;
             s.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
             s.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            if(height != 0) { s.Height = height; }
+            if (width != 0) { s.Width = width; } 
             return s;
         }
-
+        
         public StackPanel tableView (ref ObservableCollection<object> dt, int startPos)
         {
             StackPanel stp = vStack(true);
@@ -432,7 +434,7 @@ namespace Memo
             }
             
             ScrollViewer s = scroller();
-            stp.Children.Add(s);
+            //stp.Children.Add(s);
             s.Height = sizes.appHeight - startPos-30;
             stp.Children.Add(s);
             // try1
@@ -447,6 +449,7 @@ namespace Memo
             foreach(var prop in dt[0].GetType().GetProperties())
             {
                 GridViewColumn grdvc = new GridViewColumn();
+                
                 if (prop.PropertyType.ToString() == "System.Int32" ||
                     prop.PropertyType.ToString() == "System.Double" ||
                     prop.PropertyType.ToString() == "System.String" ||
@@ -454,6 +457,7 @@ namespace Memo
                 {
                     grdvc.Header = translate.trans(prop.Name.ToString());
                     grdvc.DisplayMemberBinding = new Binding(prop.Name.ToString());
+                    //MessageBox.Show(prop.Name.ToString());
                 }
                 else
                 {
@@ -463,6 +467,7 @@ namespace Memo
                         {
                             grdvc.Header = translate.trans(prop.Name.ToString());
                             grdvc.DisplayMemberBinding = new Binding(prop.Name.ToString()+"."+p.Name.ToString());
+                            //MessageBox.Show(prop.Name.ToString());
                             break;
                         }
                     }
@@ -471,7 +476,7 @@ namespace Memo
                 grdV.Columns.Add(grdvc);
             }
             l.View = grdV;
-
+            
             return stp;
         }
         public Button headerBtn(string content, string action)
@@ -520,7 +525,11 @@ namespace Memo
         public Menu ClassicalMenueBar(ObservableCollection<MenuItemViewModel> m)
         {
             Menu menu = new Menu();
-            menu.ItemsSource = m;
+            menu.Name = "ClassicMenu";
+            
+            //menu.ItemsSource = m;
+            Binding b = new Binding(path: "MainMenuItems");
+            menu.SetBinding(Menu.ItemsSourceProperty, b);
             menu.HorizontalAlignment = (translate.lang == "EN") ? HorizontalAlignment.Left : HorizontalAlignment.Right;
             menu.FlowDirection = (translate.lang == "EN") ? FlowDirection.LeftToRight : FlowDirection.RightToLeft;
             menu.HorizontalContentAlignment = (translate.lang == "EN") ? HorizontalAlignment.Left : HorizontalAlignment.Right;
@@ -575,6 +584,16 @@ namespace Memo
             {
                 ((Window)form).FlowDirection = FlowDirection.RightToLeft;
             }
+            // window name
+            if(header == "")
+            {
+                ((Window)form).Name = translate.trans(obj.GetType().Name);
+            }
+            else
+            {
+                ((Window)form).Name = translate.trans(header);
+            }
+            //MessageBox.Show(translate.trans(form.GetType().Name));
             StackPanel S = new StackPanel();
             S.HorizontalAlignment = HorizontalAlignment.Center;
             S.Margin = new Thickness(10);
@@ -635,7 +654,9 @@ namespace Memo
                 //MessageBox.Show(prop.PropertyType.ToString());     
             }
             S.Children.Add(hs);
- 
+            // generate buttons for methodes
+            i = 0;
+            hs = hStack();
             foreach (var method in obj.GetType().GetMethods())
             {
                 //MessageBox.Show(method.ToString());
@@ -644,19 +665,41 @@ namespace Memo
                 RoutedEventHandler e = (RoutedEventHandler)Delegate.CreateDelegate(
                 typeof(RoutedEventHandler),obj, method);
                 b.Click += e;
-                S.Children.Add(b);
+                if (i == n)
+                {
+                    S.Children.Add(hs);
+                    hs = hStack();
+                    hs.Children.Add(b);
+                    i = 0;
+                }
+                else
+                {
+                    hs.Children.Add(b);
+                }
+                i++;
+                //;
             }
-           
+            S.Children.Add(hs);
 
             Border border = brdr();
             border.Child = S;
+           
             StackPanel stk = vStack();
             stk.HorizontalAlignment = HorizontalAlignment.Stretch;
             //stk.Children.Add(miniHeader());
-            stk.Children.Add(border);
+            
+            
+
             if (table != null)
             {
-                stk.Children.Add(tableView(ref table, (int)border.Height + 40));
+                ScrollViewer Controls = scroller(true, 0, (height / 2) - 50); 
+                Controls.Content = border;
+                stk.Children.Add(Controls);
+                stk.Children.Add(tableView(ref table, (height / 2) + 40));
+            }
+            else
+            {
+                stk.Children.Add(border);
             }
             ((Window)form).Content = stk;
 

@@ -8,7 +8,7 @@ using System.IO;
 using System.Security.Cryptography;
 using Microsoft.Win32;
 
-namespace EasyAccessWinApp
+namespace Memo
 {
     static class activation
     {
