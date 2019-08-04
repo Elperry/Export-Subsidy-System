@@ -1,0 +1,64 @@
+D:\acc program\unilever2\Memo\Memo\bin\Debug\Memo.exe.config
+D:\acc program\unilever2\Memo\Memo\bin\Debug\Memo.exe
+D:\acc program\unilever2\Memo\Memo\bin\Debug\Memo.pdb
+D:\acc program\unilever2\Memo\Memo\bin\Debug\MaterialDesignColors.dll
+D:\acc program\unilever2\Memo\Memo\bin\Debug\MaterialDesignThemes.Wpf.dll
+D:\acc program\unilever2\Memo\Memo\bin\Debug\MySqlConnector.dll
+D:\acc program\unilever2\Memo\Memo\bin\Debug\System.Buffers.dll
+D:\acc program\unilever2\Memo\Memo\bin\Debug\System.Memory.dll
+D:\acc program\unilever2\Memo\Memo\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+D:\acc program\unilever2\Memo\Memo\bin\Debug\System.Threading.Tasks.Extensions.dll
+D:\acc program\unilever2\Memo\Memo\bin\Debug\MaterialDesignColors.pdb
+D:\acc program\unilever2\Memo\Memo\bin\Debug\MaterialDesignThemes.Wpf.pdb
+D:\acc program\unilever2\Memo\Memo\bin\Debug\MaterialDesignThemes.Wpf.xml
+D:\acc program\unilever2\Memo\Memo\bin\Debug\System.Buffers.xml
+D:\acc program\unilever2\Memo\Memo\bin\Debug\System.Memory.xml
+D:\acc program\unilever2\Memo\Memo\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+D:\acc program\unilever2\Memo\Memo\bin\Debug\System.Threading.Tasks.Extensions.xml
+D:\acc program\unilever2\Memo\Memo\obj\Debug\Memo.csprojAssemblyReference.cache
+D:\acc program\unilever2\Memo\Memo\obj\Debug\MainWindow.g.cs
+D:\acc program\unilever2\Memo\Memo\obj\Debug\App.g.cs
+D:\acc program\unilever2\Memo\Memo\obj\Debug\Memo_MarkupCompile.cache
+D:\acc program\unilever2\Memo\Memo\obj\Debug\Memo_MarkupCompile.lref
+D:\acc program\unilever2\Memo\Memo\obj\Debug\MainWindow.baml
+D:\acc program\unilever2\Memo\Memo\obj\Debug\Memo.g.resources
+D:\acc program\unilever2\Memo\Memo\obj\Debug\Memo.Properties.Resources.resources
+D:\acc program\unilever2\Memo\Memo\obj\Debug\Memo.csproj.GenerateResource.cache
+D:\acc program\unilever2\Memo\Memo\obj\Debug\Memo.csproj.CoreCompileInputs.cache
+D:\acc program\unilever2\Memo\Memo\obj\Debug\Memo.csproj.CopyComplete
+D:\acc program\unilever2\Memo\Memo\obj\Debug\Memo.exe
+D:\acc program\unilever2\Memo\Memo\obj\Debug\Memo.pdb
+G:\unilever2\Memo\Memo\obj\Debug\MainWindow.g.cs
+G:\unilever2\Memo\Memo\obj\Debug\App.g.cs
+G:\unilever2\Memo\Memo\obj\Debug\Memo_MarkupCompile.cache
+G:\unilever2\Memo\Memo\obj\Debug\Memo_MarkupCompile.lref
+G:\unilever2\Memo\Memo\obj\Debug\Memo.exe
+G:\unilever2\Memo\Memo\obj\Debug\Memo.pdb
+G:\unilever2\Memo\Memo\bin\Debug\Memo.exe.config
+G:\unilever2\Memo\Memo\bin\Debug\Memo.exe
+G:\unilever2\Memo\Memo\bin\Debug\Memo.pdb
+G:\unilever2\Memo\Memo\bin\Debug\MaterialDesignColors.dll
+G:\unilever2\Memo\Memo\bin\Debug\MaterialDesignThemes.Wpf.dll
+G:\unilever2\Memo\Memo\bin\Debug\MySqlConnector.dll
+G:\unilever2\Memo\Memo\bin\Debug\System.Buffers.dll
+G:\unilever2\Memo\Memo\bin\Debug\System.Memory.dll
+G:\unilever2\Memo\Memo\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+G:\unilever2\Memo\Memo\bin\Debug\System.Threading.Tasks.Extensions.dll
+G:\unilever2\Memo\Memo\bin\Debug\MaterialDesignColors.pdb
+G:\unilever2\Memo\Memo\bin\Debug\MaterialDesignThemes.Wpf.pdb
+G:\unilever2\Memo\Memo\bin\Debug\MaterialDesignThemes.Wpf.xml
+G:\unilever2\Memo\Memo\bin\Debug\System.Buffers.xml
+G:\unilever2\Memo\Memo\bin\Debug\System.Memory.xml
+G:\unilever2\Memo\Memo\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+G:\unilever2\Memo\Memo\bin\Debug\System.Threading.Tasks.Extensions.xml
+G:\unilever2\Memo\Memo\obj\Debug\MainWindow.baml
+G:\unilever2\Memo\Memo\obj\Debug\Memo.g.resources
+G:\unilever2\Memo\Memo\obj\Debug\Memo.Properties.Resources.resources
+G:\unilever2\Memo\Memo\obj\Debug\Memo.csproj.GenerateResource.cache
+G:\unilever2\Memo\Memo\obj\Debug\Memo.csproj.CoreCompileInputs.cache
+G:\unilever2\Memo\Memo\obj\Debug\Memo.csproj.CopyComplete
+G:\unilever2\Memo\Memo\obj\Debug\main.g.cs
+G:\unilever2\Memo\Memo\obj\Debug\main.baml
+G:\unilever2\Memo\Memo\obj\Debug\App.baml
+G:\unilever2\Memo\Memo\obj\Debug\Memo.csprojAssemblyReference.cache
+G:\unilever2\Memo\Memo\obj\Debug\GeneratedInternalTypeHelper.g.cs
