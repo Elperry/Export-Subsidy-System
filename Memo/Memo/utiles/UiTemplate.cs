@@ -271,7 +271,9 @@ namespace Memo
                 }
                     
                 t.Margin = new Thickness(5, 0, 5, 5);
-                t.SetBinding(TextBox.TextProperty, name);
+                Binding b = new Binding {Path = new PropertyPath(name), Source=obj, Mode = BindingMode.TwoWay , UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
+                t.IsReadOnly = false;
+                t.SetBinding(TextBox.TextProperty, b);
                 //t.TextChanged += T_TextChanged;
                 //MessageBox.Show("mainObj." + name);
             }
@@ -417,7 +419,7 @@ namespace Memo
             return s;
         }
         
-        public StackPanel tableView (ref ObservableCollection<object> dt, int startPos)
+        public StackPanel tableView (ref object obj, ref ObservableCollection<object> dt , int startPos)
         {
             StackPanel stp = vStack(true);
             if (dt.Count == 0)
@@ -441,6 +443,9 @@ namespace Memo
             ListView l = new ListView(); // need to be a fun
             Style style = new Style(typeof(ListViewItem));
             style.Setters.Add(new Setter(ListViewItem.HorizontalContentAlignmentProperty, HorizontalAlignment.Stretch));
+            style.Setters.Add(new EventSetter {Event = ListViewItem.PreviewMouseLeftButtonDownEvent , Handler = (MouseButtonEventHandler)Delegate.CreateDelegate(
+                typeof(MouseButtonEventHandler),obj, obj.GetType().GetMethod("selectItem"))
+            });
             l.ItemContainerStyle = style;
             l.ItemsSource = dt;
             s.Content = l;
@@ -557,7 +562,7 @@ namespace Memo
             return menu;
         }
 
-        public void template1(object form,object obj ,string header="",List<string>memberLst = null ,ObservableCollection<object> table = null, int width = 0,int height = 0,bool parent = true)
+        public void template1(object form,ref object obj ,string header="",List<string>memberLst = null ,ObservableCollection<object> table = null, int width = 0,int height = 0,bool parent = true)
         {
             if(width == 0) { width = sizes.screenWidth;  }
             if (height == 0)
@@ -695,7 +700,7 @@ namespace Memo
                 ScrollViewer Controls = scroller(true, 0, (height / 2) - 50); 
                 Controls.Content = border;
                 stk.Children.Add(Controls);
-                stk.Children.Add(tableView(ref table, (height / 2) + 40));
+                stk.Children.Add(tableView(ref obj ,ref table, (height / 2) + 40));
             }
             else
             {

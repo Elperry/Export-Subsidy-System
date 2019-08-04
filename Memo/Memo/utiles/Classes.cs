@@ -5,7 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Data;
-
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Memo
 {
@@ -165,6 +166,17 @@ namespace Memo
             this.nameAr = r["nameAr"].ToString();
             this.nolon = Convert.ToBoolean(r["nolon"]);
             this.manifest = Convert.ToBoolean(r["manifest"].ToString());
+        }
+        public void selectItem(object sender, MouseButtonEventArgs e)
+        {
+            //MessageBox.Show(((ListViewItem)sender).ToString());
+            this.id =((Country)((ListViewItem) sender).Content).id;
+            this.nameEn = ((Country)((ListViewItem)sender).Content).nameEn;
+            this.nameAr = ((Country)((ListViewItem)sender).Content).nameAr;
+            this.nolon = ((Country)((ListViewItem)sender).Content).nolon;
+            this.manifest = ((Country)((ListViewItem)sender).Content).manifest;
+            MessageBox.Show(((ListViewItem)sender).Parent.GetType().ToString());
+            ((ListView)((ListViewItem)sender).Parent).SelectedIndex = -1;
         }
         public void add(object sender, RoutedEventArgs e)
         {

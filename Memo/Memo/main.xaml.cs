@@ -68,9 +68,9 @@ namespace Memo
            
             template t = new template();
             object W = new Window();
-            Global.country = new Country((Window)W);
+            object country = new Country((Window)W);
             Global.countries = Country.getTable();
-            t.template1(W, Global.country, "Countries", new List<string>() { "nameEn", "nameAr", "nolon", "manifest", "add", "edit", "del", "close" }, Global.countries, 0, 0, false);
+            t.template1(W,ref country, "Countries", new List<string>() { "nameEn", "nameAr", "nolon", "manifest", "add", "edit", "del", "close" }, Global.countries, 0, 0, false);
             Global.addWindow((Window)W);
             ((Window)W).Show();
             Global.refreshMenu();
@@ -92,7 +92,7 @@ namespace Memo
             object W = new Window();
             object temp = new ShippingCompany((Window)W);
             Global.countries = Country.getTable();
-            t.template1(W, temp, "Shipping_Companies", new List<string>() { "id", "nameEn", "nameAr", "nolon", "mainfest", "add", "edit", "del", "close" }, Global.countries, 0, 0, false);
+            t.template1(W,ref temp, "Shipping_Companies", new List<string>() { "id", "nameEn", "nameAr", "nolon", "mainfest", "add", "edit", "del", "close" }, Global.countries, 0, 0, false);
             Global.addWindow((Window)W);
             ((Window)W).Show();
             Global.refreshMenu();

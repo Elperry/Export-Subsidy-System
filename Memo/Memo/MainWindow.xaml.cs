@@ -31,8 +31,9 @@ namespace Memo
             Global.windows = new List<Window>();
             
             mainObj = new User(this);
+            object usr = new User(this);
             template temp = new template();
-            temp.template1(this, mainObj, "Login",lst,null,500,450);
+            temp.template1(this, ref usr, "Login",lst,null,500,450);
             main m = new main();
             m.Show();
         }
