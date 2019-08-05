@@ -7,6 +7,7 @@ using System.Windows;
 using System.Data;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.ComponentModel;
 
 namespace Memo
 {
@@ -143,13 +144,64 @@ namespace Memo
             name = n;
         }
     }
-    public class Country
+    public class Country : INotifyPropertyChanged
     {
-        public string id { get; set; }
-        public string nameEn { get; set; }
-        public string nameAr { get; set; }
-        public bool nolon { get; set; }
-        public bool manifest { get; set; }
+        private string _id;
+        private string _nameEn;
+        private string _nameAr;
+        private bool _nolon;
+        private bool _manifest;
+        public string id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("id"));
+            }
+        }
+        public string nameEn
+        {
+            get { return _nameEn; }
+            set
+            {
+                _nameEn = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("nameEn"));
+            }
+        }
+        public string nameAr
+        {
+            get { return _nameAr; }
+            set
+            {
+                _nameAr = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("nameAr"));
+            }
+        }
+        public bool nolon
+        {
+            get { return _nolon; }
+            set
+            {
+                _nolon = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("nolon"));
+            }
+        }
+        public bool manifest
+        {
+            get { return _manifest; }
+            set
+            {
+                _manifest = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("manifest"));
+            }
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
         private Window window { get; set; }
         public Country(Window W = null)
         {
@@ -175,15 +227,14 @@ namespace Memo
             this.nameAr = ((Country)((ListViewItem)sender).Content).nameAr;
             this.nolon = ((Country)((ListViewItem)sender).Content).nolon;
             this.manifest = ((Country)((ListViewItem)sender).Content).manifest;
-            MessageBox.Show(((ListViewItem)sender).Parent.GetType().ToString());
-            ((ListView)((ListViewItem)sender).Parent).SelectedIndex = -1;
+            //MessageBox.Show(((ListViewItem)sender).Parent.GetType().ToString());
+            
         }
         public void add(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
             string n = (nolon) ? "1" : "0";
-            string m = (manifest) ? "1" : "0";
-            
+            string m = (manifest) ? "1" : "0";         
             string q = "INSERT INTO `countries` (`id`, `nameEn`, `nameAr`, `nolon`, `manifest`) VALUES (NULL, '"+nameEn+"', '"+nameAr+"', '"+n+"', '"+m+"');";
            
             sql.Select(q); id = (sql.nextAutoIncrement("countries") - 1).ToString();
@@ -195,14 +246,16 @@ namespace Memo
             string n = (nolon) ? "1" : "0";
             string m = (manifest) ? "1" : "0";
             string q = "UPDATE `countries` SET `nameEn` = '"+nameEn+"', `nameAr` = '"+nameAr+"', `nolon` = '"+n+"', `manifest` = '"+m+"' WHERE `countries`.`id` = "+id+";";
-            DataTable dt = sql.Select(q);
+            sql.Select(q);
+            Global.countries = getTable();
         }
         public void del(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
             string q = "DELETE FROM `countries` WHERE `countries`.`id` = "+id;
             sql.Select(q);
-            Global.countries.Remove(this);
+            //Global.countries.Remove(this);
+            Global.countries = getTable();
         }
         public void close(object sender, RoutedEventArgs e)
         {
@@ -238,7 +291,7 @@ namespace Memo
         public string id { get; set; }
         public string name { get; set; }
     }
-    public class ShippingCompany
+    public class ShippingCompany : INotifyPropertyChanged
     {
         public string id { get; set; }
         public string name { get; set; }
@@ -248,6 +301,7 @@ namespace Memo
         public string address { get; set; }
         public string note { get; set; }
         public int rating { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
         private Window window { get; set; }
         public ShippingCompany(Window w = null)
         {
@@ -306,14 +360,42 @@ namespace Memo
     {
         public string id { get; set; }
         public string name { get; set; }
-        public Cat entity { get; set; }
+        public BrandCat brandCat { get; set; }
         public double supportPercentage { get; set; }
         
     }
-    public class Cat
+    public class BrandCat : INotifyPropertyChanged
     {
-        public string id { get; set; }
-        public string name { get; set; }
+        private string _id;
+        private string _name;
+        public string id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("id"));
+            }
+        }
+        public string name
+        {
+            get { return _name; }
+            set
+            {
+                _name = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("name"));
+            }
+        }
+        private Window window { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
+        public BrandCat(Window w)
+        {
+            window = w;
+        }
+
+
     }
 
     public class record
