@@ -28,12 +28,6 @@ D:\acc program\unilever2\Memo\Memo\obj\Debug\Memo.csproj.CoreCompileInputs.cache
 D:\acc program\unilever2\Memo\Memo\obj\Debug\Memo.csproj.CopyComplete
 D:\acc program\unilever2\Memo\Memo\obj\Debug\Memo.exe
 D:\acc program\unilever2\Memo\Memo\obj\Debug\Memo.pdb
-G:\unilever2\Memo\Memo\obj\Debug\MainWindow.g.cs
-G:\unilever2\Memo\Memo\obj\Debug\App.g.cs
-G:\unilever2\Memo\Memo\obj\Debug\Memo_MarkupCompile.cache
-G:\unilever2\Memo\Memo\obj\Debug\Memo_MarkupCompile.lref
-G:\unilever2\Memo\Memo\obj\Debug\Memo.exe
-G:\unilever2\Memo\Memo\obj\Debug\Memo.pdb
 G:\unilever2\Memo\Memo\bin\Debug\Memo.exe.config
 G:\unilever2\Memo\Memo\bin\Debug\Memo.exe
 G:\unilever2\Memo\Memo\bin\Debug\Memo.pdb
@@ -51,14 +45,22 @@ G:\unilever2\Memo\Memo\bin\Debug\System.Buffers.xml
 G:\unilever2\Memo\Memo\bin\Debug\System.Memory.xml
 G:\unilever2\Memo\Memo\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
 G:\unilever2\Memo\Memo\bin\Debug\System.Threading.Tasks.Extensions.xml
+G:\unilever2\Memo\Memo\obj\Debug\InputDialogSample .g.cs
+G:\unilever2\Memo\Memo\obj\Debug\main.g.cs
+G:\unilever2\Memo\Memo\obj\Debug\MainWindow.g.cs
+G:\unilever2\Memo\Memo\obj\Debug\App.g.cs
+G:\unilever2\Memo\Memo\obj\Debug\GeneratedInternalTypeHelper.g.cs
+G:\unilever2\Memo\Memo\obj\Debug\Memo_MarkupCompile.cache
+G:\unilever2\Memo\Memo\obj\Debug\Memo_MarkupCompile.lref
+G:\unilever2\Memo\Memo\obj\Debug\App.baml
+G:\unilever2\Memo\Memo\obj\Debug\InputDialogSample .baml
+G:\unilever2\Memo\Memo\obj\Debug\main.baml
 G:\unilever2\Memo\Memo\obj\Debug\MainWindow.baml
 G:\unilever2\Memo\Memo\obj\Debug\Memo.g.resources
 G:\unilever2\Memo\Memo\obj\Debug\Memo.Properties.Resources.resources
 G:\unilever2\Memo\Memo\obj\Debug\Memo.csproj.GenerateResource.cache
 G:\unilever2\Memo\Memo\obj\Debug\Memo.csproj.CoreCompileInputs.cache
 G:\unilever2\Memo\Memo\obj\Debug\Memo.csproj.CopyComplete
-G:\unilever2\Memo\Memo\obj\Debug\main.g.cs
-G:\unilever2\Memo\Memo\obj\Debug\main.baml
-G:\unilever2\Memo\Memo\obj\Debug\App.baml
+G:\unilever2\Memo\Memo\obj\Debug\Memo.exe
+G:\unilever2\Memo\Memo\obj\Debug\Memo.pdb
 G:\unilever2\Memo\Memo\obj\Debug\Memo.csprojAssemblyReference.cache
-G:\unilever2\Memo\Memo\obj\Debug\GeneratedInternalTypeHelper.g.cs

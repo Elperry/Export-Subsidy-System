@@ -6,10 +6,16 @@
         xmlns:local="clr-namespace:test"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </Window.Resources>
     <Grid Background="White" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-        <StackPanel Orientation="Vertical">
-            <TextBox Text="{Binding MyString}"/>
+        
+        <StackPanel Name="stk" Orientation="Vertical">
+            <TextBox Text="{Binding MyString}" KeyDown="TextBox_KeyDown"/>
             <Button Content="Count my clicks" Click="Button_Click"/>
+            <CheckBox Visibility="{Binding Path=V , Converter={StaticResource BoolToVis}}" />
+            <Button Content="Toggle" Click="Button_Click_1" />
         </StackPanel>
     </Grid>
 

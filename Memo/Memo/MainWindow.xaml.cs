@@ -19,7 +19,7 @@ namespace Memo
     /// </summary>
     public partial class MainWindow : Window
     {
-        public object mainObj
+        public object usr
         {
             get { return Global.usr; }
             set { Global.usr = (User)value; }
@@ -28,14 +28,17 @@ namespace Memo
         public MainWindow()
         {
             InitializeComponent();
-            Global.windows = new List<Window>();
-            
-            mainObj = new User(this);
-            object usr = new User(this);
+            Global.windows = new List<Window>();  
+            usr = new User(this);
             template temp = new template();
-            temp.template1(this, ref usr, "Login",lst,null,500,450);
-            main m = new main();
-            m.Show();
+            temp.template1(this, usr, "Login",lst,null,500,450);
+            /* Here is seed up open*/
+            ((User)usr).email = "admin@admin";
+            ((User)usr).password = "123";
+            ((User)usr).lang = Global.langs[0];
+           ((User)usr).login(this,new RoutedEventArgs());
+            //main m = new main();
+            //m.Show();
         }
         
     }

@@ -81,7 +81,7 @@ public class Mysqldb
         {
             connString.host = "127.0.0.1";
             connString.port = "3306";
-            connString.database = "exportmemo";
+            connString.database = "uniexport";
             connString.charset = "utf8";
             connString.uid = "root";
             connString.password = "";
@@ -384,7 +384,7 @@ public class Mysqldb
         catch (Exception ex)
         {
             MessageBox.Show(ex.ToString());
-            throw;
+            return null;
         }
     }
 

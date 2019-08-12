@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -18,12 +18,71 @@ namespace test
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    /// 
+
+    public class FileNo : INotifyPropertyChanged
+    {
+        private string _id;
+        private string _name;
+        public event PropertyChangedEventHandler PropertyChanged;
+        public string id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("id"));
+            }
+        }
+        public string name
+        {
+            get { return _name; }
+            set
+            {
+                _name = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("name"));
+            }
+        }
+        public FileNo(string x)
+        {
+            id = x;
+            name = x;
+        }
+       
+        
+    }
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        private FileNo _f;
+        public FileNo f
+        {
+            get { return _f; }
+            set
+            {
+                _f = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("f"));
+            }
+        }
+        public ObservableCollection<FileNo> lst;
         public string S { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
         private int clicks;
         private string _myString;
+        private bool _V;
+        public bool V
+        {
+            get { return _V; }
+            set
+            {
+
+                this._V = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("V"));
+            }
+        }
         public string MyString
         {
             get
@@ -41,31 +100,20 @@ namespace test
         {
            InitializeComponent();
             this.DataContext = this;
-            /* Binding b = new Binding
-             { Source = this,
-               Path = new PropertyPath("S") ,
-               Mode = BindingMode.TwoWay,
-               UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-               
-            };
-            textBox.SetBinding(TextBox.TextProperty, b);
-            //ref string x = ref textBox.Text.ToString();
-            Binding x = new Binding
+            lst = new ObservableCollection<FileNo>()
             {
-                Path = new PropertyPath("s"),
-                Mode = BindingMode.TwoWay,
-                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                new FileNo("1"),
+                new FileNo("2"),
+                new FileNo("3"),
+                new FileNo("4")
             };
-            textBlock.SetBinding(TextBlock.TextProperty, x);
-            Binding n = new Binding
-            {
-                //Source = this,
-                ElementName = "textBox",
-                Path = new PropertyPath("Text"),
-                Mode = BindingMode.TwoWay,
-                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-            };
-            textBox1.SetBinding(TextBox.TextProperty, n);*/
+            ComboBox cmb = new ComboBox();
+            cmb.ItemsSource = lst;
+            Binding b = new Binding { Path = new PropertyPath("f"), Source = this, Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
+            cmb.SetBinding(ComboBox.SelectedItemProperty, b);
+            cmb.DisplayMemberPath=".name";
+            stk.Children.Add(cmb);
+
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -79,6 +127,19 @@ namespace test
         private void Button1_Click(object sender, RoutedEventArgs e)
         {
             //textBlock.Text = S;
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            V = !V;
+            Random r = new Random();
+            int num = r.Next(3);
+            f = lst[num];
+        }
+
+        private void TextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+
         }
     }
 }

@@ -11,10 +11,45 @@ using System.Windows.Media;
 using System.Data;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Text.RegularExpressions;
 using System.Reflection;
+using System.ComponentModel;
 
 namespace Memo
 {
+    public class Property
+    {
+        public string name { get; set; }
+        public string type { get; set; }
+        public string visiblityBind { get; set; }
+        public bool readOnly { get; set; }
+        public string action { get; set; }
+        public string displayPath { get; set; }
+        public Property(string _name , string _type = "auto" , string _visiblityBind = "" , bool _readOnly = false,string _action="" , string _displayPath="")
+        {
+            name = _name;
+            type = _type;
+            visiblityBind = _visiblityBind;
+            readOnly = _readOnly;
+            action = _action;
+            displayPath = _displayPath;
+        }
+    }
+    public class BoolToVis : IValueConverter
+    {
+
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            //...
+            return null;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            //...
+            return null;
+        }
+    }
     public struct dic
     {
         public string from, to1, to2;
@@ -46,7 +81,25 @@ namespace Memo
             new dic("priceBracket","شريحة السعر","Price Bracket"),
             new dic("balanceDate","تاريخ ","Date"),
             new dic("logo","الشعار","Logo"),
-            new dic("usr.City" , "المدينة" , "City")
+            new dic("usr.City" , "المدينة" , "City"),
+            new dic("nolon" , "نولون", "Nolon" ),
+            new dic("shippingcompany" , "شركة الشحن" , "Shipping Company"),
+            new dic("manifest" , "Manifesto", "Manifesto" ),
+            new dic("manifesto" , "Manifesto", "Manifesto" ),
+            new dic("usdval" , "السعر بالدولار", "Price (USD)" ),
+            new dic("egpval" , "السعر بالجنيه", "Price (EGP)" ),
+            new dic("port" , "الميناء", "Port" ),
+            new dic("ptregp" , "الدعم بالجنيه", "Support (EGP)" ),
+            new dic("brandcat" , "تصنيف", "Etinty" ),
+            new dic("brand" , "براند", "Brand" ),
+            new dic("invoices" , "الفواتير", "Invoices" ),
+            new dic("invoice" , "الفاتورة", "Invoice" ),
+            new dic("exportcertificate" , "شهادة الصادر", "Export Certificate" ),
+            new dic("dat" , "التاريخ", "Date" ),
+            new dic("submitdate" , "تاريخ التقديم", "Submit Date" ),
+            new dic("accrualdate" , "تاريخ الإستحقاق", "Accrual Date" ),
+            new dic("totalegp" , "إجمالى الدعم بالجنيه", "Total PTR()" ),
+
         };
         public static string trans(string str)
         {
@@ -54,14 +107,14 @@ namespace Memo
             {
                 if (lang == "EN")
                 {
-                    if (d.from == str)
+                    if (d.from == str.ToLower())
                     {
                         return d.to2;
                     }
                 }
                 else if (lang == "AR")
                 {
-                    if (d.from == str)
+                    if (d.from == str.ToLower())
                     {
                         return d.to1;
                     }
@@ -159,17 +212,15 @@ namespace Memo
             }
         }
     }
-    public class MenuItemViewModel
+    public class MenuItemViewModel 
     {
         private  ICommand _command;
-
         public MenuItemViewModel()
         {
             _command = new CommandViewModel(Execute);
         }
 
         public string Header { get; set; }
-
         public ObservableCollection<MenuItemViewModel> MenuItems { get; set; }
         
         public ICommand Command
@@ -250,6 +301,34 @@ namespace Memo
             }
             return l;
         }
+        public Label lbl(ref object obj,Property p)
+        {
+            Label l = new Label();
+            try
+            {
+
+                l.Content = translate.trans(p.name) + " :";
+                l.Background = transparent;
+                l.Foreground = fColor;
+                l.FontSize = 13;
+                l.FontWeight = fontWeight;
+                if (p.visiblityBind != "")
+                {
+                    Binding b2 = new Binding { Path = new PropertyPath(p.visiblityBind), Source = obj, Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
+                    l.SetBinding(Label.VisibilityProperty, b2);
+                }
+                if (translate.lang == "EN") { l.FlowDirection = FlowDirection.LeftToRight; l.HorizontalAlignment = HorizontalAlignment.Left; }
+                else { l.FlowDirection = FlowDirection.RightToLeft; l.HorizontalAlignment = HorizontalAlignment.Right; }
+
+                //l.Margin = new Thickness(5, 0, 5, 0);
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            return l;
+        }
         public TextBox txt(ref object obj,string name,int width)
         {
             TextBox t = new TextBox();
@@ -284,12 +363,67 @@ namespace Memo
 
             return t;
         }
-
-        private void T_TextChanged(object sender, TextChangedEventArgs e)
+        public TextBox txt(ref object obj, Property P, int width)
         {
-            MessageBox.Show("lol");
-        }
+            TextBox t = new TextBox();
+            try
+            {
+                t.DataContext = obj;
+                t.Background = bgColor2;
+                t.Foreground = fColor2;
+                t.BorderBrush = borderColor;
+                t.Width = width;
+                if (translate.lang == "EN")
+                {
+                    t.FlowDirection = FlowDirection.LeftToRight;
+                    t.HorizontalAlignment = HorizontalAlignment.Left;
+                }
+                else
+                {
+                    t.FlowDirection = FlowDirection.RightToLeft;
+                    t.HorizontalAlignment = HorizontalAlignment.Right;
+                }
 
+                t.Margin = new Thickness(5, 0, 5, 5);
+                Binding b = new Binding { Path = new PropertyPath(P.name), Source = obj, Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
+                t.IsReadOnly = P.readOnly;
+                t.IsEnabled = !P.readOnly;
+                if (P.readOnly)
+                {
+                    t.Background = gray;
+                }
+                t.SetBinding(TextBox.TextProperty, b);
+                if(P.visiblityBind != "")
+                {
+                    Binding b2 = new Binding { Path = new PropertyPath(P.visiblityBind), Source = obj, Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
+                    t.SetBinding(TextBox.VisibilityProperty, b2);
+                }
+                if(P.type == "num")
+                {
+                    t.PreviewTextInput += NumberTextBox;
+                }
+                if(P.action != "")
+                {
+                    KeyEventHandler e = (KeyEventHandler)Delegate.CreateDelegate(
+                typeof(KeyEventHandler), obj, obj.GetType().GetMethod(P.action));
+                    t.KeyDown += e;
+                    //t.CommandBindings.Add();
+                }
+                //t.TextChanged += T_TextChanged;
+                //MessageBox.Show("mainObj." + name);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+
+            return t;
+        }
+        private void NumberTextBox(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
         public ComboBox cmb(ref object obj,string name, int width)
         {
             ComboBox t = new ComboBox();
@@ -325,6 +459,57 @@ namespace Memo
 
             return t;
         }
+        public ComboBox cmb(ref object obj, Property p, int width)
+        {
+            ComboBox t = new ComboBox();
+            try
+            {
+                t.Background = bgColor2;
+                t.Foreground = fColor2;
+                t.BorderBrush = borderColor;
+                if (translate.lang == "EN")
+                {
+                    t.HorizontalAlignment = HorizontalAlignment.Left;
+                    t.FlowDirection = FlowDirection.LeftToRight;
+                }
+                else
+                {
+                    t.HorizontalAlignment = HorizontalAlignment.Right;
+                    t.FlowDirection = FlowDirection.RightToLeft;
+                }
+
+                t.DataContext = obj;
+                t.Width = width;
+                t.SetBinding(ComboBox.ItemsSourceProperty, p.name + "s");
+                Binding b = new Binding { Path = new PropertyPath(p.name), Source = obj, Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
+                t.SetBinding(ComboBox.SelectedItemProperty, b);
+                t.IsReadOnly = p.readOnly;
+                if (p.visiblityBind != "")
+                {
+                    Binding b2 = new Binding { Path = new PropertyPath(p.visiblityBind), Source = obj, Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
+                    t.SetBinding(ComboBox.VisibilityProperty, b2);
+                }
+                if(p.displayPath == "")
+                {
+                    t.DisplayMemberPath = ".name";
+                    t.SelectedValuePath = ".id";
+                }
+                else
+                {
+                    t.DisplayMemberPath = p.displayPath;
+                    //t.SelectedValuePath = ".id";
+                }
+                t.IsEditable = true;
+
+                t.Margin = new Thickness(5, 0, 5, 5);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+
+            return t;
+        }
         public Button btn ( string name , int width)
         {
             Button b = new Button();
@@ -341,6 +526,21 @@ namespace Memo
             CheckBox c = new CheckBox();
             c.DataContext = obj;
             c.SetBinding(CheckBox.IsCheckedProperty, name);
+            c.Margin = new Thickness(5);
+            return c;
+        }
+        public CheckBox chb(ref object obj, Property p)
+        {
+            CheckBox c = new CheckBox();
+            c.DataContext = obj;
+            c.SetBinding(CheckBox.IsCheckedProperty, p.name);
+            c.IsEnabled = !(p.readOnly);
+            if (p.visiblityBind != "")
+            {
+                Binding b2 = new Binding { Path = new PropertyPath(p.visiblityBind), Source = obj, Mode = BindingMode.TwoWay,Converter= new BooleanToVisibilityConverter() };
+                c.SetBinding(CheckBox.VisibilityProperty, b2);
+            }
+            //if (p.action)
             c.Margin = new Thickness(5);
             return c;
         }
@@ -364,7 +564,31 @@ namespace Memo
             l.View = gd;
             return l;
         }
+        public DatePicker datePicker(ref object obj, string name , int width)
+        {
+            DatePicker d = new DatePicker();
+            d.Width = width;
+            d.DataContext = obj;
+            Binding b = new Binding { Path = new PropertyPath(name), Source = obj, Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
+            d.SetBinding(DatePicker.TextProperty, b);
+           
+            return d;
+        }
+        public DatePicker datePicker(ref object obj, Property p, int width)
+        {
+            DatePicker d = new DatePicker();
+            d.Width = width;
+            d.DataContext = obj;
+            Binding b = new Binding { Path = new PropertyPath(p.name), Source = obj, Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
+            d.SetBinding(DatePicker.TextProperty, b);
+            if (p.visiblityBind != "")
+            {
+                Binding b2 = new Binding { Path = new PropertyPath(p.visiblityBind), Source = obj, Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
+                d.SetBinding(DatePicker.VisibilityProperty, b2);
+            }
 
+            return d;
+        }
         public StackPanel hStack(bool center= false)
         {
             StackPanel s = new StackPanel();
@@ -448,6 +672,13 @@ namespace Memo
             });
             l.ItemContainerStyle = style;
             l.ItemsSource = dt;
+            /*Binding b = new Binding
+            {
+                Path = new PropertyPath("Global.countries"),
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            };*/
+            //l.SetBinding(ListView.ItemsSourceProperty, b);
             s.Content = l;
 
             GridView grdV = new GridView(); // needed to be a func later
@@ -468,10 +699,19 @@ namespace Memo
                 {
                     foreach (var p in prop.GetType().GetProperties())
                     {
-                        if (p.Name.ToString() == "name" || p.Name.ToString() == "value")
+                        if(prop.PropertyType.Name == "ObservableCollection`1" || prop.Name == "exportCertificate")
+                        {
+                            grdvc.Header = translate.trans("");
+                            grdvc.DisplayMemberBinding = new Binding(prop.Name.ToString() + ".name");
+                            grdvc.Width = 0;
+                            
+                            continue;
+                        }
+
+                        if (p.Name.ToString().ToLower() == "name")
                         {
                             grdvc.Header = translate.trans(prop.Name.ToString());
-                            grdvc.DisplayMemberBinding = new Binding(prop.Name.ToString()+"."+p.Name.ToString());
+                            grdvc.DisplayMemberBinding = new Binding(prop.Name.ToString()+".name");
                             //MessageBox.Show(prop.Name.ToString());
                             break;
                         }
@@ -531,10 +771,10 @@ namespace Memo
         {
             Menu menu = new Menu();
             menu.Name = "ClassicMenu";
-            
             //menu.ItemsSource = m;
-            Binding b = new Binding(path: "MainMenuItems");
-            menu.SetBinding(Menu.ItemsSourceProperty, b);
+            //Binding b = new Binding { Path=new PropertyPath("MainMenuItems") , Mode = BindingMode.TwoWay };
+            //menu.SetBinding(Menu.ItemsSourceProperty, b);
+            menu.ItemsSource = m;
             menu.HorizontalAlignment = (translate.lang == "EN") ? HorizontalAlignment.Left : HorizontalAlignment.Right;
             menu.FlowDirection = (translate.lang == "EN") ? FlowDirection.LeftToRight : FlowDirection.RightToLeft;
             menu.HorizontalContentAlignment = (translate.lang == "EN") ? HorizontalAlignment.Left : HorizontalAlignment.Right;
@@ -592,11 +832,11 @@ namespace Memo
             // window name
             if(header == "")
             {
-                ((Window)form).Name = translate.trans(obj.GetType().Name);
+                ((Window)form).Title = translate.trans(obj.GetType().Name);
             }
             else
             {
-                ((Window)form).Name = translate.trans(header);
+                ((Window)form).Title = translate.trans(header);
             }
             //MessageBox.Show(translate.trans(form.GetType().Name));
             StackPanel S = new StackPanel();
@@ -709,6 +949,188 @@ namespace Memo
             ((Window)form).Content = stk;
 
         }
+        public void Moderntemplate(object form, ref object obj, string header = "",List<Property> inputs = null ,List<string> buttons = null, ObservableCollection<object> table = null, int width = 0, int height = 0, bool parent = true)
+        {
+            if (width == 0) { width = sizes.screenWidth; }
+            if (height == 0)
+            {
+                height = sizes.screenHeight;
+                ((Window)form).Top = 0;
+                ((Window)form).Left = 0;
+                if (!parent) { ((Window)form).Top = 50; }
+            }
+            else
+            {
+                ((Window)form).Top = Convert.ToInt32((sizes.screenHeight - height) / 2);
+                ((Window)form).Left = Convert.ToInt32((sizes.screenWidth - width) / 2);
+            }
+            sizes.appHeight = height;
+            sizes.appWidth = width;
+            ((Window)form).Width = width;
+            ((Window)form).Height = height;
+            ((Window)form).Background = bgColor;
+            ((Window)form).HorizontalAlignment = HorizontalAlignment.Center;
+            ((Window)form).WindowStyle = WindowStyle.None;
+            if (translate.lang == "EN") { ((Window)form).FlowDirection = FlowDirection.LeftToRight; }
+            else
+            {
+                ((Window)form).FlowDirection = FlowDirection.RightToLeft;
+            }
+            // window name
+            if (header == "")
+            {
+                ((Window)form).Title = translate.trans(obj.GetType().Name);
+            }
+            else
+            {
+                ((Window)form).Title = translate.trans(header);
+            }
+            //MessageBox.Show(translate.trans(form.GetType().Name));
+            StackPanel S = new StackPanel();
+            S.HorizontalAlignment = HorizontalAlignment.Center;
+            S.Margin = new Thickness(10);
+            if (header != "")
+            {
+                Label h = new Label();
+                h.Content = translate.trans(header);
+                h.FontSize = 24;
+                h.Foreground = fColor;
+                h.Background = transparent;
+                h.HorizontalAlignment = HorizontalAlignment.Center;
+                h.Margin = new Thickness(20);
+                S.Children.Add(h);
+            }
+            int n = sizes.getScreenSize(width);
+            int i = 0;
+            StackPanel hs = hStack();
+            foreach (var prop in obj.GetType().GetProperties())
+            {
+                if(inputs == null) { break; }
+                foreach (Property p in inputs)
+                {
+                    if(p.name == prop.Name)
+                    {
+                        StackPanel stp = vStack();
+                        stp.Width = sizes.fieldWidth(width);
+                        if (p.type == "auto")
+                        {
+                            if (prop.PropertyType.ToString() == "System.Int32" ||
+                               prop.PropertyType.ToString() == "System.Double" ||
+                               prop.PropertyType.ToString() == "System.String")
+                            {
+                                stp.Children.Add(lbl(translate.trans(prop.Name)));
+                                stp.Children.Add(txt(ref obj, prop.Name.ToString(), sizes.fieldWidth(width) - 10));
+                            }
+                            else if (prop.PropertyType.ToString() == "System.Boolean")
+                            {
+                                stp.Children.Add(lbl(translate.trans(prop.Name)));
+                                stp.Children.Add(chb(ref obj, prop.Name));
+                            }
+                            else
+                            {
+                                //MessageBox.Show(prop.Name + "       " + prop.PropertyType.ToString());
+                                stp.Children.Add(lbl(translate.trans(prop.Name)));
+                                stp.Children.Add(cmb(ref obj, prop.Name, sizes.fieldWidth(width) - 10));
+                            }
+                        }
+                        else if(p.type == "txt" || p.type == "num")
+                        {
+                            stp.Children.Add(lbl(ref obj , p));
+                            stp.Children.Add(txt(ref obj, p, sizes.fieldWidth(width) - 10));
+                        }
+                        else if(p.type == "bool")
+                        {
+                            stp.Children.Add(lbl(ref obj, p));
+                            stp.Children.Add(chb(ref obj, p));
+                        }
+                        else if(p.type == "cmb")
+                        {
+                            stp.Children.Add(lbl(ref obj, p));
+                            stp.Children.Add(cmb(ref obj, p, sizes.fieldWidth(width) - 10));
+                        }else if (p.type == "date")
+                        {
+                            stp.Children.Add(lbl(ref obj, p));
+                            stp.Children.Add(datePicker(ref obj, p, sizes.fieldWidth(width) - 10));
+                        }
+                        if(p.visiblityBind != "")
+                        {
+                            Binding b2 = new Binding { Path = new PropertyPath(p.visiblityBind), Source = obj, Mode = BindingMode.TwoWay, Converter = new BooleanToVisibilityConverter() };
+                            stp.SetBinding(CheckBox.VisibilityProperty, b2);
+                        }
+                        if (i == n)
+                        {
+                            S.Children.Add(hs);
+                            hs = hStack();
+                            hs.Children.Add(stp);
+                            i = 0;
+                        }
+                        else
+                        {
+                            hs.Children.Add(stp);
+                        }
+                        i++;
+
+                    }
+                }
+
+                
+                
+
+
+                //MessageBox.Show(prop.PropertyType.ToString());     
+            }
+            S.Children.Add(hs);
+            // generate buttons for methodes
+            i = 0;
+            hs = hStack();
+            foreach (var method in obj.GetType().GetMethods())
+            {
+                //MessageBox.Show(method.ToString());
+                if (buttons != null && !buttons.Contains(method.Name)) { continue; }
+                Button b = btn(translate.trans(method.Name), sizes.fieldWidth(width));
+                RoutedEventHandler e = (RoutedEventHandler)Delegate.CreateDelegate(
+                typeof(RoutedEventHandler), obj, method);
+                b.Click += e;
+                if (i == n)
+                {
+                    S.Children.Add(hs);
+                    hs = hStack();
+                    hs.Children.Add(b);
+                    i = 0;
+                }
+                else
+                {
+                    hs.Children.Add(b);
+                }
+                i++;
+                //;
+            }
+            S.Children.Add(hs);
+
+            Border border = brdr();
+            border.Child = S;
+
+            StackPanel stk = vStack();
+            stk.HorizontalAlignment = HorizontalAlignment.Stretch;
+            //stk.Children.Add(miniHeader());
+
+
+
+            if (table != null)
+            {
+                ScrollViewer Controls = scroller(true, 0, (height / 2) - 50);
+                Controls.Content = border;
+                stk.Children.Add(Controls);
+                stk.Children.Add(tableView(ref obj, ref table, (height / 2) + 40));
+            }
+            else
+            {
+                stk.Children.Add(border);
+            }
+          ((Window)form).Content = stk;
+
+        }
+
         public void template2(object form, ref object obj, string header = "", ObservableCollection<MenuItemViewModel> MenueHeader = null, List<string> lst = null, int width = 0, int height = 0,bool parent = true)
         {
             if (width == 0) { width = sizes.screenWidth; }
@@ -751,6 +1173,153 @@ namespace Memo
             ((Window)form).Content = dock;
 
         }
+        public void template1(object form, object obj, string header = "", List<string> memberLst = null, ObservableCollection<object> table = null, int width = 0, int height = 0, bool parent = true)
+        {
+            if (width == 0) { width = sizes.screenWidth; }
+            if (height == 0)
+            {
+                height = sizes.screenHeight;
+                ((Window)form).Top = 0;
+                ((Window)form).Left = 0;
+                if (!parent) { ((Window)form).Top = 50; }
+            }
+            else
+            {
+                ((Window)form).Top = Convert.ToInt32((sizes.screenHeight - height) / 2);
+                ((Window)form).Left = Convert.ToInt32((sizes.screenWidth - width) / 2);
+            }
+            sizes.appHeight = height;
+            sizes.appWidth = width;
+            ((Window)form).Width = width;
+            ((Window)form).Height = height;
+            ((Window)form).Background = bgColor;
+            ((Window)form).HorizontalAlignment = HorizontalAlignment.Center;
+            ((Window)form).WindowStyle = WindowStyle.None;
+            if (translate.lang == "EN") { ((Window)form).FlowDirection = FlowDirection.LeftToRight; }
+            else
+            {
+                ((Window)form).FlowDirection = FlowDirection.RightToLeft;
+            }
+            // window name
+            if (header == "")
+            {
+                ((Window)form).Title = translate.trans(obj.GetType().Name);
+            }
+            else
+            {
+                ((Window)form).Title = translate.trans(header);
+            }
+            //MessageBox.Show(translate.trans(form.GetType().Name));
+            StackPanel S = new StackPanel();
+            S.HorizontalAlignment = HorizontalAlignment.Center;
+            S.Margin = new Thickness(10);
+            if (header != "")
+            {
+                Label h = new Label();
+                h.Content = translate.trans(header);
+                h.FontSize = 24;
+                h.Foreground = fColor;
+                h.Background = transparent;
+                h.HorizontalAlignment = HorizontalAlignment.Center;
+                h.Margin = new Thickness(20);
+                S.Children.Add(h);
+            }
+            int n = sizes.getScreenSize(width);
+            int i = 0;
+            StackPanel hs = hStack();
+            foreach (var prop in obj.GetType().GetProperties())
+            {
+                if (memberLst != null && !memberLst.Contains(prop.Name)) { continue; }
+                StackPanel stp = new StackPanel();
+                if (translate.lang == "EN") { stp.FlowDirection = FlowDirection.LeftToRight; stp.HorizontalAlignment = HorizontalAlignment.Left; }
+                else
+                {
+                    stp.FlowDirection = FlowDirection.RightToLeft;
+                    stp.HorizontalAlignment = HorizontalAlignment.Right;
+                }
+                stp.Width = sizes.fieldWidth(width);
+                if (prop.PropertyType.ToString() == "System.Int32" ||
+                   prop.PropertyType.ToString() == "System.Double" ||
+                   prop.PropertyType.ToString() == "System.String")
+                {
+                    stp.Children.Add(lbl(translate.trans(prop.Name)));
+                    stp.Children.Add(txt(ref obj, prop.Name.ToString(), sizes.fieldWidth(width) - 10));
+                }
+                else if (prop.PropertyType.ToString() == "System.Boolean")
+                {
+                    stp.Children.Add(lbl(translate.trans(prop.Name)));
+                    stp.Children.Add(chb(ref obj, prop.Name));
+                }
+                else
+                {
+                    //MessageBox.Show(prop.Name + "       " + prop.PropertyType.ToString());
+                    stp.Children.Add(lbl(translate.trans(prop.Name)));
+                    stp.Children.Add(cmb(ref obj, prop.Name, sizes.fieldWidth(width) - 10));
+                }
+                if (i == n)
+                {
+                    S.Children.Add(hs);
+                    hs = hStack();
+                    hs.Children.Add(stp);
+                    i = 0;
+                }
+                else
+                {
+                    hs.Children.Add(stp);
+                }
+                i++;
+                //MessageBox.Show(prop.PropertyType.ToString());     
+            }
+            S.Children.Add(hs);
+            // generate buttons for methodes
+            i = 0;
+            hs = hStack();
+            foreach (var method in obj.GetType().GetMethods())
+            {
+                //MessageBox.Show(method.ToString());
+                if (memberLst != null && !memberLst.Contains(method.Name)) { continue; }
+                Button b = btn(translate.trans(method.Name), sizes.fieldWidth(width));
+                RoutedEventHandler e = (RoutedEventHandler)Delegate.CreateDelegate(
+                typeof(RoutedEventHandler), obj, method);
+                b.Click += e;
+                if (i == n)
+                {
+                    S.Children.Add(hs);
+                    hs = hStack();
+                    hs.Children.Add(b);
+                    i = 0;
+                }
+                else
+                {
+                    hs.Children.Add(b);
+                }
+                i++;
+                //;
+            }
+            S.Children.Add(hs);
 
+            Border border = brdr();
+            border.Child = S;
+
+            StackPanel stk = vStack();
+            stk.HorizontalAlignment = HorizontalAlignment.Stretch;
+            //stk.Children.Add(miniHeader());
+
+
+
+            if (table != null)
+            {
+                ScrollViewer Controls = scroller(true, 0, (height / 2) - 50);
+                Controls.Content = border;
+                stk.Children.Add(Controls);
+                stk.Children.Add(tableView(ref obj, ref table, (height / 2) + 40));
+            }
+            else
+            {
+                stk.Children.Add(border);
+            }
+    ((Window)form).Content = stk;
+
+        }
     }
 }
