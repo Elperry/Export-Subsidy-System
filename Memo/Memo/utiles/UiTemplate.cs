@@ -99,6 +99,26 @@ namespace Memo
             new dic("submitdate" , "تاريخ التقديم", "Submit Date" ),
             new dic("accrualdate" , "تاريخ الإستحقاق", "Accrual Date" ),
             new dic("totalegp" , "إجمالى الدعم بالجنيه", "Total PTR()" ),
+            new dic("client" , "العميل", "Client" ),
+            new dic("clients" , "العملاء", "Clients" ),
+            new dic("countries" , "الدول", "Countries" ),
+            new dic("admin" , "صلاحيات المدير", "Administrator Privileges" ),
+            new dic("password" , "كلمة المرور", "Password" ),
+            new dic("add" , "إضافة جديد", "Add New" ),
+            new dic("edit" , "تعديل", "Edit" ),
+            new dic("delete" , "حذف", "Delete" ),
+            new dic("del" , "حذف", "Delete" ),
+            new dic("close" , "إغلاق", "Close" ),
+            new dic("openinvoice" , "فتح الفواتيرفى هذه الشهادة", "Open Invoices in this Certificate" ),
+            new dic("openinvoicedata" , "البراندات فى هذه الفاتورة", "Open Brands in this Invoice" ),
+            new dic("fileno" , "رقم الملف", "File Number" ),
+            new dic("estiva" , "إستيفا", "Estiva" ),
+            new dic("Activateapp" , "تفعيل البرنامج", "Activate The App" ),
+            new dic("hwkey" , "الرقم المميز","Product Id" ),
+            new dic("serial" , "كود التفعيل", "License" ),
+            new dic("lang" , "اللغة", "Language" ),
+            new dic("boles" , "بوليصة الشحن", "Bill of lading" ),
+            new dic("bankreciete" , "إصال البنك", "bank receipt" ),
 
         };
         public static string trans(string str)
@@ -387,7 +407,7 @@ namespace Memo
                 t.Margin = new Thickness(5, 0, 5, 5);
                 Binding b = new Binding { Path = new PropertyPath(P.name), Source = obj, Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
                 t.IsReadOnly = P.readOnly;
-                t.IsEnabled = !P.readOnly;
+                //t.IsEnabled = !P.readOnly;
                 if (P.readOnly)
                 {
                     t.Background = gray;

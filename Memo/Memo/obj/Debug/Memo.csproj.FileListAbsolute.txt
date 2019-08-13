@@ -64,3 +64,7 @@ G:\unilever2\Memo\Memo\obj\Debug\Memo.csproj.CopyComplete
 G:\unilever2\Memo\Memo\obj\Debug\Memo.exe
 G:\unilever2\Memo\Memo\obj\Debug\Memo.pdb
 G:\unilever2\Memo\Memo\obj\Debug\Memo.csprojAssemblyReference.cache
+G:\unilever2\Memo\Memo\bin\Debug\Memo.exe.manifest
+G:\unilever2\Memo\Memo\bin\Debug\Memo.application
+G:\unilever2\Memo\Memo\obj\Debug\Memo.exe.manifest
+G:\unilever2\Memo\Memo\obj\Debug\Memo.application

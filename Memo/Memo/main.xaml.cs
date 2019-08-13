@@ -104,7 +104,7 @@ namespace Memo
             template t = new template();
             object W = new Window();
             object shippingCompany = new ShippingCompany((Window)W);
-
+            Global.shippingCompanys = ShippingCompany.getTable();
             t.template1(W, ref shippingCompany, translate.trans("ShippingCompanies"), new List<string>() { "name", "email", "phone", "fax","address","notes" ,"add", "edit", "del", "close" }, Global.shippingCompanys, 0, 0, false);
             Global.addWindow((Window)W);
             if (((ShippingCompany)Global.shippingCompanys[0]).id == string.Empty || ((ShippingCompany)Global.shippingCompanys[0]).id == "" || ((ShippingCompany)Global.shippingCompanys[0]).id == null)
@@ -126,7 +126,7 @@ namespace Memo
             template t = new template();
             object W = new Window();
             object company = new Company((Window)W);
-
+            Global.companys = Company.getTable();
             t.template1(W, ref company, translate.trans("Companies"), new List<string>() { "name", "email", "phone", "fax", "address", "notes", "add", "edit", "del", "close" }, Global.companys, 0, 0, false);
             Global.addWindow((Window)W);
             if(Global.companys == null)
@@ -152,13 +152,13 @@ namespace Memo
             template t = new template();
             object W = new Window();
             object client = new Client((Window)W);
-
-            t.template1(W, ref client, translate.trans("Clients"), new List<string>() { "name", "email", "fax", "phone", "country","address", "notes", "add", "edit", "del", "close" }, Global.clients, 0, 0, false);
-            Global.addWindow((Window)W);
             if(Global.clients == null)
             {
                 Global.clients = Client.getTable();
             }
+            t.template1(W, ref client, translate.trans("Clients"), new List<string>() { "name", "email", "fax", "phone", "country","address", "notes", "add", "edit", "del", "close" }, Global.clients, 0, 0, false);
+            Global.addWindow((Window)W);
+
             if (((Client)Global.clients[0]).id == string.Empty || ((Client)Global.clients[0]).id == "" || ((Client)Global.clients[0]).id == null)
             {
                 Global.clients.RemoveAt(0);
@@ -204,13 +204,13 @@ namespace Memo
             template t = new template();
             object W = new Window();
             object brandCat = new BrandCat((Window)W);
-
-            t.template1(W, ref brandCat, translate.trans("Brand Categories"), new List<string>() { "name", "add", "edit", "del", "close" }, Global.brandCats, 0, 0, false);
-            Global.addWindow((Window)W);
-            if(Global.brandCats == null)
+           if(Global.brandCats == null)
             {
                 Global.brandCats = BrandCat.getTable();
             }
+            t.template1(W, ref brandCat, translate.trans("Brand Categories"), new List<string>() { "name", "add", "edit", "del", "close" }, Global.brandCats, 0, 0, false);
+            Global.addWindow((Window)W);
+ 
             if (((BrandCat)Global.brandCats[0]).id == string.Empty || ((BrandCat)Global.brandCats[0]).id == "" || ((BrandCat)Global.brandCats[0]).id == null)
             {
                 Global.brandCats.RemoveAt(0);
@@ -230,13 +230,13 @@ namespace Memo
             template t = new template();
             object W = new Window();
             object brand = new Brand((Window)W);
-
-            t.template1(W, ref brand, translate.trans("Brands"), new List<string>() { "name","brandCat", "supportPercentage", "add", "edit", "del", "close" }, Global.brands, 0, 0, false);
-            Global.addWindow((Window)W);
             if(Global.brands == null)
             {
                 Global.brands = Brand.getTable();
             }
+            t.template1(W, ref brand, translate.trans("Brands"), new List<string>() { "name","brandCat", "supportPercentage", "add", "edit", "del", "close" }, Global.brands, 0, 0, false);
+            Global.addWindow((Window)W);
+
             if (((Brand)Global.brands[0]).id == string.Empty || ((Brand)Global.brands[0]).id == "" || ((Brand)Global.brands[0]).id == null)
             {
                 Global.brands.RemoveAt(0);

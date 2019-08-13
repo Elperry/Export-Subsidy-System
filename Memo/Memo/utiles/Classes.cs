@@ -2685,5 +2685,60 @@ namespace Memo
         }
     }
 
+    public class Activation : INotifyPropertyChanged
+    {
+        private string _hwKey;
+        private string _serial;
+        public event PropertyChangedEventHandler PropertyChanged;
+        private Window window { get; set; }
+        public string hwKey
+        {
+            get { return activation.getUniqId(); }
+            set
+            {
+                _hwKey = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("hwKey"));
+            }
+        }
+        public string serial
+        {
+            get { return _serial; }
+            set
+            {
+                _serial = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("serial"));
+            }
+        }
+
+        public Activation(Window W = null)
+        {
+            window = W;
+        }
+
+
+        public void ActivateApp(object sender, RoutedEventArgs e)
+        {
+            if (activation.Reg(serial))
+            {
+                MessageBox.Show("Activation Success");
+                MainWindow m = new MainWindow();
+                m.Show();
+                window.Close();
+            }
+            else
+            {
+                MessageBox.Show("Activation Faild");
+            }
+        }
+
+        public void close(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+
+    }
 
 }

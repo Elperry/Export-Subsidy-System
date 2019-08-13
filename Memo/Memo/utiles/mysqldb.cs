@@ -79,7 +79,7 @@ public class Mysqldb
     {
         try
         {
-            connString.host = "127.0.0.1";
+            connString.host = "127.0.0.1";//"197.56.194.225";
             connString.port = "3306";
             connString.database = "uniexport";
             connString.charset = "utf8";
