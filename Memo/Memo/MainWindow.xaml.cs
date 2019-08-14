@@ -42,7 +42,7 @@ namespace Memo
                 };
                 string header = "Hello , this App Created By \nEng: Mohammad Al-Berry \nEmail:Mohammedelpry@yahoo.com\nPhone:01147264224 ";
                 template t = new template();
-                t.Moderntemplate(w,ref A, header, P, new List<string>() { "ActivateApp", "close" }, null, 500, 450);
+                t.Moderntemplate(w,ref A, header, P, new List<string>() { "ActivateApp", "close" }, null,null ,500, 450);
                 w.Show();
                 this.Close();
                 // open Activation
@@ -52,10 +52,10 @@ namespace Memo
             template temp = new template();
             temp.template1(this, usr, "Login",lst,null,500,450);
             /* Here is seed up open*/
-            /*((User)usr).email = "admin@admin";
+            ((User)usr).email = "admin@admin";
             ((User)usr).password = "123";
             ((User)usr).lang = Global.langs[0];
-           ((User)usr).login(this,new RoutedEventArgs());*/
+           ((User)usr).login(this,new RoutedEventArgs());
             //main m = new main();
             //m.Show();
         }

@@ -68,3 +68,12 @@ G:\unilever2\Memo\Memo\bin\Debug\Memo.exe.manifest
 G:\unilever2\Memo\Memo\bin\Debug\Memo.application
 G:\unilever2\Memo\Memo\obj\Debug\Memo.exe.manifest
 G:\unilever2\Memo\Memo\obj\Debug\Memo.application
+G:\unilever2\Memo\Memo\bin\Debug\SqlServerTypes\x64\msvcr120.dll
+G:\unilever2\Memo\Memo\bin\Debug\SqlServerTypes\x64\SqlServerSpatial140.dll
+G:\unilever2\Memo\Memo\bin\Debug\SqlServerTypes\x86\msvcr120.dll
+G:\unilever2\Memo\Memo\bin\Debug\SqlServerTypes\x86\SqlServerSpatial140.dll
+G:\unilever2\Memo\Memo\bin\Debug\Microsoft.ReportViewer.Common.dll
+G:\unilever2\Memo\Memo\bin\Debug\Microsoft.ReportViewer.ProcessingObjectModel.DLL
+G:\unilever2\Memo\Memo\bin\Debug\Microsoft.ReportViewer.WebForms.DLL
+G:\unilever2\Memo\Memo\bin\Debug\Microsoft.SqlServer.Types.dll
+G:\unilever2\Memo\Memo\obj\Debug\Memo_Content.g.cs

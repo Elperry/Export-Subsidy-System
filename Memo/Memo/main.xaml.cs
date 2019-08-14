@@ -265,13 +265,10 @@ namespace Memo
                 new Property("shippingCompany","cmb"),
                 new Property("usdToEgp","txt"),
                 new Property("boles"),
-                new Property("bankReciete"),
-                new Property("nolon","bool","country.nolon"),
+                new Property("nolon","num","country.nolon"),
                 new Property("manifesto","bool","country.manifest"),
                 new Property("submitDate","date"),
                 new Property("accrualDate","date"),
-                new Property("usdVal","txt",_readOnly:true),
-                new Property("egpVal","txt",_readOnly:true),
                 new Property("PTREgp","txt",_readOnly:true),
                 new Property("ptr_nolon_man","txt",_readOnly:true),
                 new Property("totalEgp","txt",_readOnly:true),
@@ -305,7 +302,7 @@ namespace Memo
                 Global.shippingCompanys = ShippingCompany.getTable();
                 Global.ports = Port.getTable();
             }
-            t.Moderntemplate(W, ref exportCertificate, translate.trans(" Export Certificates"), P, new List<string>() { "add", "edit", "del", "openInvoice", "close" }, Global.exportCertificates, 0, 0, false);
+            t.Moderntemplate(W, ref exportCertificate, translate.trans(" Export Certificates"), P, new List<string>() { "add", "edit", "del", "openInvoice", "close" }, Global.exportCertificates,null, 0, 0, false);
             Global.addWindow((Window)W);
             ((Window)W).Show();
             //MessageBox.Show("++"+((ExportCertificate)Global.exportCertificates[0]).num+"++");
@@ -365,9 +362,15 @@ namespace Memo
             {
                 new Property("num","num"),
                 new Property("dat","date"),
-                new Property("exportCertificate","cmb"),
+                new Property("exportCertificate","cmb",_displayPath : "num"),
             };
-            t.Moderntemplate(W, ref fileNo, translate.trans("FileNo"), P,new List<string>() {"add", "edit", "del", "close" }, Global.fileNos, 0, 0, false);
+            List<TableCol> tbcs = new List<TableCol>()
+            {
+                new TableCol("num","num"),
+                new TableCol("dat","dat"),
+                new TableCol("exportCertificate","exportCertificate.num"),
+            };
+            t.Moderntemplate(W, ref fileNo, translate.trans("FileNo"), P,new List<string>() {"add", "edit", "del", "close" }, Global.fileNos, tbcs,0, 0, false);
             Global.addWindow((Window)W);
 
             if (((FileNo)Global.fileNos[0]).id == string.Empty || ((FileNo)Global.fileNos[0]).id == "" || ((FileNo)Global.fileNos[0]).id == null)

@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using System.ComponentModel;
+using System.Windows.Media.Imaging;
 
 namespace Memo
 {
@@ -33,6 +34,16 @@ namespace Memo
             readOnly = _readOnly;
             action = _action;
             displayPath = _displayPath;
+        }
+    }
+    public class TableCol
+    {
+        public string name { get; set; }
+        public string path { get; set; }
+        public TableCol(string _name = "name" , string _path = "path")
+        {
+            name = _name;
+            path = _path;
         }
     }
     public class BoolToVis : IValueConverter
@@ -117,8 +128,11 @@ namespace Memo
             new dic("hwkey" , "الرقم المميز","Product Id" ),
             new dic("serial" , "كود التفعيل", "License" ),
             new dic("lang" , "اللغة", "Language" ),
-            new dic("boles" , "بوليصة الشحن", "Bill of lading" ),
+            new dic("boles" , "بوليصة الشحن", "Shipping Policy" ),
             new dic("bankreciete" , "إصال البنك", "bank receipt" ),
+            new dic("ptrnolon_man" , "النولون + المانيفستو", "Nolon + Manifesto" ),
+            new dic("ptr_nolon_man" , "النولون + المانيفستو", "Nolon + Manifesto" ),
+
 
         };
         public static string trans(string str)
@@ -744,6 +758,64 @@ namespace Memo
             
             return stp;
         }
+        public StackPanel tableView(ref object obj, ref ObservableCollection<object> dt,List<TableCol> lst, int startPos)
+        {
+            StackPanel stp = vStack(true);
+            if (dt.Count == 0)
+            {
+                Label h = new Label();
+                h.Content = translate.trans("There Is no Records !!");
+                h.FontSize = 24;
+                h.Foreground = fColor;
+                h.Background = transparent;
+                h.HorizontalAlignment = HorizontalAlignment.Center;
+                h.Margin = new Thickness(20);
+                stp.Children.Add(h);
+                return stp;
+            }
+
+            ScrollViewer s = scroller();
+            //stp.Children.Add(s);
+            s.Height = sizes.appHeight - startPos - 30;
+            stp.Children.Add(s);
+            // try1
+            ListView l = new ListView(); // need to be a fun
+            Style style = new Style(typeof(ListViewItem));
+            style.Setters.Add(new Setter(ListViewItem.HorizontalContentAlignmentProperty, HorizontalAlignment.Stretch));
+            style.Setters.Add(new EventSetter
+            {
+                Event = ListViewItem.PreviewMouseLeftButtonDownEvent,
+                Handler = (MouseButtonEventHandler)Delegate.CreateDelegate(
+                typeof(MouseButtonEventHandler), obj, obj.GetType().GetMethod("selectItem"))
+            });
+            l.ItemContainerStyle = style;
+            l.ItemsSource = dt;
+            s.Content = l;
+
+            GridView grdV = new GridView(); // needed to be a func later
+            foreach (var prop in dt[0].GetType().GetProperties())
+            {
+                GridViewColumn grdvc = new GridViewColumn();
+                TableCol tb = lst.Find(x => x.name == prop.Name);
+                if (tb == null)
+                {
+                    grdvc.Header = translate.trans("");
+                    grdvc.Width = 0;
+                    continue;
+                }
+                else
+                {
+                    grdvc.Header = translate.trans(tb.name);
+                    grdvc.DisplayMemberBinding = new Binding(tb.path);
+                }
+                
+
+                grdV.Columns.Add(grdvc);
+            }
+            l.View = grdV;
+
+            return stp;
+        }
         public Button headerBtn(string content, string action)
         {
             Button btn = new Button();
@@ -863,14 +935,33 @@ namespace Memo
             S.HorizontalAlignment = HorizontalAlignment.Center;
             S.Margin = new Thickness(10);
             if (header != "") {
+                Grid grd = new Grid();
                 Label h = new Label();
                 h.Content = translate.trans(header);
+                BitmapImage bImg = new BitmapImage(new Uri("pack://application:,,,/Icons/logo.png"));
+                //bImg.UriSource = new Uri("", UriKind.Relative);
+                Image logo = new Image
+                {
+                    Source = bImg
+                };
+
+                logo.Width = 50; logo.Height = 50;
+                if (translate.lang == "EN")
+                {
+                    logo.HorizontalAlignment = HorizontalAlignment.Left;
+                }
+                else
+                {
+                    logo.HorizontalAlignment = HorizontalAlignment.Right;
+                }
                 h.FontSize = 24;
                 h.Foreground = fColor;
                 h.Background = transparent;
                 h.HorizontalAlignment = HorizontalAlignment.Center;
                 h.Margin = new Thickness(20);
-                S.Children.Add(h);
+                grd.Children.Add(logo);
+                grd.Children.Add(h);
+                S.Children.Add(grd);
             }
             int n = sizes.getScreenSize(width);
             int i = 0;
@@ -969,7 +1060,7 @@ namespace Memo
             ((Window)form).Content = stk;
 
         }
-        public void Moderntemplate(object form, ref object obj, string header = "",List<Property> inputs = null ,List<string> buttons = null, ObservableCollection<object> table = null, int width = 0, int height = 0, bool parent = true)
+        public void Moderntemplate(object form, ref object obj, string header = "",List<Property> inputs = null ,List<string> buttons = null, ObservableCollection<object> table = null,List<TableCol> tableCols = null, int width = 0, int height = 0, bool parent = true)
         {
             if (width == 0) { width = sizes.screenWidth; }
             if (height == 0)
@@ -1011,14 +1102,34 @@ namespace Memo
             S.Margin = new Thickness(10);
             if (header != "")
             {
+                Grid grd = new Grid();
                 Label h = new Label();
                 h.Content = translate.trans(header);
+                BitmapImage bImg = new BitmapImage(new Uri("pack://application:,,,/Icons/logo.png"));
+                //bImg.UriSource = new Uri("", UriKind.Relative);
+                Image logo = new Image
+                {
+                    Source = bImg
+                };
+                
+                logo.Width = 50;logo.Height = 50;
+                if(translate.lang == "EN")
+                {
+                    logo.HorizontalAlignment = HorizontalAlignment.Left;
+                }
+                else
+                {
+                    logo.HorizontalAlignment = HorizontalAlignment.Right;
+                }
                 h.FontSize = 24;
                 h.Foreground = fColor;
                 h.Background = transparent;
                 h.HorizontalAlignment = HorizontalAlignment.Center;
                 h.Margin = new Thickness(20);
-                S.Children.Add(h);
+                grd.Children.Add(logo);
+                grd.Children.Add(h);
+                S.Children.Add(grd);
+                
             }
             int n = sizes.getScreenSize(width);
             int i = 0;
@@ -1134,14 +1245,20 @@ namespace Memo
             stk.HorizontalAlignment = HorizontalAlignment.Stretch;
             //stk.Children.Add(miniHeader());
 
-
-
             if (table != null)
             {
                 ScrollViewer Controls = scroller(true, 0, (height / 2) - 50);
                 Controls.Content = border;
                 stk.Children.Add(Controls);
-                stk.Children.Add(tableView(ref obj, ref table, (height / 2) + 40));
+                if(tableCols == null)
+                {
+                    stk.Children.Add(tableView(ref obj, ref table, (height / 2) + 40));
+                }
+                else
+                {
+                    stk.Children.Add(tableView(ref obj, ref table, tableCols, (height / 2) + 40));
+                }
+                
             }
             else
             {
@@ -1235,14 +1352,33 @@ namespace Memo
             S.Margin = new Thickness(10);
             if (header != "")
             {
+                Grid grd = new Grid();
                 Label h = new Label();
                 h.Content = translate.trans(header);
+                BitmapImage bImg = new BitmapImage(new Uri("pack://application:,,,/Icons/logo.png"));
+                //bImg.UriSource = new Uri("", UriKind.Relative);
+                Image logo = new Image
+                {
+                    Source = bImg
+                };
+
+                logo.Width = 50; logo.Height = 50;
+                if (translate.lang == "EN")
+                {
+                    logo.HorizontalAlignment = HorizontalAlignment.Left;
+                }
+                else
+                {
+                    logo.HorizontalAlignment = HorizontalAlignment.Right;
+                }
                 h.FontSize = 24;
                 h.Foreground = fColor;
                 h.Background = transparent;
                 h.HorizontalAlignment = HorizontalAlignment.Center;
                 h.Margin = new Thickness(20);
-                S.Children.Add(h);
+                grd.Children.Add(logo);
+                grd.Children.Add(h);
+                S.Children.Add(grd);
             }
             int n = sizes.getScreenSize(width);
             int i = 0;

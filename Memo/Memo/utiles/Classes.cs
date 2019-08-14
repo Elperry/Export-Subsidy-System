@@ -1554,14 +1554,9 @@ namespace Memo
         private ShippingCompany _shippingCompany;
         private string _ptr_nolon_man = "0";
         private bool _boles;
-        private bool _bankReciete;
-        private bool _nolon;
+        private string _nolon;
         private bool _manifesto;
-        private bool _estifa;
-        
         private string _usdToEgp;
-        private string _usdVal = "0";
-        private string _egpVal = "0";
         private string _PTREgp = "0";
         private string _totalEgp = "0";
         private string _submitDate;
@@ -1678,17 +1673,8 @@ namespace Memo
                     this.PropertyChanged(this, new PropertyChangedEventArgs("boles"));
             }
         }
-        public bool bankReciete
-        {
-            get { return _bankReciete; }
-            set
-            {
-                _bankReciete = value;
-                if (this.PropertyChanged != null)
-                    this.PropertyChanged(this, new PropertyChangedEventArgs("bankReciete"));
-            }
-        }
-        public bool nolon
+
+        public string nolon
         {
             get { return _nolon; }
             set
@@ -1708,16 +1694,6 @@ namespace Memo
                     this.PropertyChanged(this, new PropertyChangedEventArgs("manifesto"));
             }
         }
-        public bool estifa
-        {
-            get { return _estifa; }
-            set
-            {
-                _estifa = value;
-                if (this.PropertyChanged != null)
-                    this.PropertyChanged(this, new PropertyChangedEventArgs("estifa"));
-            }
-        }
         public string usdToEgp
         {
             get { return _usdToEgp; }
@@ -1726,26 +1702,6 @@ namespace Memo
                 _usdToEgp = value;
                 if (this.PropertyChanged != null)
                     this.PropertyChanged(this, new PropertyChangedEventArgs("usdToEgp"));
-            }
-        }
-        public string usdVal
-        {
-            get { return _usdVal; }
-            set
-            {
-                _usdVal = value;
-                if (this.PropertyChanged != null)
-                    this.PropertyChanged(this, new PropertyChangedEventArgs("usdVal"));
-            }
-        }
-        public string egpVal
-        {
-            get { return _egpVal; }
-            set
-            {
-                _egpVal = value;
-                if (this.PropertyChanged != null)
-                    this.PropertyChanged(this, new PropertyChangedEventArgs("egpVal"));
             }
         }
         public string PTREgp
@@ -1818,8 +1774,6 @@ namespace Memo
             this.shippingCompany = new ShippingCompany(r["shippingCompany"].ToString());
             //this.ptr_nolon_man = r["ptr_nolon_man"].ToString();
             this.boles = Convert.ToBoolean(r["boles"]);
-            this.bankReciete = Convert.ToBoolean(r["bankReciete"]);
-            this.estifa = Convert.ToBoolean(r["estifa"]);
             this.usdToEgp = r["usdToEgp"].ToString();
             //this.usdVal = r["usdVal"].ToString();
             //this.egpVal = r["egpVal"].ToString();
@@ -1843,11 +1797,8 @@ namespace Memo
             this.shippingCompany = new ShippingCompany(r["shippingCompany"].ToString());
             this.ptr_nolon_man = r["ptr_nolon_man"].ToString();
             this.boles = Convert.ToBoolean(r["boles"]);
-            this.bankReciete = Convert.ToBoolean(r["bankReciete"]);
-            this.estifa = Convert.ToBoolean(r["estifa"]);
+
             this.usdToEgp = r["usdToEgp"].ToString();
-            this.usdVal = r["usdVal"].ToString();
-            this.egpVal = r["egpVal"].ToString();
             this.PTREgp = r["PTREgp"].ToString();
             this.totalEgp = r["totalEgp"].ToString();
             this.submitDate = r["submitDate"].ToString();
@@ -1865,11 +1816,9 @@ namespace Memo
             temp.shippingCompany = this._shippingCompany.clone();
             temp.ptr_nolon_man = this._ptr_nolon_man;
             temp.boles = this._boles;
-            temp.bankReciete = this._bankReciete;
-            temp.estifa = this._estifa;
+
             temp.usdToEgp = this._usdToEgp;
-            temp.usdVal = this._usdVal;
-            temp.egpVal = this._egpVal;
+
             temp.PTREgp = this._PTREgp;
             temp.totalEgp = this._totalEgp;
             temp.submitDate = this._submitDate;
@@ -1886,26 +1835,23 @@ namespace Memo
             this.port = (Port)Global.ports.Where(x=>((Port)x).name == ((ExportCertificate)((ListViewItem)sender).Content).port.name).First();
             this.shippingCompany = (ShippingCompany)Global.shippingCompanys.Where(x=>((ShippingCompany)x).name == ((ExportCertificate)((ListViewItem)sender).Content).shippingCompany.name).First();
             this.boles = ((ExportCertificate)((ListViewItem)sender).Content).boles;
-            this.bankReciete = ((ExportCertificate)((ListViewItem)sender).Content).bankReciete;
             this.nolon = ((ExportCertificate)((ListViewItem)sender).Content).nolon;
             this.manifesto = ((ExportCertificate)((ListViewItem)sender).Content).manifesto;
-            this.estifa = ((ExportCertificate)((ListViewItem)sender).Content).estifa;
+            //this.estifa = ((ExportCertificate)((ListViewItem)sender).Content).estifa;
             this.usdToEgp = ((ExportCertificate)((ListViewItem)sender).Content).usdToEgp;          
             this.submitDate = ((ExportCertificate)((ListViewItem)sender).Content).submitDate;
             this.accrualDate = ((ExportCertificate)((ListViewItem)sender).Content).accrualDate;
             this._rowSelected = true;
             // needs Edits
             this.ptr_nolon_man = ((ExportCertificate)((ListViewItem)sender).Content).ptr_nolon_man;
-            this.usdVal = ((ExportCertificate)((ListViewItem)sender).Content).usdVal;
-            this.egpVal = ((ExportCertificate)((ListViewItem)sender).Content).egpVal;
             this.PTREgp = ((ExportCertificate)((ListViewItem)sender).Content).PTREgp;
             this.totalEgp = ((ExportCertificate)((ListViewItem)sender).Content).totalEgp;
         }
         public void add(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `exportcertificate` (`num`,`company`,`dat`,`country`,`port`,`shippingCompany`,`boles`,`bankReciete`,`nolon`,`manifesto`,`usdToEgp`,`submitDate`,`accrualDate`) VALUES " +
-                "('" + num + "','" + Global.company.id + "'," + Global.dateFormate(dat) + ",'" + country.id + "','" + port.id + "','" + shippingCompany.id + "','" + ((boles) ? "1" : "0") + "','" + ((bankReciete) ? "1" : "0") + "','" + ((nolon) ? "1" : "0") + "','" + ((manifesto) ? "1" : "0") + "','" + usdToEgp + "'," + Global.dateFormate(submitDate) + "," + Global.dateFormate(accrualDate) + ");";
+            string q = "INSERT INTO `exportcertificate` (`num`,`company`,`dat`,`country`,`port`,`shippingCompany`,`boles`,`nolon`,`manifesto`,`usdToEgp`,`submitDate`,`accrualDate`) VALUES " +
+                "('" + num + "','" + Global.company.id + "'," + Global.dateFormate(dat) + ",'" + country.id + "','" + port.id + "','" + shippingCompany.id + "','" + ((boles) ? "1" : "0") + "','" + nolon + "','" + ((manifesto) ? "1" : "0") + "','" + usdToEgp + "'," + Global.dateFormate(submitDate) + "," + Global.dateFormate(accrualDate) + ");";
             sql.Select(q);
             num = (sql.nextAutoIncrement("exportcertificate") - 1).ToString();
             Global.exportCertificates.Add(clone()); clear();
@@ -1913,7 +1859,7 @@ namespace Memo
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `exportcertificate` SET `num` = '" + num + "' ,`company` = '" + Global.company.id + "' ,`dat` = " + Global.dateFormate(dat) + " ,`country` = '" + country.id + "' ,`port` = '" + port.id + "' ,`shippingCompany` = '" + shippingCompany.id + "' ,`boles` = '" + ((boles) ? "1" : "0") + "' ,`bankReciete` = '" + ((bankReciete) ? "1" : "0") + "' ,`nolon` = '" + ((nolon) ? "1" : "0") + "' ,`manifesto` = '" + ((manifesto) ? "1" : "0") + "'  ,`usdToEgp` = '" + usdToEgp + "' ,`submitDate` = " + Global.dateFormate(submitDate) + " ,`accrualDate` = " + Global.dateFormate(accrualDate) + " WHERE `ExportCertificate`.`id` = "+id+";";
+            string q = "UPDATE `exportcertificate` SET `num` = '" + num + "' ,`company` = '" + Global.company.id + "' ,`dat` = " + Global.dateFormate(dat) + " ,`country` = '" + country.id + "' ,`port` = '" + port.id + "' ,`shippingCompany` = '" + shippingCompany.id + "' ,`boles` = '" + ((boles) ? "1" : "0") + "' ,`nolon` = '" + ((nolon)) + "' ,`manifesto` = '" + ((manifesto) ? "1" : "0") + "'  ,`usdToEgp` = '" + usdToEgp + "' ,`submitDate` = " + Global.dateFormate(submitDate) + " ,`accrualDate` = " + Global.dateFormate(accrualDate) + " WHERE `ExportCertificate`.`id` = "+id+";";
             sql.Select(q);
             foreach (ExportCertificate c in Global.exportCertificates)
             {
@@ -1990,11 +1936,8 @@ namespace Memo
             _shippingCompany = null;
             _ptr_nolon_man = null;
             _boles = false;
-            _bankReciete = false;
-            _estifa = false;
             _usdToEgp = null;
-            _usdVal = null;
-            _egpVal = null;
+
             _PTREgp = null;
             _totalEgp = null;
             _submitDate = null;
@@ -2006,7 +1949,7 @@ namespace Memo
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `exportcertificate` where `company`= "+Global.company.id; DataTable dt = sql.Select(q);
+            string q = "SELECT * FROM `exptable` WHERE company = " + Global.company.id; DataTable dt = sql.Select(q);
             if (dt.Rows.Count == 0)
             {
                 ExportCertificate tmp = new ExportCertificate(); c.Add(tmp); return c;
@@ -2021,15 +1964,14 @@ namespace Memo
                 temp.country = new Country(r["country"].ToString());
                 temp.port = new Port(r["port"].ToString());
                 temp.shippingCompany = new ShippingCompany(r["shippingCompany"].ToString());
-                //temp.ptr_nolon_man = r["ptr_nolon_man"].ToString();
+                temp.ptr_nolon_man = r["nolon_Man"].ToString();
                 temp.boles = Convert.ToBoolean(r["boles"].ToString());
-                temp.bankReciete = Convert.ToBoolean(r["bankReciete"].ToString());
-                temp.estifa = Convert.ToBoolean(r["estifa"].ToString());
+                temp.nolon = (r["nolon"].ToString());
                 temp.usdToEgp = r["usdToEgp"].ToString();
                 //temp.usdVal = r["usdVal"].ToString();
                 //temp.egpVal = r["egpVal"].ToString();
-                //temp.PTREgp = r["PTREgp"].ToString();
-                //temp.totalEgp = r["totalEgp"].ToString();
+                temp.PTREgp = r["PTREgp"].ToString();
+                temp.totalEgp = (Convert.ToDouble(temp.PTREgp) + Convert.ToDouble(temp.ptr_nolon_man)).ToString();
                 temp.submitDate = r["submitDate"].ToString();
                 temp.accrualDate = r["accrualDate"].ToString();
                 c.Add(temp);
@@ -2046,6 +1988,7 @@ namespace Memo
         private ExportCertificate _exportCertificate;
         private string _performa;
         private string _systemRef;
+        private bool _bankReciete;
         public event PropertyChangedEventHandler PropertyChanged;
         private Window window { get; set; }
         public string num
@@ -2118,6 +2061,16 @@ namespace Memo
                     this.PropertyChanged(this, new PropertyChangedEventArgs("systemRef"));
             }
         }
+        public bool bankReciete
+        {
+            get { return _bankReciete; }
+            set
+            {
+                _bankReciete = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("bankReciete"));
+            }
+        }
         public Invoice(ExportCertificate ex ,Window W = null)
         {
             window = W;
@@ -2134,7 +2087,8 @@ namespace Memo
             this.exportCertificate = new ExportCertificate(r["exportCertificate"].ToString());
             this.performa = r["performa"].ToString();
             this.systemRef = r["systemRef"].ToString();
-            
+            this.bankReciete = Convert.ToBoolean(r["bankReciete"].ToString());
+
         }
         public void complete(string ID)
         {
@@ -2146,6 +2100,7 @@ namespace Memo
             this.exportCertificate = new ExportCertificate(r["exportCertificate"].ToString());
             this.performa = r["performa"].ToString();
             this.systemRef = r["systemRef"].ToString();
+            this.bankReciete = Convert.ToBoolean(r["bankReciete"].ToString());
         }
         public Invoice clone()
         {
@@ -2156,6 +2111,7 @@ namespace Memo
             temp.client = this.client.clone();
             temp.performa = this._performa;
             temp.systemRef = this._systemRef;
+            temp.bankReciete = this.bankReciete;
             return temp;
         }
         public void selectItem(object sender, MouseButtonEventArgs e)
@@ -2166,12 +2122,13 @@ namespace Memo
             this.exportCertificate = ((Invoice)((ListViewItem)sender).Content).exportCertificate;
             this.performa = ((Invoice)((ListViewItem)sender).Content).performa;
             this.systemRef = ((Invoice)((ListViewItem)sender).Content).systemRef;
+            this.bankReciete = ((Invoice)((ListViewItem)sender).Content).bankReciete;
             _rowSelected = true;
         }
         public void add(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `invoice` (`num`,`client`,`exportCertificate`,`performa`,`systemRef`) VALUES ( '" + num+ "','" + client.id + "','" + exportCertificate.num + "','" + performa + "','" + systemRef + "');";
+            string q = "INSERT INTO `invoice` (`num`,`client`,`exportCertificate`,`performa`,`systemRef`,`bankReciete`) VALUES ( '" + num+ "','" + client.id + "','" + exportCertificate.num + "','" + performa + "','" + systemRef + "','" + ((bankReciete)?"1":"0") + "');";
             sql.Select(q);
             id = (sql.nextAutoIncrement("invoice") - 1).ToString();
             Global.invoices.Add(clone()); clear();
@@ -2179,7 +2136,7 @@ namespace Memo
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `invoice` SET `num` = '" + num + "' ,`client` = '"+client.id+"' ,`exportCertificate` = '" + exportCertificate.id + "' ,`performa` = '" + performa + "' ,`systemRef` = '" + systemRef + "' WHERE `Invoice`.`id` = "+id+" ;";
+            string q = "UPDATE `invoice` SET `num` = '" + num + "' ,`client` = '"+client.id+"' ,`exportCertificate` = '" + exportCertificate.id + "' ,`performa` = '" + performa + "' ,`systemRef` = '" + systemRef + "' ,`bankReciete` = '" + ((bankReciete) ? "1" : "0") + "' WHERE `Invoice`.`id` = " + id+" ;";
             sql.Select(q);
             foreach (Invoice c in Global.invoices)
             {
@@ -2215,6 +2172,7 @@ namespace Memo
             _performa = null;
             _systemRef = null;
             _rowSelected = false;
+            _bankReciete = false;
         }
         public void openInvoiceData(object sender, RoutedEventArgs e)
         {
@@ -2254,7 +2212,8 @@ namespace Memo
                 Global.brandCats = BrandCat.getTable();
                 Global.brands = Brand.getTable();
             }
-            t.Moderntemplate(W, ref invoiceData, translate.trans("InvoicesData"), p,new List<string>() { "add", "edit", "del", "openInvoice", "close" }, Global.invoiceDatas, 0, 0, false);
+
+            t.Moderntemplate(W, ref invoiceData, translate.trans("InvoicesData"), p,new List<string>() { "add", "edit", "del", "openInvoice", "close" }, Global.invoiceDatas,null, 0, 0, false);
             Global.addWindow((Window)W);
 
             if (((InvoiceData)Global.invoiceDatas[0]).id == string.Empty || ((InvoiceData)Global.invoiceDatas[0]).id == "" || ((InvoiceData)Global.invoiceDatas[0]).id == null)
@@ -2281,6 +2240,7 @@ namespace Memo
                 temp.client = new Client(r["client"].ToString());
                 temp.performa = r["performa"].ToString();
                 temp.systemRef = r["systemRef"].ToString();
+                temp.bankReciete = Convert.ToBoolean(r["bankReciete"].ToString());
                 c.Add(temp);
             }
             return c;
@@ -2519,9 +2479,10 @@ namespace Memo
                 temp.id = r["id"].ToString();
                 temp.invoice = new Invoice(r["invoice"].ToString());
                 temp.brand = new Brand(r["brand"].ToString());
+                temp.brandCat = temp.brand.brandCat;
                 temp.usdVal = r["usdVal"].ToString();
-                temp.egpVal = r["egpVal"].ToString();
-                temp.PTREgp = r["PTREgp"].ToString();
+                temp.egpVal = (Convert.ToDouble(r["usdVal"].ToString())*Convert.ToDouble(temp.invoice.exportCertificate.usdToEgp)).ToString();//r["egpVal"].ToString();
+                temp.PTREgp = (Convert.ToDouble(r["usdVal"].ToString()) * Convert.ToDouble(temp.invoice.exportCertificate.usdToEgp) * Convert.ToDouble(temp.brand.supportPercentage)).ToString();
                 c.Add(temp);
             }
             return c;
@@ -2575,6 +2536,17 @@ namespace Memo
                     this.PropertyChanged(this, new PropertyChangedEventArgs("exportCertificate"));
             }
         }
+        public ObservableCollection<object> exportCertificates
+        {
+            get { return Global.exportCertificates; }
+            set
+            {
+                Global.exportCertificates = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("exportCertificate"));
+            }
+        }
+
         public FileNo(Window W = null)
         {
             window = W;
@@ -2616,12 +2588,12 @@ namespace Memo
             this.id = ((FileNo)((ListViewItem)sender).Content).id;
             this.num = ((FileNo)((ListViewItem)sender).Content).num;
             this.dat = ((FileNo)((ListViewItem)sender).Content).dat;
-            this.exportCertificate = (ExportCertificate)Global.exportCertificates.Where(x => ((ExportCertificate)x).num == ((FileNo)((ListViewItem)sender).Content).num).First();
+            this.exportCertificate = (ExportCertificate)Global.exportCertificates.Where(x => ((ExportCertificate)x).num == ((FileNo)((ListViewItem)sender).Content).exportCertificate.num).First();
         }
         public void add(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `fileno` (`id`,`num`,`dat`,`exportCertificate`) VALUES ( NULL ,'" + num + "','" + Global.dateFormate(dat) + "','" + exportCertificate.id + "');";
+            string q = "INSERT INTO `fileno` (`id`,`num`,`dat`,`exportCertificate`) VALUES ( NULL ,'" + num + "'," + Global.dateFormate(dat) + ",'" + exportCertificate.id + "');";
             sql.Select(q);
             id = (sql.nextAutoIncrement("fileno") - 1).ToString();
             Global.fileNos.Add(clone()); clear();
@@ -2629,7 +2601,7 @@ namespace Memo
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `fileno` SET `num` = '" + num + "' ,`dat` = '" + dat + "',`exportCertificate` = '" + exportCertificate.id + "'  WHERE `FileNo`.`id` = id;";
+            string q = "UPDATE `fileno` SET `num` = '" + num + "' ,`dat` = " + Global.dateFormate(dat) + ",`exportCertificate` = '" + exportCertificate.id + "'  WHERE `FileNo`.`id` = "+id+" ;";
             sql.Select(q);
             foreach (FileNo c in Global.fileNos)
             {
