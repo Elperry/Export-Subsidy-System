@@ -1909,9 +1909,9 @@ namespace Memo
             template t = new template();
             object W = new Window();
             object invoice = new Invoice(this, (Window)W);
+            Global.invoices = Invoice.getTable(this.id);
             if (Global.invoices == null || Global.invoices.Count == 0)
             {
-                Global.invoices = Invoice.getTable(this.id);
                 Global.clients = Client.getTable();
             }
             t.template1(W, ref invoice, translate.trans("Invoices"), new List<string>() { "num","client", "performa", "systemRef", "add", "edit", "del", "openInvoiceData", "close" }, Global.invoices, 0, 0, false);
@@ -2084,6 +2084,7 @@ namespace Memo
             DataTable dt = sql.Select(q);
             DataRow r = dt.Rows[0];
             this.id = r["id"].ToString();
+            this.num = r["num"].ToString();
             this.exportCertificate = new ExportCertificate(r["exportCertificate"].ToString());
             this.performa = r["performa"].ToString();
             this.systemRef = r["systemRef"].ToString();
@@ -2226,7 +2227,7 @@ namespace Memo
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `invoice` where `exportCertificate` = " + cerNum; DataTable dt = sql.Select(q);
+            string q = "SELECT * FROM `invoice` inner join `exportCertificate` as e on (e.id = invoice.`exportCertificate`) where e.company = "+Global.company.id+"  and `exportCertificate` like " + cerNum; DataTable dt = sql.Select(q);
             if (dt.Rows.Count == 0)
             {
                 Invoice tmp = new Invoice(new ExportCertificate()); c.Add(tmp); return c;
@@ -2713,4 +2714,1163 @@ namespace Memo
 
     }
 
+    public class BankReceipt : INotifyPropertyChanged
+    {
+        private bool _rowSelected = false;
+        private string _id;
+        private string _num;
+        private Client _client;
+
+        private string _usd;
+        private string _dat;
+        public event PropertyChangedEventHandler PropertyChanged;
+        private Window window { get; set; }
+        public string id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("id"));
+            }
+        }
+        public string num
+        {
+            get { return _num; }
+            set
+            {
+                _num = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("num"));
+            }
+        }
+        public Client client
+        {
+            get { return _client; }
+            set
+            {
+                _client = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("client"));
+            }
+        }
+        public Company company
+        {
+            get { return Global.company; }
+            set
+            {
+                //_client = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("company"));
+            }
+        }
+        public ObservableCollection<object> clients
+        {
+            get { return Global.clients; }
+            set
+            {
+                Global.clients = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("clients"));
+            }
+        }
+        public string usd
+        {
+            get { return _usd; }
+            set
+            {
+                _usd = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("usd"));
+            }
+        }
+        public string dat
+        {
+            get { return _dat; }
+            set
+            {
+                _dat = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("dat"));
+            }
+        }
+        public BankReceipt(Window W = null)
+        {
+            window = W;
+        }
+        public BankReceipt(string ID, Window W = null)
+        {
+            try
+            {
+                window = W;
+                Mysqldb sql = new Mysqldb();
+                string q = "SELECT * FROM `bankReceipt` Where id = " + ID;
+                DataTable dt = sql.Select(q);
+                DataRow r = dt.Rows[0];
+                this.id = r["id"].ToString();
+                this.num = r["num"].ToString();
+                this.client = new Client(r["client"].ToString());
+                this.usd = r["usd"].ToString();
+                this.dat = r["dat"].ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+        public void complete(string ID)
+        {
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `bankreceipt` Where id = " + ID;
+            DataTable dt = sql.Select(q);
+            DataRow r = dt.Rows[0];
+            this.id = r["id"].ToString();
+            this.num = r["num"].ToString();
+            this.client = new Client(r["client"].ToString());
+            this.usd = r["usd"].ToString();
+            this.dat = r["dat"].ToString();
+        }
+        public BankReceipt clone()
+        {
+            BankReceipt temp = new BankReceipt();
+            temp.id = this._id;
+            temp.num = this._num;
+            temp.client = this._client.clone();
+            temp.usd = this._usd;
+            temp.dat = this._dat;
+            return temp;
+        }
+        public void selectItem(object sender, MouseButtonEventArgs e)
+        {
+            this._rowSelected = true;
+            this.id = ((BankReceipt)((ListViewItem)sender).Content).id;
+            this.num = ((BankReceipt)((ListViewItem)sender).Content).num;
+            this.client = (Client)Global.clients.Where(x => ((Client)x).id == ((BankReceipt)((ListViewItem)sender).Content).client.id).First();
+            this.usd = ((BankReceipt)((ListViewItem)sender).Content).usd;
+            this.dat = ((BankReceipt)((ListViewItem)sender).Content).dat;
+        }
+        public void add(object sender, RoutedEventArgs e)
+        {
+            Mysqldb sql = new Mysqldb();
+            string q = "INSERT INTO `bankreceipt` (`id`,`company`,`num`,`client`,`usd`,`dat`) VALUES ( NULL,'" + Global.company.id + "','" + num + "','" + client.id + "','" + usd + "'," + Global.dateFormate(dat) + ");";
+            sql.Select(q);
+            id = (sql.nextAutoIncrement("bankreceipt") - 1).ToString();
+            Global.bankReceipts.Add(clone()); clear();
+        }
+        public void edit(object sender, RoutedEventArgs e)
+        {
+            if (!_rowSelected){MessageBox.Show(translate.trans("Please Select Record"));return;}
+
+            Mysqldb sql = new Mysqldb();
+            string q = "UPDATE `bankreceipt` SET `num` = '" + num + "' ,`client` = '" + client + "' ,`usd` = '" + usd + "' ,`dat` = " + Global.dateFormate(dat) + " WHERE `BankReceipt`.`id` = " + id + ";";
+            sql.Select(q);
+            foreach (BankReceipt c in Global.bankReceipts)
+            {
+                if (c.id == _id)
+                {
+                    Global.bankReceipts[Global.bankReceipts.IndexOf(c)] = clone(); return;
+                }
+            }
+            clear();
+        }
+        public void del(object sender, RoutedEventArgs e)
+        {
+            if (!_rowSelected) { MessageBox.Show(translate.trans("Please Select Record")); return; }
+            Mysqldb sql = new Mysqldb();
+            string q = "DELETE FROM `bankreceipt` WHERE `bankreceipt`.`id` = " + id;
+            sql.Select(q);
+            foreach (BankReceipt temp in Global.bankReceipts)
+            {
+                if (temp.id == _id)
+                {
+                    Global.bankReceipts.Remove(temp); return;
+                }
+            }
+            clear();
+        }
+        public void close(object sender, RoutedEventArgs e)
+        {
+            Global.removeWindow(window); window.Close();
+        }
+        public void openBankReceiptData(object sender, RoutedEventArgs e)
+        {
+            if (!_rowSelected) { MessageBox.Show(translate.trans("Please Select Record first!!"));return; }
+            foreach (Window w in Global.windows)
+            {
+                if (w.Name == translate.trans("BankReceiptData"))
+                {
+                    w.Activate(); return;
+                }
+            }
+            template t = new template();
+            object W = new Window();
+            object bankReceiptData = new BankReceiptData(this,(Window)W);
+            Global.bankReceiptDatas = BankReceiptData.getTable(this);
+            Global.invoices = Invoice.getTable("'%'");
+            List<Property> P = new List<Property>()
+            {
+                new Property("txtbankReceipt","num" , _readOnly:true),
+                new Property("bankUsd","num" , _readOnly:true),
+                new Property("sum","num" , _readOnly:true),
+                new Property("invoice","cmb",_displayPath:"num" , _action:"select"),
+            };
+            List<TableCol> tbcs = new List<TableCol>()
+            {
+                //new TableCol("id","id"),
+                new TableCol("invoice","invoice.num"),
+                new TableCol("invoiceUsd","invoiceUsd"),
+                new TableCol("chck","chck",new Property("chck","bool",_action:"chckClicked")),
+            };
+            t.Moderntemplate(W, ref bankReceiptData, translate.trans("BankReceiptData"), P, new List<string>() { "save", "autoCalc", "close" }, Global.bankReceiptDatas, tbcs, 0, 0, false);
+            Global.addWindow((Window)W);
+
+            if (((BankReceiptData)Global.bankReceiptDatas[0]).id == string.Empty || ((BankReceiptData)Global.bankReceiptDatas[0]).id == "" || ((BankReceiptData)Global.bankReceiptDatas[0]).id == null)
+            {
+                Global.bankReceiptDatas.RemoveAt(0);
+            }
+            ((Window)W).Show();
+        }
+        public void clear()
+        {
+            _id = null;
+            _num = null;
+            _client = null;
+            _usd = null;
+            _dat = null;
+            _rowSelected = false;
+        }
+        public static ObservableCollection<object> getTable()
+        {
+            ObservableCollection<object> c = new ObservableCollection<object>();
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `bankreceipt` where company = "+Global.company.id; DataTable dt = sql.Select(q);
+            if (dt.Rows.Count == 0)
+            {
+                BankReceipt tmp = new BankReceipt(); c.Add(tmp); return c;
+            }
+            foreach (DataRow r in dt.Rows)
+            {
+                BankReceipt temp = new BankReceipt();
+                temp.id = r["id"].ToString();
+                temp.num = r["num"].ToString();
+                temp.client = new Client(r["client"].ToString());
+                temp.usd = r["usd"].ToString();
+                temp.dat = r["dat"].ToString();
+                c.Add(temp);
+            }
+            return c;
+        }
+    }
+    public class BankReceiptData : INotifyPropertyChanged
+    {
+        private bool _rowSelected = false;
+        private string _id;
+        private BankReceipt _bankReceipt;
+        private Invoice _invoice;
+        //private double _sum;
+        private double _usd;
+        private bool _chck;
+        public event PropertyChangedEventHandler PropertyChanged;
+        private Window window { get; set; }
+        public string id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("id"));
+            }
+        }
+        public BankReceipt bankReceipt
+        {
+            get { return _bankReceipt; }
+            set
+            {
+                _bankReceipt = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("bankReceipt"));
+            }
+        }
+        public Invoice invoice
+        {
+            get { return _invoice; }
+            set
+            {
+                _invoice = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("invoice"));
+            }
+        }
+
+        public string txtbankReceipt
+        {
+            get { return _bankReceipt.num; }
+            set
+            {
+                //_bankReceipt = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("txtbankReceipt"));
+            }
+        }
+        public string invoiceUsd
+        {
+            get { return _usd.ToString(); }
+            set
+            {
+                _usd = Convert.ToDouble(value);
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("invoiceUsd"));
+            }
+        }
+        public string bankUsd
+        {
+            get { return bankReceipt.usd; }
+            set
+            {
+                //_usd = Convert.ToDouble(value);
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("bankUsd"));
+            }
+        }
+        public string sum
+        {
+            get { return Global.tempsum.ToString(); }
+            set
+            {
+                Global.tempsum = Convert.ToDouble(value);
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("sum"));
+            }
+        }
+        public bool chck
+        {
+            get { return _chck; }
+            set
+            {
+                _chck = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("chck"));
+            }
+        }
+        public ObservableCollection<object> bankReceipts
+        {
+            get { return Global.bankReceipts; }
+            set
+            {
+                Global.bankReceipts = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("bankReceipts"));
+            }
+        }
+        public ObservableCollection<object> invoices
+        {
+            get { return Global.invoices; }
+            set
+            {
+                Global.invoices = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("invoices"));
+            }
+        }
+        public BankReceiptData(Window W = null)
+        {
+            window = W;
+        }
+        public BankReceiptData(BankReceipt b , Window W = null)
+        {
+            this.bankReceipt = b;
+            window = W;
+        }
+        public BankReceiptData(string ID, Window W = null)
+        {
+            window = W;
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `bankReceiptData` Where id = " + ID;
+            DataTable dt = sql.Select(q);
+            DataRow r = dt.Rows[0];
+            this.id = r["id"].ToString();
+            this.bankReceipt = new BankReceipt(r["bankReceipt"].ToString());
+            this.invoice = new Invoice(r["invoice"].ToString());
+        }
+        public void complete(string ID)
+        {
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `bankreceiptdata` Where id = " + ID;
+            DataTable dt = sql.Select(q);
+            DataRow r = dt.Rows[0];
+            this.id = r["id"].ToString();
+            this.bankReceipt = new BankReceipt(r["bankReceipt"].ToString());
+            this.invoice = new Invoice(r["invoice"].ToString());
+        }
+        public BankReceiptData clone()
+        {
+            BankReceiptData temp = new BankReceiptData();
+            temp.id = this._id;
+            temp.bankReceipt = this._bankReceipt.clone();
+            temp.invoice = this._invoice.clone();
+            return temp;
+        }
+        public void selectItem(object sender, MouseButtonEventArgs e)
+        {
+            this._rowSelected = true;
+            this.id = ((BankReceiptData)((ListViewItem)sender).Content).id;
+            this.bankReceipt = (BankReceipt)Global.bankReceipts.Where(x => ((BankReceipt)x).id == ((BankReceiptData)((ListViewItem)sender).Content).bankReceipt.id).First();
+            this.invoice = (Invoice)Global.invoices.Where(x => ((Invoice)x).id == ((BankReceiptData)((ListViewItem)sender).Content).invoice.id).First();
+        }
+        public void save(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Mysqldb sql = new Mysqldb();
+                string q = "DELETE FROM `bankreceiptdata` WHERE `bankreceiptdata`.`bankReceipt` = " + bankReceipt.id;
+                sql.Select(q);
+                foreach(object obj in Global.bankReceiptDatas)
+                {
+                    if (!((BankReceiptData)obj).chck) break;
+                    q = "INSERT INTO `bankreceiptdata` (`id`, `bankReceipt`, `invoice`) VALUES (NULL, '"+ bankReceipt.id+"', '"+ ((BankReceiptData)obj).invoice.id+"');";
+                    sql.Select(q);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+
+             
+        }
+        public void chckClicked(object sender, RoutedEventArgs e)
+        {
+            CheckBox c = (CheckBox)sender;
+            BankReceiptData b = (BankReceiptData)c.DataContext;
+            int i = Global.bankReceiptDatas.IndexOf(Global.bankReceiptDatas.Where(x => ((BankReceiptData)x).invoice == b.invoice).First());
+            if (c.IsChecked == true)
+            {
+                this.sum = (Global.tempsum + Convert.ToDouble(b.invoiceUsd)).ToString();
+                Global.bankReceiptDatas.Move(i, 0);
+            }
+            else
+            {
+                this.sum = (Global.tempsum - Convert.ToDouble(b.invoiceUsd)).ToString();
+                Global.bankReceiptDatas.Move(i, Global.bankReceiptDatas.Count - 1);
+
+            }
+
+        }
+        public void select(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Enter)
+            {
+                string invoice = ((ComboBox)sender).Text;
+                object temp = Global.bankReceiptDatas.Where(x => ((BankReceiptData)x).invoice.num == invoice).First();
+                ((BankReceiptData)temp).chck = true;
+                int i = Global.bankReceiptDatas.IndexOf(temp);
+                Global.bankReceiptDatas.Move(i, 0);
+            }
+            else
+            {
+                return;
+            }
+
+        }
+        public void autoCalc(object sender, RoutedEventArgs e)
+        {
+            // need to be calculated
+        }
+        public void close(object sender, RoutedEventArgs e)
+        {
+            Global.removeWindow(window); window.Close();
+        }
+        public void clear()
+        {
+            _id = null;
+            _bankReceipt = null;
+            _invoice = null;
+            _rowSelected = false;
+        }
+        public static ObservableCollection<object> getTable(BankReceipt br)
+        {
+            ObservableCollection<object> c = new ObservableCollection<object>();
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT bdata.id , bdata.bankReceipt , i.id as 'invoice' , sum(idata.usdVal) as 'usd' FROM bankreceiptdata as bdata INNER JOIN invoice as i on (bdata.invoice = i.id) INNER JOIN invoicedata as idata on (idata.invoice = i.id) INNER JOIN exportcertificate as e on(i.exportCertificate = e.id) INNER JOIN bankreceipt as b on(b.id = bdata.bankReceipt) where b.client like "+br.client.id+" AND bdata.bankReceipt like " + br.id+ " GROUP by(i.num)";
+            DataTable dt = sql.Select(q);
+
+            Global.tempsum = 0;
+            foreach (DataRow r in dt.Rows)
+            {
+                if (r[0].ToString() == "") break;
+                BankReceiptData temp = new BankReceiptData();
+                temp.id = r["id"].ToString();
+                temp.bankReceipt = new BankReceipt(r["bankReceipt"].ToString());
+                temp.invoice = new Invoice(r["invoice"].ToString());
+                temp.invoiceUsd = r["usd"].ToString();
+                Global.tempsum += Convert.ToDouble(r["usd"].ToString());
+                temp.chck = true;
+                c.Add(temp);
+            }
+            q = "SELECT i.id as 'invoice', sum(idata.usdVal) as 'usd' FROM invoice as i  INNER JOIN invoicedata as idata on (idata.invoice = i.id) INNER JOIN exportcertificate as e on(i.exportCertificate = e.id) where NOT EXISTS(select * from  bankreceiptdata WHERE bankreceiptdata.invoice = i.id) AND e.company like "+Global.company.id+" AND i.client like "+br.client.id+" group by(i.id)";
+            dt = sql.Select(q);
+            foreach (DataRow r in dt.Rows)
+            {
+                if (r[0].ToString() == "") break;
+                BankReceiptData temp = new BankReceiptData();
+                temp.id = "null";
+                temp.bankReceipt = br;
+                temp.invoice = new Invoice(r["invoice"].ToString());
+                temp.invoiceUsd = r["usd"].ToString();
+                temp.chck = false;
+                c.Add(temp);
+            }
+            if (c.Count == 0)
+            {
+                BankReceiptData tmp = new BankReceiptData(); c.Add(tmp);
+            }
+            return c;
+        }
+    }
+
+    public class Booked : INotifyPropertyChanged
+    {
+        private bool _rowSelected = false;
+        private string _id;
+        private string _valueEgp;
+        private string _dat;
+        public event PropertyChangedEventHandler PropertyChanged;
+        private Window window { get; set; }
+        public string id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("id"));
+            }
+        }
+        public string valueEgp
+        {
+            get { return _valueEgp; }
+            set
+            {
+                _valueEgp = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("valueEgp"));
+            }
+        }
+        public string dat
+        {
+            get { return _dat; }
+            set
+            {
+                _dat = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("dat"));
+            }
+        }
+        public Booked(Window W = null)
+        {
+            window = W;
+        }
+        public Booked(string ID, Window W = null)
+        {
+            window = W;
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `booked` Where id = " + ID;
+            DataTable dt = sql.Select(q);
+            DataRow r = dt.Rows[0];
+            this.id = r["id"].ToString();
+            this.valueEgp = r["valueEgp"].ToString();
+            this.dat = r["dat"].ToString();
+        }
+        public void complete(string ID)
+        {
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `booked` Where id = " + ID;
+            DataTable dt = sql.Select(q);
+            DataRow r = dt.Rows[0];
+            this.id = r["id"].ToString();
+            this.valueEgp = r["valueEgp"].ToString();
+            this.dat = r["dat"].ToString();
+        }
+        public Booked clone()
+        {
+            Booked temp = new Booked();
+            temp.id = this._id;
+            temp.valueEgp = this._valueEgp;
+            temp.dat = this._dat;
+            return temp;
+        }
+        public void selectItem(object sender, MouseButtonEventArgs e)
+        {
+            this._rowSelected = true;
+            this.id = ((Booked)((ListViewItem)sender).Content).id;
+            this.valueEgp = ((Booked)((ListViewItem)sender).Content).valueEgp;
+            this.dat = ((Booked)((ListViewItem)sender).Content).dat;
+        }
+        public void add(object sender, RoutedEventArgs e)
+        {
+            Mysqldb sql = new Mysqldb();
+            string q = "INSERT INTO `booked` (`id`,`valueEgp`,`dat`) VALUES ( NULL,'" + valueEgp + "','" + dat + "');";
+            sql.Select(q);
+            id = (sql.nextAutoIncrement("booked") - 1).ToString();
+            Global.bookeds.Add(clone()); clear();
+        }
+        public void edit(object sender, RoutedEventArgs e)
+        {
+            if (!_rowSelected) { MessageBox.Show(translate.trans("Please Select Record")); return; }
+            Mysqldb sql = new Mysqldb();
+            string q = "UPDATE `booked` SET `valueEgp` = '" + valueEgp + "' ,`dat` = '" + dat + "' WHERE `Booked`.`id` = " + id + ";";
+            sql.Select(q);
+            foreach (Booked c in Global.bookeds)
+            {
+                if (c.id == _id)
+                {
+                    Global.bookeds[Global.bookeds.IndexOf(c)] = clone(); return;
+                }
+            }
+            clear();
+        }
+        public void del(object sender, RoutedEventArgs e)
+        {
+            if (!_rowSelected) { MessageBox.Show(translate.trans("Please Select Record")); return; }
+            Mysqldb sql = new Mysqldb();
+            string q = "DELETE FROM `booked` WHERE `booked`.`id` = " + id;
+            sql.Select(q);
+            foreach (Booked temp in Global.bookeds)
+            {
+                if (temp.id == _id)
+                {
+                    Global.bookeds.Remove(temp); return;
+                }
+            }
+            clear();
+        }
+        public void close(object sender, RoutedEventArgs e)
+        {
+            Global.removeWindow(window); window.Close();
+        }
+        public void clear()
+        {
+            _id = null;
+            _valueEgp = null;
+            _dat = null;
+            _rowSelected = false;
+        }
+        public static ObservableCollection<object> getTable()
+        {
+            ObservableCollection<object> c = new ObservableCollection<object>();
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `booked` "; DataTable dt = sql.Select(q);
+            if (dt.Rows.Count == 0)
+            {
+                Booked tmp = new Booked(); c.Add(tmp); return c;
+            }
+            foreach (DataRow r in dt.Rows)
+            {
+                Booked temp = new Booked();
+                temp.id = r["id"].ToString();
+                temp.valueEgp = r["valueEgp"].ToString();
+                temp.dat = r["dat"].ToString();
+                c.Add(temp);
+            }
+            return c;
+        }
+    }
+
+    public class Cheque : INotifyPropertyChanged
+    {
+        private bool _rowSelected = false;
+        private string _id;
+        private string _num;
+        private string _valueEgp;
+        private string _dat;
+        public event PropertyChangedEventHandler PropertyChanged;
+        private Window window { get; set; }
+        public string id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("id"));
+            }
+        }
+        public string num
+        {
+            get { return _num; }
+            set
+            {
+                _num = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("num"));
+            }
+        }
+        public Company company
+        {
+            get { return Global.company; }
+            set
+            {
+                //_client = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("company"));
+            }
+        }
+        public string valueEgp
+        {
+            get { return _valueEgp; }
+            set
+            {
+                _valueEgp = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("valueEgp"));
+            }
+        }
+        public string dat
+        {
+            get { return _dat; }
+            set
+            {
+                _dat = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("dat"));
+            }
+        }
+        public Cheque(Window W = null)
+        {
+            window = W;
+        }
+        public Cheque(string ID, Window W = null)
+        {
+            try
+            {
+                window = W;
+                Mysqldb sql = new Mysqldb();
+                string q = "SELECT * FROM `cheque` Where id = " + ID;
+                DataTable dt = sql.Select(q);
+                DataRow r = dt.Rows[0];
+                this.id = r["id"].ToString();
+                this.num = r["num"].ToString();
+                this.valueEgp = r["valueEgp"].ToString();
+                this.dat = r["dat"].ToString();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+        }
+        public void complete(string ID)
+        {
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `cheque` Where id = " + ID;
+            DataTable dt = sql.Select(q);
+            DataRow r = dt.Rows[0];
+            this.id = r["id"].ToString();
+            this.num = r["num"].ToString();
+            this.valueEgp = r["valueEgp"].ToString();
+            this.dat = r["dat"].ToString();
+        }
+        public Cheque clone()
+        {
+            Cheque temp = new Cheque();
+            temp.id = this._id;
+            temp.num = this._num;
+            temp.valueEgp = this._valueEgp;
+            temp.dat = this._dat;
+            return temp;
+        }
+        public void selectItem(object sender, MouseButtonEventArgs e)
+        {
+            this._rowSelected = true;
+            this.id = ((Cheque)((ListViewItem)sender).Content).id;
+            this.num = ((Cheque)((ListViewItem)sender).Content).num;
+            this.valueEgp = ((Cheque)((ListViewItem)sender).Content).valueEgp;
+            this.dat = ((Cheque)((ListViewItem)sender).Content).dat;
+        }
+        public void add(object sender, RoutedEventArgs e)
+        {
+            Mysqldb sql = new Mysqldb();
+            string q = "INSERT INTO `cheque` (`id`,`num`,`company`,`valueEgp`,`dat`) VALUES ( NULL,'" + num + "','" + Global.company.id + "','" + valueEgp + "'," + Global.dateFormate(dat) + ");";
+            sql.Select(q);
+            id = (sql.nextAutoIncrement("cheque") - 1).ToString();
+            Global.cheques.Add(clone()); clear();
+        }
+        public void edit(object sender, RoutedEventArgs e)
+        {
+            if (!_rowSelected) { MessageBox.Show(translate.trans("Please Select Record")); return; }
+
+            Mysqldb sql = new Mysqldb();
+            string q = "UPDATE `cheque` SET `num` = '" + num + "' ,`valueEgp` = '" + valueEgp + "' ,`dat` = " + Global.dateFormate(dat) + " WHERE `Cheque`.`id` = " + id + ";";
+            sql.Select(q);
+            foreach (Cheque c in Global.cheques)
+            {
+                if (c.id == _id)
+                {
+                    Global.cheques[Global.cheques.IndexOf(c)] = clone(); return;
+                }
+            }
+            clear();
+        }
+        public void del(object sender, RoutedEventArgs e)
+        {
+            if (!_rowSelected) { MessageBox.Show(translate.trans("Please Select Record")); return; }
+            Mysqldb sql = new Mysqldb();
+            string q = "DELETE FROM `cheque` WHERE `cheque`.`id` = " + id;
+            sql.Select(q);
+            foreach (Cheque temp in Global.cheques)
+            {
+                if (temp.id == _id)
+                {
+                    Global.cheques.Remove(temp); return;
+                }
+            }
+            clear();
+        }
+        public void close(object sender, RoutedEventArgs e)
+        {
+            Global.removeWindow(window); window.Close();
+        }
+        public void openChequeData(object sender, RoutedEventArgs e)
+        {
+            if (!_rowSelected) { MessageBox.Show(translate.trans("Please Select Record first!!")); return; }
+            foreach (Window w in Global.windows)
+            {
+                if (w.Name == translate.trans("ChequeData"))
+                {
+                    w.Activate(); return;
+                }
+            }
+            template t = new template();
+            object W = new Window();
+            object chequeData = new ChequeData(this, (Window)W);
+            Global.chequeDatas = ChequeData.getTable(this);
+            Global.fileNos = FileNo.getTable();
+            List<Property> P = new List<Property>()
+            {
+                new Property("txtcheque","num" , _readOnly:true),
+                new Property("bankUsd","num" , _readOnly:true),
+                new Property("sum","num" , _readOnly:true),
+                new Property("fileNo","cmb",_displayPath:"num" , _action:"select"),
+            };
+            List<TableCol> tbcs = new List<TableCol>()
+            {
+                //new TableCol("id","id"),
+                new TableCol("fileNo","fileNo.num"),
+                new TableCol("totalEgp","totalEgp"),
+                new TableCol("chck","chck",new Property("chck","bool",_action:"chckClicked")),
+            };
+            t.Moderntemplate(W, ref chequeData, translate.trans("ChequeData"), P, new List<string>() { "save", "autoCalc", "close" }, Global.chequeDatas, tbcs, 0, 0, false);
+            Global.addWindow((Window)W);
+
+            if (((ChequeData)Global.chequeDatas[0]).id == string.Empty || ((ChequeData)Global.chequeDatas[0]).id == "" || ((ChequeData)Global.chequeDatas[0]).id == null)
+            {
+                Global.chequeDatas.RemoveAt(0);
+            }
+            ((Window)W).Show();
+        }
+        public void clear()
+        {
+            _id = null;
+            _num = null;
+            _valueEgp = null;
+            _dat = null;
+            _rowSelected = false;
+        }
+        public static ObservableCollection<object> getTable()
+        {
+            ObservableCollection<object> c = new ObservableCollection<object>();
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `cheque` where company = " + Global.company.id; DataTable dt = sql.Select(q);
+            if (dt.Rows.Count == 0)
+            {
+                Cheque tmp = new Cheque(); c.Add(tmp); return c;
+            }
+            foreach (DataRow r in dt.Rows)
+            {
+                Cheque temp = new Cheque();
+                temp.id = r["id"].ToString();
+                temp.num = r["num"].ToString();
+                temp.valueEgp = r["valueEgp"].ToString();
+                temp.dat = r["dat"].ToString();
+                c.Add(temp);
+            }
+            return c;
+        }
+    }
+    public class ChequeData : INotifyPropertyChanged
+    {
+        private bool _rowSelected = false;
+        private string _id;
+        private Cheque _cheque;
+        private FileNo _fileNo;
+        //private double _sum;
+        private double _valueEgp;
+        private bool _chck;
+        public event PropertyChangedEventHandler PropertyChanged;
+        private Window window { get; set; }
+        public string id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("id"));
+            }
+        }
+        public Cheque cheque
+        {
+            get { return _cheque; }
+            set
+            {
+                _cheque = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("cheque"));
+            }
+        }
+        public FileNo fileNo
+        {
+            get { return _fileNo; }
+            set
+            {
+                _fileNo = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("fileNo"));
+            }
+        }
+
+        public string txtcheque
+        {
+            get { return _cheque.num; }
+            set
+            {
+                //_cheque = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("txtcheque"));
+            }
+        }
+        public string totalEgp
+        {
+            get { return _valueEgp.ToString(); }
+            set
+            {
+                _valueEgp = Convert.ToDouble(value);
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("totalEgp"));
+            }
+        }
+        public string bankUsd
+        {
+            get { return cheque.valueEgp; }
+            set
+            {
+                //_valueEgp = Convert.ToDouble(value);
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("bankUsd"));
+            }
+        }
+        public string sum
+        {
+            get { return Global.tempsum.ToString(); }
+            set
+            {
+                Global.tempsum = Convert.ToDouble(value);
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("sum"));
+            }
+        }
+        public bool chck
+        {
+            get { return _chck; }
+            set
+            {
+                _chck = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("chck"));
+            }
+        }
+        public ObservableCollection<object> cheques
+        {
+            get { return Global.cheques; }
+            set
+            {
+                Global.cheques = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("cheques"));
+            }
+        }
+        public ObservableCollection<object> fileNos
+        {
+            get { return Global.fileNos; }
+            set
+            {
+                Global.fileNos = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("fileNos"));
+            }
+        }
+        public ChequeData(Window W = null)
+        {
+            window = W;
+        }
+        public ChequeData(Cheque b, Window W = null)
+        {
+            this.cheque = b;
+            window = W;
+        }
+        public ChequeData(string ID, Window W = null)
+        {
+            window = W;
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `chequeData` Where id = " + ID;
+            DataTable dt = sql.Select(q);
+            DataRow r = dt.Rows[0];
+            this.id = r["id"].ToString();
+            this.cheque = new Cheque(r["cheque"].ToString());
+            this.fileNo = new FileNo(r["fileNo"].ToString());
+        }
+        public void complete(string ID)
+        {
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `chequedata` Where id = " + ID;
+            DataTable dt = sql.Select(q);
+            DataRow r = dt.Rows[0];
+            this.id = r["id"].ToString();
+            this.cheque = new Cheque(r["cheque"].ToString());
+            this.fileNo = new FileNo(r["fileNo"].ToString());
+        }
+        public ChequeData clone()
+        {
+            ChequeData temp = new ChequeData();
+            temp.id = this._id;
+            temp.cheque = this._cheque.clone();
+            temp.fileNo = this._fileNo.clone();
+            return temp;
+        }
+        public void selectItem(object sender, MouseButtonEventArgs e)
+        {
+            this._rowSelected = true;
+            this.id = ((ChequeData)((ListViewItem)sender).Content).id;
+            this.cheque = (Cheque)Global.cheques.Where(x => ((Cheque)x).id == ((ChequeData)((ListViewItem)sender).Content).cheque.id).First();
+            this.fileNo = (FileNo)Global.fileNos.Where(x => ((FileNo)x).id == ((ChequeData)((ListViewItem)sender).Content).fileNo.id).First();
+        }
+        public void save(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Mysqldb sql = new Mysqldb();
+                string q = "DELETE FROM `chequedata` WHERE `chequedata`.`cheque` = " + cheque.id;
+                sql.Select(q);
+                foreach (object obj in Global.chequeDatas)
+                {
+                    if (!((ChequeData)obj).chck) break;
+                    q = "INSERT INTO `chequedata` (`id`, `cheque`, `fileNo`) VALUES (NULL, '" + cheque.id + "', '" + ((ChequeData)obj).fileNo.id + "');";
+                    sql.Select(q);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+
+
+        }
+        public void chckClicked(object sender, RoutedEventArgs e)
+        {
+            CheckBox c = (CheckBox)sender;
+            ChequeData b = (ChequeData)c.DataContext;
+            int i = Global.chequeDatas.IndexOf(Global.chequeDatas.Where(x => ((ChequeData)x).fileNo == b.fileNo).First());
+            if (c.IsChecked == true)
+            {
+                this.sum = (Global.tempsum + Convert.ToDouble(b.totalEgp)).ToString();
+                Global.chequeDatas.Move(i, 0);
+            }
+            else
+            {
+                this.sum = (Global.tempsum - Convert.ToDouble(b.totalEgp)).ToString();
+                Global.chequeDatas.Move(i, Global.chequeDatas.Count - 1);
+
+            }
+
+        }
+        public void select(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                string fileNo = ((ComboBox)sender).Text;
+                object temp = Global.chequeDatas.Where(x => ((ChequeData)x).fileNo.num == fileNo).First();
+                ((ChequeData)temp).chck = true;
+                int i = Global.chequeDatas.IndexOf(temp);
+                Global.chequeDatas.Move(i, 0);
+            }
+            else
+            {
+                return;
+            }
+
+        }
+        public void autoCalc(object sender, RoutedEventArgs e)
+        {
+            // need to be calculated
+        }
+        public void close(object sender, RoutedEventArgs e)
+        {
+            Global.removeWindow(window); window.Close();
+        }
+        public void clear()
+        {
+            _id = null;
+            _cheque = null;
+            _fileNo = null;
+            _rowSelected = false;
+        }
+        public static ObservableCollection<object> getTable(Cheque br)
+        {
+            ObservableCollection<object> c = new ObservableCollection<object>();
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT cdata.id , cdata.cheque , f.id as 'fileNo', sum(e.PTREgp + e.nolon_Man) as 'totalSupport' from chequedata as cdata INNER JOIN cheque as c on(c.id = cdata.cheque) INNER JOIN fileno as f on (f.id = cdata.fileNo) INNER JOIN exptable as e on(e.id = f.exportCertificate) where e.company = "+Global.company.id+" and cdata.cheque = "+br.id+ "  group by(f.id)";
+            DataTable dt = sql.Select(q);
+
+            Global.tempsum = 0;
+            foreach (DataRow r in dt.Rows)
+            {
+                if (r[0].ToString() == "") break;
+                ChequeData temp = new ChequeData();
+                temp.id = r["id"].ToString();
+                temp.cheque = new Cheque(r["cheque"].ToString());
+                temp.fileNo = new FileNo(r["fileNo"].ToString());
+                temp.totalEgp = r["totalSupport"].ToString();
+                Global.tempsum += Convert.ToDouble(r["totalSupport"].ToString());
+                temp.chck = true;
+                c.Add(temp);
+            }
+            q = "SELECT f.id as 'fileNo',sum(e.PTREgp + e.nolon_Man) as 'totalSupport'  FROM fileno as f INNER JOIN exptable as e on(e.id = f.exportCertificate) where NOT EXISTS(select * from  chequedata WHERE chequedata.fileNo = f.id) AND e.company = "+Global.company.id+" group by(f.id)";
+            dt = sql.Select(q);
+            foreach (DataRow r in dt.Rows)
+            {
+                if (r[0].ToString() == "") break;
+                ChequeData temp = new ChequeData();
+                temp.id = "null";
+                temp.cheque = br;
+                temp.fileNo = new FileNo(r["fileNo"].ToString());
+                temp.totalEgp = r["totalSupport"].ToString();
+                temp.chck = false;
+                c.Add(temp);
+            }
+            if (c.Count == 0)
+            {
+                ChequeData tmp = new ChequeData(); c.Add(tmp);
+            }
+            return c;
+        }
+    }
+
+    public class TestReport
+    {
+        public string title { get; set; }
+        public string date { get; set; }
+        public DataTable dt { get; set; } 
+        
+    }
 }

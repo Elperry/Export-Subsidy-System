@@ -379,6 +379,125 @@ namespace Memo
             }
             ((Window)W).Show();
         }
+        public void openBankReceipt()
+        {
+
+            foreach (Window w in Global.windows)
+            {
+                if (w.Name == translate.trans("BankReceipt"))
+                {
+                    w.Activate(); return;
+                }
+            }
+            template t = new template();
+            object W = new Window();
+            object bankReceipt = new BankReceipt((Window)W);
+            if (Global.bankReceipts == null || Global.bankReceipts.Count == 0)
+            {
+                Global.bankReceipts = BankReceipt.getTable();
+                Global.clients = Client.getTable();
+            }
+            List<Property> P = new List<Property>()
+            {
+                new Property("num","num"),
+                new Property("client","cmb",_displayPath:"name"),
+                new Property("usd","num"),
+                new Property("dat","date"),
+            };
+            List<TableCol> tbcs = new List<TableCol>()
+            {
+                new TableCol("num","num"),
+                new TableCol("client","client.name"),
+                new TableCol("usd","usd"),
+                new TableCol("dat","dat"),
+            };
+            t.Moderntemplate(W, ref bankReceipt, translate.trans("BankReceipt"), P, new List<string>() { "add", "edit", "del", "openBankReceiptData", "close" }, Global.bankReceipts, tbcs, 0, 0, false);
+            Global.addWindow((Window)W);
+
+            if (((BankReceipt)Global.bankReceipts[0]).id == string.Empty || ((BankReceipt)Global.bankReceipts[0]).id == "" || ((BankReceipt)Global.bankReceipts[0]).id == null)
+            {
+                Global.bankReceipts.RemoveAt(0);
+            }
+           ((Window)W).Show();
+        }
+        public void openCheque()
+        {
+
+            foreach (Window w in Global.windows)
+            {
+                if (w.Name == translate.trans("Cheque"))
+                {
+                    w.Activate(); return;
+                }
+            }
+            template t = new template();
+            object W = new Window();
+            object cheque = new Cheque((Window)W);
+            if (Global.cheques == null || Global.cheques.Count == 0)
+            {
+                Global.cheques = Cheque.getTable();
+                Global.exportCertificates = ExportCertificate.getTable();
+            }
+            List<Property> P = new List<Property>()
+            {
+                new Property("num","num"),
+                new Property("valueEgp","num"),
+                new Property("dat","date"),
+            };
+            List<TableCol> tbcs = new List<TableCol>()
+            {
+                new TableCol("num","num"),
+                new TableCol("valueEgp","valueEgp"),
+                new TableCol("dat","dat"),
+            };
+            t.Moderntemplate(W, ref cheque, translate.trans("Cheque"), P, new List<string>() { "add", "edit", "del", "openChequeData", "close" }, Global.cheques, tbcs, 0, 0, false);
+            Global.addWindow((Window)W);
+
+            if (((Cheque)Global.cheques[0]).id == string.Empty || ((Cheque)Global.cheques[0]).id == "" || ((Cheque)Global.cheques[0]).id == null)
+            {
+                Global.cheques.RemoveAt(0);
+            }
+           ((Window)W).Show();
+        }
+        public void openBooked()
+        {
+
+            foreach (Window w in Global.windows)
+            {
+                if (w.Name == translate.trans("Booked"))
+                {
+                    w.Activate(); return;
+                }
+            }
+            template t = new template();
+            object W = new Window();
+            object booked = new Booked((Window)W);
+            if (Global.bookeds == null || Global.bookeds.Count == 0)
+            {
+                Global.bookeds = Booked.getTable();
+                Global.exportCertificates = ExportCertificate.getTable();
+            }
+            List<Property> P = new List<Property>()
+            {
+                new Property("id","num" , _readOnly:true),
+                new Property("valueEgp","num"),
+                new Property("dat","date"),
+            };
+            List<TableCol> tbcs = new List<TableCol>()
+            {
+                new TableCol("id","id"),
+                new TableCol("valueEgp","valueEgp"),
+                new TableCol("dat","dat"),
+            };
+            t.Moderntemplate(W, ref booked, translate.trans("Booked"), P, new List<string>() { "add", "edit", "del", "close" }, Global.bookeds, tbcs, 0, 0, false);
+            Global.addWindow((Window)W);
+
+            if (((Booked)Global.bookeds[0]).id == string.Empty || ((Booked)Global.bookeds[0]).id == "" || ((Booked)Global.bookeds[0]).id == null)
+            {
+                Global.bookeds.RemoveAt(0);
+            }
+           ((Window)W).Show();
+        }
         private void Login_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             close();

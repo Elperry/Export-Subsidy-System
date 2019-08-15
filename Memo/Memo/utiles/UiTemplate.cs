@@ -40,10 +40,12 @@ namespace Memo
     {
         public string name { get; set; }
         public string path { get; set; }
-        public TableCol(string _name = "name" , string _path = "path")
+        public Property prop { get; set; }
+        public TableCol(string _name = "name" , string _path = "path" , Property _prop = null)
         {
             name = _name;
             path = _path;
+            prop = _prop;
         }
     }
     public class BoolToVis : IValueConverter
@@ -129,10 +131,15 @@ namespace Memo
             new dic("serial" , "كود التفعيل", "License" ),
             new dic("lang" , "اللغة", "Language" ),
             new dic("boles" , "بوليصة الشحن", "Shipping Policy" ),
-            new dic("bankreciete" , "إصال البنك", "bank receipt" ),
+            new dic("bankreciete" , "إصال البنك", "Bank Receipt" ),
             new dic("ptrnolon_man" , "النولون + المانيفستو", "Nolon + Manifesto" ),
             new dic("ptr_nolon_man" , "النولون + المانيفستو", "Nolon + Manifesto" ),
-
+            new dic("txtbankReceipt" , "إصال البنك", "Bank Receipt Number" ),
+            new dic("usd" , "القيمة بالدولار", "USD $" ),
+            new dic("txtbankreceipt" , "رقم الإشعار البنكى", "Bank Receipt Num" ),
+            new dic("openchequedata" , "تتبع هذا الشيك", "Track This Cheque" ),
+            new dic("chequedatas" , "الملفات المربوطة بالشيك", "fles binded with this Chequq" ),
+            new dic("cheque" , "شيك بنكى", "Cheque" ),
 
         };
         public static string trans(string str)
@@ -439,7 +446,7 @@ namespace Memo
                 if(P.action != "")
                 {
                     KeyEventHandler e = (KeyEventHandler)Delegate.CreateDelegate(
-                typeof(KeyEventHandler), obj, obj.GetType().GetMethod(P.action));
+                    typeof(KeyEventHandler), obj, obj.GetType().GetMethod(P.action));
                     t.KeyDown += e;
                     //t.CommandBindings.Add();
                 }
@@ -455,8 +462,30 @@ namespace Memo
         }
         private void NumberTextBox(object sender, TextCompositionEventArgs e)
         {
-            Regex regex = new Regex("[^0-9]+");
-            e.Handled = regex.IsMatch(e.Text);
+            //Regex regex = new Regex("^[0-9]*\\.?[0-9]*");
+            try
+            {
+                string s = e.Text;
+                //MessageBox.Show((e.Text == ".").ToString() + " &&  "+((TextBox)sender).Text.IndexOf('.').ToString());
+                if(e.Text == "." && ((TextBox)sender).Text.IndexOf('.') == -1){
+
+                    e.Handled = false;
+                    return;
+                }
+                if(s == "0" && ((TextBox)sender).Text.Length > 0)
+                {
+                    e.Handled = false;
+                    return;
+                }
+               double i = Convert.ToDouble(s);
+                e.Handled = !(i > 0);
+            }
+            catch (Exception)
+            {
+                e.Handled = true;
+                //throw;
+            }
+            // = regex.IsMatch(e.Text);
         }
         public ComboBox cmb(ref object obj,string name, int width)
         {
@@ -533,6 +562,12 @@ namespace Memo
                     t.DisplayMemberPath = p.displayPath;
                     //t.SelectedValuePath = ".id";
                 }
+                if(p.action != "")
+                {
+                    KeyEventHandler e = (KeyEventHandler)Delegate.CreateDelegate(
+                    typeof(KeyEventHandler), obj, obj.GetType().GetMethod(p.action));
+                    t.KeyDown += e;
+                }
                 t.IsEditable = true;
 
                 t.Margin = new Thickness(5, 0, 5, 5);
@@ -573,6 +608,13 @@ namespace Memo
             {
                 Binding b2 = new Binding { Path = new PropertyPath(p.visiblityBind), Source = obj, Mode = BindingMode.TwoWay,Converter= new BooleanToVisibilityConverter() };
                 c.SetBinding(CheckBox.VisibilityProperty, b2);
+            }
+            if (p.action != "")
+            {
+                RoutedEventHandler e = (RoutedEventHandler)Delegate.CreateDelegate(
+                typeof(RoutedEventHandler), obj, obj.GetType().GetMethod(p.action));
+                c.Click += e;
+                //t.CommandBindings.Add();
             }
             //if (p.action)
             c.Margin = new Thickness(5);
@@ -805,8 +847,39 @@ namespace Memo
                 }
                 else
                 {
-                    grdvc.Header = translate.trans(tb.name);
-                    grdvc.DisplayMemberBinding = new Binding(tb.path);
+                    if (tb.prop != null)
+                    {
+                        if (tb.prop.type == "bool")
+                        {
+                            DataTemplate t = new DataTemplate();
+                            FrameworkElementFactory temp = new FrameworkElementFactory(typeof(CheckBox));
+                            temp.Name = "chckHeader";
+                            t.DataType = typeof(CheckBox);
+                            t.VisualTree = temp;
+                            grdvc.HeaderTemplate =t;
+
+                            DataTemplate dt2 = new DataTemplate();
+                            FrameworkElementFactory ff = new FrameworkElementFactory(typeof(CheckBox));
+                            ff.SetBinding(CheckBox.IsCheckedProperty, new Binding(tb.path));
+                            if(tb.prop.action != "")
+                            {
+                                RoutedEventHandler e = (RoutedEventHandler)Delegate.CreateDelegate(
+                                typeof(RoutedEventHandler), obj, obj.GetType().GetMethod(tb.prop.action));
+                                ff.AddHandler(CheckBox.ClickEvent, e);
+                            }
+                            dt2.VisualTree = ff;
+                            grdvc.CellTemplate = dt2;
+                        }
+
+                        //ff.SetValue(TextBlock.ToolTipProperty, "Credit Card Number");
+                        
+                    }
+                    else
+                    {
+                        grdvc.Header = translate.trans(tb.name);
+                        grdvc.DisplayMemberBinding = new Binding(tb.path);
+                    }
+                    
                 }
                 
 
@@ -1264,6 +1337,7 @@ namespace Memo
             {
                 stk.Children.Add(border);
             }
+
           ((Window)form).Content = stk;
 
         }
@@ -1299,10 +1373,12 @@ namespace Memo
             dock.LastChildFill = true;
             Menu m = ClassicalMenueBar(MenueHeader);
             dock.Children.Add(m);
-            
-            
-             
-            
+
+
+            Label l = lbl("Hello , this App Created By Eng: Mohammad Al-Berry Email:Mohammedelpry@yahoo.com Phone:01147264224 ");
+            DockPanel.SetDock(l, Dock.Bottom);
+            dock.Children.Add(l);
+
             //StackPanel b = vStack(false);
             //((Window)form).Content = b;
             //b.Children.Add(miniHeader(width));
