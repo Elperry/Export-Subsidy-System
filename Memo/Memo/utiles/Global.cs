@@ -12,6 +12,7 @@ using System.Globalization;
 namespace Memo {
     public static class Global
     {
+        public static double tempsum { get; set; }
         public static List<Window> windows { get; set; }
         public static User usr { get; set; }
         public static lang Lang { get; set; }
@@ -33,7 +34,11 @@ namespace Memo {
         public static ObservableCollection<object> invoiceDatas { get; set; }
         public static ObservableCollection<object> fileNos { get; set; }
         public static ObservableCollection<object> users { get; set; }
-
+        public static ObservableCollection<object> bankReceipts { get; set; }
+        public static ObservableCollection<object> bankReceiptDatas { get; set; }
+        public static ObservableCollection<object> cheques { get; set; }
+        public static ObservableCollection<object> bookeds { get; set; }
+        public static ObservableCollection<object> chequeDatas { get; set; }
         public static ObservableCollection<object> exportCertificates { get; set; }
         public static ObservableCollection<MenuItemViewModel> MainMenu { get; set; }
         public static ObservableCollection<MenuItemViewModel> getOpenWin()
@@ -122,7 +127,9 @@ namespace Memo {
                                 {
                                     new MenuItemViewModel { Header =  translate.trans("Export Certificates"),Command = new CommandViewModel(mainWindow.openExportCer) },
                                     new MenuItemViewModel { Header =  translate.trans("FileNo"),Command = new CommandViewModel(mainWindow.openFileNo) },
-                                    new MenuItemViewModel { Header =  translate.trans("Estiva") },
+                                    new MenuItemViewModel { Header =  translate.trans("BankReceipt"),Command = new CommandViewModel(mainWindow.openBankReceipt) },
+                                    new MenuItemViewModel { Header =  translate.trans("Cheque"),Command = new CommandViewModel(mainWindow.openCheque) },
+                                    new MenuItemViewModel { Header =  translate.trans("Booked"),Command = new CommandViewModel(mainWindow.openBooked) },
                                     new MenuItemViewModel {Header =  translate.trans("automatic Bank check Setter")}
                                 }
                 },
