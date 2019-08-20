@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-G:\unilever2\Memo\Memo\obj\Debug\
+I:\unilever2\Memo\Memo\obj\Debug\
 Memo
 none
 false
 DEBUG;TRACE
-G:\unilever2\Memo\Memo\App.xaml
-4-2106016989
-51001242449
-18281493754
-72-1911159610
-InputDialogSample .xaml;main.xaml;MainWindow.xaml;repoWindow.xaml;
+I:\unilever2\Memo\Memo\App.xaml
+41645993506
 
-False
+14592246877
+76-228464867
+InputDialogSample .xaml;main.xaml;MainWindow.xaml;ReportsWindow.xaml;
+
+True
 

@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.IO;
+
 
 namespace test
 {
@@ -20,19 +22,16 @@ namespace test
     /// </summary>
     /// 
 
-    public class FileNo : INotifyPropertyChanged
+    public class FileNo 
     {
         private string _id;
         private string _name;
-        public event PropertyChangedEventHandler PropertyChanged;
         public string id
         {
             get { return _id; }
             set
             {
                 _id = value;
-                if (this.PropertyChanged != null)
-                    this.PropertyChanged(this, new PropertyChangedEventArgs("id"));
             }
         }
         public string name
@@ -41,8 +40,6 @@ namespace test
             set
             {
                 _name = value;
-                if (this.PropertyChanged != null)
-                    this.PropertyChanged(this, new PropertyChangedEventArgs("name"));
             }
         }
         public FileNo(string x)

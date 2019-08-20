@@ -502,5 +502,11 @@ namespace Memo
         {
             close();
         }
+        public void openReports()
+        {
+            ReportsWindow rw = new ReportsWindow();
+            rw.Show();
+            
+        }
     }
 }
