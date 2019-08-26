@@ -151,7 +151,7 @@ namespace Memo
         public void add(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `brandcat` (`id`,`name`) VALUES ( NULL,'" + name + "');";
+            string q = "INSERT INTO `brandcat` (`id`,`name`,`company`) VALUES ( NULL,'" + name + "','" + Global.company.id + "');";
             sql.Select(q);
             id = (sql.nextAutoIncrement("brandcat") - 1).ToString();
             Global.brandCats.Add(clone()); clear();
@@ -159,7 +159,7 @@ namespace Memo
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `brandcat` SET `id` = '" + id + "' ,`name` = '" + name + "' WHERE `BrandCat`.`id` = id;";
+            string q = "UPDATE `brandcat` SET   `name` = '" + name + "' WHERE `BrandCat`.`id` = "+this.id;
             sql.Select(q);
             foreach (BrandCat c in Global.brandCats)
             {
@@ -197,7 +197,7 @@ namespace Memo
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `brandcat` "; DataTable dt = sql.Select(q);
+            string q = "SELECT * FROM `brandcat` where company ="+Global.company.id; DataTable dt = sql.Select(q);
             if (dt.Rows.Count == 0)
             {
                 BrandCat tmp = new BrandCat(); c.Add(tmp); return c;
@@ -278,7 +278,17 @@ namespace Memo
         {
             window = W;
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `brand` Where id = " + ID;
+            string q;
+            try
+            {
+                string x = Convert.ToInt32(ID).ToString();
+                q = "SELECT * FROM `brand` Where id = " + ID;
+            }
+            catch (Exception)
+            {
+
+                q = "SELECT * FROM `brand` Where name = '" + ID + "'";
+            }
             DataTable dt = sql.Select(q);
             DataRow r = dt.Rows[0];
             this.id = r["id"].ToString();
@@ -325,7 +335,7 @@ namespace Memo
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `brand` SET `id` = '" + id + "' ,`name` = '" + name + "' ,`brandCat` = '" + brandCat + "' ,`supportPercentage` = '" + supportPercentage + "' WHERE `Brand`.`id` = id;";
+            string q = "UPDATE `brand` SET   `name` = '" + name + "' ,`brandCat` = '" + brandCat + "' ,`supportPercentage` = '" + supportPercentage + "' WHERE `Brand`.`id` = "+this.id;
             sql.Select(q);
             foreach (Brand c in Global.brands)
             {
@@ -362,11 +372,16 @@ namespace Memo
             _brandCat = null;
             _supportPercentage = null;
         }
-        public static ObservableCollection<object> getTable()
+        public static ObservableCollection<object> getTable(BrandCat bc = null)
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `brand` "; DataTable dt = sql.Select(q);
+            string q = "SELECT * FROM `brand` ";
+            if (bc != null)
+            {
+                q = "SELECT * FROM `brand` where brandCat = "+bc.id;
+            }
+            DataTable dt = sql.Select(q);
             if (dt.Rows.Count == 0)
             {
                 Brand tmp = new Brand(); c.Add(tmp); return c;
@@ -439,7 +454,18 @@ namespace Memo
         {
             window = W;
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `country` Where id = " + ID;
+
+            string q;
+            try
+            {
+                string x = Convert.ToInt32(ID).ToString();
+                q = "SELECT * FROM `country` Where id = " + ID;
+            }
+            catch (Exception)
+            {
+
+                q = "SELECT * FROM `country` Where name = '" + ID+"'";
+            }
             DataTable dt = sql.Select(q);
             DataRow r = dt.Rows[0];
             this.id = r["id"].ToString();
@@ -485,7 +511,7 @@ namespace Memo
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `country` SET `id` = '" + id + "' ,`name` = '" + name + "' ,`nolon` = '" + ((nolon) ? "1" : "0") + "' ,`manifest` = '" + ((manifest) ? "1" : "0") + "' WHERE `Country`.`id` = id;";
+            string q = "UPDATE `country` SET   `name` = '" + name + "' ,`nolon` = '" + ((nolon) ? "1" : "0") + "' ,`manifest` = '" + ((manifest) ? "1" : "0") + "' WHERE `Country`.`id` = "+this.id;
             sql.Select(q);
             foreach (Country c in Global.countrys)
             {
@@ -587,7 +613,17 @@ namespace Memo
         {
             window = W;
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `port` Where id = " + ID;
+            string q;
+            try
+            {
+                string x = Convert.ToInt32(ID).ToString();
+                q = "SELECT * FROM `port` Where id = " + ID;
+            }
+            catch (Exception)
+            {
+
+                q = "SELECT * FROM `port` Where name = '" + ID+"'";
+            }
             DataTable dt = sql.Select(q);
             DataRow r = dt.Rows[0];
             this.id = r["id"].ToString();
@@ -629,7 +665,7 @@ namespace Memo
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `port` SET `id` = '" + id + "' ,`name` = '" + name + "' ,`notes` = '" + notes + "' WHERE `Port`.`id` = id;";
+            string q = "UPDATE `port` SET   `name` = '" + name + "' ,`notes` = '" + notes + "' WHERE `Port`.`id` = "+this.id;
             sql.Select(q);
             foreach (Port c in Global.ports)
             {
@@ -773,7 +809,17 @@ namespace Memo
         {
             window = W;
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `shippingCompany` Where id = " + ID;
+            string q;
+            try
+            {
+                string x = Convert.ToInt32(ID).ToString();
+                q = "SELECT * FROM `shippingCompany` Where id = " + ID;
+            }
+            catch (Exception)
+            {
+
+                q = "SELECT * FROM `shippingCompany` Where name = '" + ID+"'";
+            }
             DataTable dt = sql.Select(q);
             DataRow r = dt.Rows[0];
             this.id = r["id"].ToString();
@@ -831,7 +877,7 @@ namespace Memo
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `shippingcompany` SET `id` = '" + id + "' ,`name` = '" + name + "' ,`email` = '" + email + "' ,`phone` = '" + phone + "' ,`fax` = '" + fax + "' ,`address` = '" + address + "' ,`notes` = '" + notes + "' WHERE `ShippingCompany`.`id` = id;";
+            string q = "UPDATE `shippingcompany` SET   `name` = '" + name + "' ,`email` = '" + email + "' ,`phone` = '" + phone + "' ,`fax` = '" + fax + "' ,`address` = '" + address + "' ,`notes` = '" + notes + "' WHERE `ShippingCompany`.`id` = "+this.id;
             sql.Select(q);
             foreach (ShippingCompany c in Global.shippingCompanys)
             {
@@ -1041,7 +1087,7 @@ namespace Memo
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `company` SET `id` = '" + id + "' ,`name` = '" + name + "' ,`email` = '" + email + "' ,`phone` = '" + phone + "' ,`fax` = '" + fax + "' ,`address` = '" + address + "' ,`notes` = '" + notes + "' WHERE `Company`.`id` = id;";
+            string q = "UPDATE `company` SET   `name` = '" + name + "' ,`email` = '" + email + "' ,`phone` = '" + phone + "' ,`fax` = '" + fax + "' ,`address` = '" + address + "' ,`notes` = '" + notes + "' WHERE `Company`.`id` = "+this.id;
             sql.Select(q);
             foreach (Company c in Global.companys)
             {
@@ -1313,6 +1359,7 @@ namespace Memo
         private string _fax;
         private string _phone;
         private Country _country;
+        
         private string _address;
         private string _notes;
         public event PropertyChangedEventHandler PropertyChanged;
@@ -1415,7 +1462,17 @@ namespace Memo
         {
             window = W;
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `client` Where id = " + ID;
+            string q;
+            try
+            {
+                string x = Convert.ToInt32(ID).ToString();
+                q = "SELECT * FROM `client` Where id = " + ID;
+            }
+            catch (Exception)
+            {
+
+                q = "SELECT * FROM `client` Where name = '" + ID + "'";
+            }
             DataTable dt = sql.Select(q);
             DataRow r = dt.Rows[0];
             this.id = r["id"].ToString();
@@ -1469,7 +1526,7 @@ namespace Memo
         public void add(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `client` (`id`,`name`,`email`,`fax`,`phone`,`country`,`address`,`notes`) VALUES ( NULL,'" + name + "','" + email + "','" + fax + "','" + phone + "','" + country.id + "','" + address + "','" + notes + "');";
+            string q = "INSERT INTO `client` (`id`,`company`,`name`,`email`,`fax`,`phone`,`country`,`address`,`notes`) VALUES ( NULL,'" + Global.company.id + "','" + name + "','" + email + "','" + fax + "','" + phone + "','" + country.id + "','" + address + "','" + notes + "');";
             sql.Select(q);
             id = (sql.nextAutoIncrement("client") - 1).ToString();
             Global.clients.Add(clone()); clear();
@@ -1477,7 +1534,7 @@ namespace Memo
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `client` SET `id` = '" + id + "' ,`name` = '" + name + "' ,`email` = '" + email + "' ,`fax` = '" + fax + "' ,`phone` = '" + phone + "' ,`country` = '" + country + "' ,`address` = '" + address + "' ,`notes` = '" + notes + "' WHERE `Client`.`id` = id;";
+            string q = "UPDATE `client` SET `name` = '" + name + "' ,`email` = '" + email + "' ,`fax` = '" + fax + "' ,`phone` = '" + phone + "' ,`country` = '" + country + "' ,`address` = '" + address + "' ,`notes` = '" + notes + "' WHERE `Client`.`id` = "+this.id;
             sql.Select(q);
             foreach (Client c in Global.clients)
             {
@@ -1909,9 +1966,10 @@ namespace Memo
             template t = new template();
             object W = new Window();
             object invoice = new Invoice(this, (Window)W);
-            Global.invoices = Invoice.getTable(this.id);
+            
             if (Global.invoices == null || Global.invoices.Count == 0)
             {
+                Global.invoices = Invoice.getTable(this.id);
                 Global.clients = Client.getTable();
             }
             t.template1(W, ref invoice, translate.trans("Invoices"), new List<string>() { "num","client", "performa", "systemRef", "add", "edit", "del", "openInvoiceData", "close" }, Global.invoices, 0, 0, false);
@@ -1949,7 +2007,8 @@ namespace Memo
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `exptable` WHERE company = " + Global.company.id; DataTable dt = sql.Select(q);
+            string q = "SELECT * FROM `notsubmitted` where company = '" + Global.company.name+ "' GROUP BY export";
+            DataTable dt = sql.Select(q);
             if (dt.Rows.Count == 0)
             {
                 ExportCertificate tmp = new ExportCertificate(); c.Add(tmp); return c;
@@ -1958,19 +2017,20 @@ namespace Memo
             {
                 ExportCertificate temp = new ExportCertificate();
                 temp.id = r["id"].ToString();
-                temp.num = r["num"].ToString();
-                temp.company = new Company(r["company"].ToString());
-                temp.dat = r["dat"].ToString();
+                temp.num = r["export"].ToString();
+                temp.company = (Company)Global.company.clone();
+                temp.dat = r["exportDate"].ToString();
                 temp.country = new Country(r["country"].ToString());
                 temp.port = new Port(r["port"].ToString());
                 temp.shippingCompany = new ShippingCompany(r["shippingCompany"].ToString());
-                temp.ptr_nolon_man = r["nolon_Man"].ToString();
+                temp.ptr_nolon_man = (Convert.ToDouble(r["nolonSupport"].ToString())+Convert.ToDouble(r["manifestoSupport"].ToString())).ToString();
                 temp.boles = Convert.ToBoolean(r["boles"].ToString());
                 temp.nolon = (r["nolon"].ToString());
                 temp.usdToEgp = r["usdToEgp"].ToString();
+                temp.manifesto = Convert.ToBoolean(r["manifesto"].ToString());
                 //temp.usdVal = r["usdVal"].ToString();
                 //temp.egpVal = r["egpVal"].ToString();
-                temp.PTREgp = r["PTREgp"].ToString();
+                temp.PTREgp = r["PTR"].ToString();
                 temp.totalEgp = (Convert.ToDouble(temp.PTREgp) + Convert.ToDouble(temp.ptr_nolon_man)).ToString();
                 temp.submitDate = r["submitDate"].ToString();
                 temp.accrualDate = r["accrualDate"].ToString();
@@ -2201,10 +2261,11 @@ namespace Memo
             object invoiceData = new InvoiceData(this, (Window)W);
             List<Property> p = new List<Property>()
             {
-                new Property("brandCat","cmb"),
-                new Property("brand"),
+                new Property("brandCat","cmb" , _action:"onBrandCatChange"),
+                new Property("brand", "cmb", _action:"onBrandChange"),
                 new Property("usdVal","num",_action:"calc"),
                 new Property("egpVal","num","",true),
+                new Property("supportPercentage","num","",true),
                 new Property("PTREgp","num","",true)
             };
             if (Global.invoiceDatas == null || Global.invoiceDatas.Count == 0)
@@ -2256,6 +2317,7 @@ namespace Memo
         private string _usdVal;
         private string _egpVal;
         private string _PTREgp;
+        private string _supportPercentage;
         public event PropertyChangedEventHandler PropertyChanged;
         private Window window { get; set; }
         public string id
@@ -2348,6 +2410,16 @@ namespace Memo
                     this.PropertyChanged(this, new PropertyChangedEventArgs("egpVal"));
             }
         }
+        public string supportPercentage
+        {
+            get { return _supportPercentage; }
+            set
+            {
+                _supportPercentage = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("supportPercentage"));
+            }
+        }
         public string PTREgp
         {
             get { return _PTREgp; }
@@ -2405,16 +2477,19 @@ namespace Memo
         {
             this.id = ((InvoiceData)((ListViewItem)sender).Content).id;
             this.invoice = ((InvoiceData)((ListViewItem)sender).Content).invoice;
-            this.brand = ((InvoiceData)((ListViewItem)sender).Content).brand;
+            //this.brand 
+            Brand b = (Brand)Global.brands.Where(x => ((Brand)x).name == ((InvoiceData)((ListViewItem)sender).Content).brand.name).First();
+            this.brandCat = (BrandCat)Global.brandCats.Where(x => ((BrandCat)x).name == b.brandCat.name).First();
+            Global.brands = Brand.getTable(b.brandCat);
+            this.brand = b;
             this.usdVal = ((InvoiceData)((ListViewItem)sender).Content).usdVal;
-            this.egpVal = ((InvoiceData)((ListViewItem)sender).Content).egpVal;
-            this.PTREgp = ((InvoiceData)((ListViewItem)sender).Content).PTREgp;
-            this.brandCat = this.brand.brandCat;
+            this.supportPercentage = ((InvoiceData)((ListViewItem)sender).Content).supportPercentage;
+            
         }
         public void add(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `invoicedata` (`id`,`invoice`,`brand`,`usdVal`,`egpVal`,`PTREgp`) VALUES ( NULL,'" + invoice.id + "','" + brand.id + "','" + usdVal + "','" + egpVal + "','" + PTREgp + "');";
+            string q = "INSERT INTO `invoicedata` (`id`,`invoice`,`brand`,`usdVal`,`supportPercentage`) VALUES ( NULL,'" + invoice.id + "','" + brand.id + "','" + usdVal + "','" + supportPercentage + "');";
             sql.Select(q);
             id = (sql.nextAutoIncrement("invoicedata") - 1).ToString();
             Global.invoiceDatas.Add(clone()); clear();
@@ -2422,7 +2497,7 @@ namespace Memo
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `invoicedata` SET `invoice` = '" + invoice.id + "' ,`brand` = '" + brand.id + "' ,`usdVal` = '" + usdVal + "' ,`egpVal` = '" + egpVal + "' ,`PTREgp` = '" + PTREgp + "' WHERE `InvoiceData`.`id` ="+id+" ;";
+            string q = "UPDATE `invoicedata` SET `invoice` = '" + invoice.id + "' ,`brand` = '" + brand.id + "' ,`usdVal` = '" + usdVal + "' ,`supportPercentage` = '" + supportPercentage + "'  WHERE `InvoiceData`.`id` ="+id+" ;";
             sql.Select(q);
             foreach (InvoiceData c in Global.invoiceDatas)
             {
@@ -2464,6 +2539,14 @@ namespace Memo
             _usdVal = null;
             _egpVal = null;
             _PTREgp = null;
+        }
+        public void onBrandCatChange(object sender, SelectionChangedEventArgs e)
+        {
+            Global.brands = Brand.getTable(this.brandCat);
+        }
+        public void onBrandChange(object sender, SelectionChangedEventArgs e)
+        {
+            supportPercentage = brand.supportPercentage;
         }
         public static ObservableCollection<object> getTable(string inv)
         {
@@ -2594,7 +2677,7 @@ namespace Memo
         public void add(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `fileno` (`id`,`num`,`dat`,`exportCertificate`) VALUES ( NULL ,'" + num + "'," + Global.dateFormate(dat) + ",'" + exportCertificate.id + "');";
+            string q = "INSERT INTO `fileno` (`id`,`num`,`company`,`dat`,`exportCertificate`) VALUES ( NULL ,'" + num + "','" + Global.company.id + "'," + Global.dateFormate(dat) + ",'" + exportCertificate.id + "');";
             sql.Select(q);
             id = (sql.nextAutoIncrement("fileno") - 1).ToString();
             Global.fileNos.Add(clone()); clear();
@@ -2640,7 +2723,7 @@ namespace Memo
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `fileno` "; DataTable dt = sql.Select(q);
+            string q = "SELECT * FROM `fileno` as f WHERE company = " + Global.company.id+" and NOT EXISTS(SELECT * from chequedata WHERE chequedata.fileNo = f.num)" ; DataTable dt = sql.Select(q);
             if (dt.Rows.Count == 0)
             {
                 FileNo tmp = new FileNo(); c.Add(tmp); return c;
@@ -2651,7 +2734,7 @@ namespace Memo
                 temp.id = r["id"].ToString();
                 temp.num = r["num"].ToString();
                 temp.dat = r["dat"].ToString();
-                temp.exportCertificate = new ExportCertificate(r["id"].ToString());
+                temp.exportCertificate = new ExportCertificate(r["exportCertificate"].ToString());
                 c.Add(temp);
             }
             return c;
@@ -3174,9 +3257,66 @@ namespace Memo
             }
 
         }
+        public List<int> findElementsOfSum(List<double>lst, double target)
+        {
+            List<int> r = new List<int>();
+            if (lst.Count == 0) return r;
+            for(int i = 0;i < lst.Count; i++)
+            {
+                if (lst[i] == target)
+                {
+                    r.Add(i);return r;
+                }
+                else if (lst[i] < target)
+                {
+                    r = findElementsOfSum(lst.GetRange(i + 1, lst.Count - i - 1),target- lst[i]);
+                    if(r.Count != 0)
+                    {
+                        r.Add(i);return r;
+                    }
+                }
+            }
+
+            return r;
+        }
         public void autoCalc(object sender, RoutedEventArgs e)
         {
+            if(bankUsd == "0")
+            {
+                MessageBox.Show("Please Enter Correct Bank Receipt Value (USD)");return;
+            }
             // need to be calculated
+            Mysqldb sql = new Mysqldb();
+            DataTable dt = sql.Select("SELECT t.export , sum(usdVal) as usd from notsubmitted as t WHERE t.country = '"+bankReceipt.client.country.name+ "' GROUP BY t.export order by usd DESC ");
+            if (dt == null || dt.Rows.Count == 0)
+            {
+                MessageBox.Show(translate.trans("There is no un Submitted Export Certificates in DataBase")); return;
+            }
+            List<double> lst = new List<double>();
+            foreach (DataRow r in dt.Rows)
+            {
+                lst.Add(Convert.ToDouble(r["usd"].ToString()));
+            }
+            List<int> indeces = findElementsOfSum(lst, Convert.ToDouble(bankUsd));// indeces of the export certificates
+            if(indeces.Count == 0)
+            {
+                MessageBox.Show(translate.trans("There Is no Set of Ivoices with this sum !!!"));
+                return;
+            }
+            // here we must select exportCer and invoices inside them  then select them in the table
+            foreach(int i in indeces)
+            {
+                ObservableCollection<object> t = Invoice.getTable(dt.Rows[i]["export"].ToString());
+                foreach(object o in t)
+                {
+                    int ii = Global.bankReceiptDatas.IndexOf(Global.bankReceiptDatas.Where(x => ((BankReceiptData)x).invoice.num == ((Invoice)o).num).First());
+                    ((BankReceiptData)Global.bankReceiptDatas[ii]).chck = true;
+                    Global.bankReceiptDatas.Move(ii, 0);
+                }
+            }
+            
+               
+            
         }
         public void close(object sender, RoutedEventArgs e)
         {
@@ -3866,11 +4006,685 @@ namespace Memo
         }
     }
 
-    public class TestReport
+    public class Estiva : INotifyPropertyChanged
     {
-        public string title { get; set; }
-        public string date { get; set; }
-        public DataTable dt { get; set; } 
+        private bool _rowSelected = false;
+        private string _id;
+        private Company _company;
+        private ExportCertificate _exportCertificate;
+        private string _dat;
+        private string _note;
+        public event PropertyChangedEventHandler PropertyChanged;
+        private Window window { get; set; }
+        public string id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("id"));
+            }
+        }
+        public Company company
+        {
+            get { return Global.company; }
+            set
+            {
+                _company = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("company"));
+            }
+        }
+        public ObservableCollection<object> companys
+        {
+            get { return Global.companys; }
+            set
+            {
+                Global.companys = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("companys"));
+            }
+        }
+        public ExportCertificate exportCertificate
+        {
+            get { return _exportCertificate; }
+            set
+            {
+                _exportCertificate = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("exportCertificate"));
+            }
+        }
+        public ObservableCollection<object> exportCertificates
+        {
+            get { return Global.exportCertificates; }
+            set
+            {
+                Global.exportCertificates = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("exportCertificates"));
+            }
+        }
+        public string dat
+        {
+            get { return _dat; }
+            set
+            {
+                _dat = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("dat"));
+            }
+        }
+        public string note
+        {
+            get { return _note; }
+            set
+            {
+                _note = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("note"));
+            }
+        }
+        public Estiva(Window W = null)
+        {
+            window = W;
+        }
+        public Estiva(string ID, Window W = null)
+        {
+            window = W;
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `estiva` Where id = " + ID;
+            DataTable dt = sql.Select(q);
+            DataRow r = dt.Rows[0];
+            this.id = r["id"].ToString();
+            this.company = new Company(r["company"].ToString());
+            this.exportCertificate = new ExportCertificate(r["exportCertificate"].ToString());
+            this.dat = r["dat"].ToString();
+            this.note = r["note"].ToString();
+        }
+        public void complete(string ID)
+        {
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `estiva` Where id = " + ID;
+            DataTable dt = sql.Select(q);
+            DataRow r = dt.Rows[0];
+            this.id = r["id"].ToString();
+            this.company = new Company(r["company"].ToString());
+            this.exportCertificate = new ExportCertificate(r["exportCertificate"].ToString());
+            this.dat = r["dat"].ToString();
+            this.note = r["note"].ToString();
+        }
+        public Estiva clone()
+        {
+            Estiva temp = new Estiva();
+            temp.id = this._id;
+            temp.company = this._company.clone();
+            temp.exportCertificate = this._exportCertificate.clone();
+            temp.dat = this._dat;
+            temp.note = this._note;
+            return temp;
+        }
+        public void selectItem(object sender, MouseButtonEventArgs e)
+        {
+            this._rowSelected = true;
+            this.id = ((Estiva)((ListViewItem)sender).Content).id;
+            this.company = (Company)Global.companys.Where(x => ((Company)x).id == ((Estiva)((ListViewItem)sender).Content).company.id).First();
+            this.exportCertificate = (ExportCertificate)Global.exportCertificates.Where(x => ((ExportCertificate)x).id == ((Estiva)((ListViewItem)sender).Content).exportCertificate.id).First();
+            this.dat = ((Estiva)((ListViewItem)sender).Content).dat;
+            this.note = ((Estiva)((ListViewItem)sender).Content).note;
+        }
+        public void add(object sender, RoutedEventArgs e)
+        {
+            Mysqldb sql = new Mysqldb();
+            string q = "INSERT INTO `estiva` (`id`,`company`,`exportCertificate`,`dat`,`note`) VALUES ( NULL,'" + company.id + "','" + exportCertificate.id + "','" + dat + "','" + note + "');";
+            sql.Select(q);
+            id = (sql.nextAutoIncrement("estiva") - 1).ToString();
+            Global.estivas.Add(clone()); clear();
+        }
+        public void edit(object sender, RoutedEventArgs e)
+        {
+            if (!_rowSelected)
+            {
+                MessageBox.Show(translate.trans("Please Select Record")); return;
+            }
+            Mysqldb sql = new Mysqldb();
+            string q = "UPDATE `estiva` SET `company` = '" + company + "' ,`exportCertificate` = '" + exportCertificate + "' ,`dat` = '" + dat + "' ,`note` = '" + note + "' WHERE `Estiva`.`id` = " + id + ";";
+            sql.Select(q);
+            foreach (Estiva c in Global.estivas)
+            {
+                if (c.id == _id)
+                {
+                    Global.estivas[Global.estivas.IndexOf(c)] = clone(); return;
+                }
+            }
+            clear();
+        }
+        public void del(object sender, RoutedEventArgs e)
+        {
+            Mysqldb sql = new Mysqldb();
+            string q = "DELETE FROM `estiva` WHERE `estiva`.`id` = " + id;
+            sql.Select(q);
+            foreach (Estiva temp in Global.estivas)
+            {
+                if (temp.id == _id)
+                {
+                    Global.estivas.Remove(temp); return;
+                }
+            }
+            clear();
+        }
+        public void close(object sender, RoutedEventArgs e)
+        {
+            Global.removeWindow(window); window.Close();
+        }
+        public void clear()
+        {
+            _id = null;
+            _company = null;
+            _exportCertificate = null;
+            _dat = null;
+            _note = null;
+        }
+        public static ObservableCollection<object> getTable()
+        {
+            ObservableCollection<object> c = new ObservableCollection<object>();
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `estiva` where company = "+Global.company.id; DataTable dt = sql.Select(q);
+            if (dt.Rows.Count == 0)
+            {
+                Estiva tmp = new Estiva(); c.Add(tmp); return c;
+            }
+            foreach (DataRow r in dt.Rows)
+            {
+                Estiva temp = new Estiva();
+                temp.id = r["id"].ToString();
+                temp.company = new Company(r["company"].ToString());
+                temp.exportCertificate = new ExportCertificate(r["exportCertificate"].ToString());
+                temp.dat = r["dat"].ToString();
+                temp.note = r["note"].ToString();
+                c.Add(temp);
+            }
+            return c;
+        }
+    }
+
+
+    public class Col
+    {
+        public string id { get; set; }
+        public string name { get; set; }
+        public Col(string n = "")
+        {
+            id = n;
+            name = translate.trans(n);
+        }
+    }
+    public class ReportBuilderPage : INotifyPropertyChanged
+    {
+
+        public Col _type;
+        public Col _col;
+        public bool _condition;
+        public Col _op;
+        ObservableCollection<object> _types = new ObservableCollection<object>()
+        {
+            new Col("Have File Number"),
+            new Col("Not Have File Number")
+        };
+        ObservableCollection<object> _cols;
+        ObservableCollection<object> _ops;
+        public event PropertyChangedEventHandler PropertyChanged;
+        private Window window { get; set; }
+        public Col type
+        {
+            get { return _type; }
+            set
+            {
+                _type = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("type"));
+            }
+        }
+        public Col col
+        {
+            get { return _col; }
+            set
+            {
+                _col = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("col"));
+            }
+        }
+        public Col op
+        {
+            get { return _op; }
+            set
+            {
+                _op = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("op"));
+            }
+        }
+        public bool condition
+        {
+            get { return _condition; }
+            set
+            {
+                _condition = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("condition"));
+            }
+        }
+
+        public ObservableCollection<object> types
+        {
+            get { return _types; }
+            set
+            {
+                _types = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("types"));
+            }
+        }
+        public ObservableCollection<object> cols
+        {
+            get { return _cols; }
+            set
+            {
+                _cols = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("cols"));
+            }
+        }
+
+        public void close(object sender, RoutedEventArgs e)
+        {
+            Global.removeWindow(window); window.Close();
+        }
+        public void clear()
+        {
+           // _id = null;
+           // _valueEgp = null;
+           // _dat = null;
+
+        }
         
     }
+    public class ReportViewerPage : INotifyPropertyChanged
+    {
+        private string _cond="";
+        private Col _repoName;
+        private Col _col;
+        private Col _op;
+        private Col _pageSetup;
+        private string _value;
+        private string _date1;
+        private string _date2;
+        private bool _isDate;
+        private bool _isBetween;
+        private ObservableCollection<object> _repoNames;
+        private ObservableCollection<object> _cols;
+        private ObservableCollection<object> _ops = new ObservableCollection<object>()
+        {
+            new Col("="),
+            new Col(">"),
+            new Col("<"),
+            new Col("Like"),
+            new Col("!="),
+            new Col("between")
+        };
+        public event PropertyChangedEventHandler PropertyChanged;
+        private Window window { get; set; }
+        public Col repoName
+        {
+            get { return _repoName; }
+            set
+            {
+                _repoName = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("repoName"));
+            }
+        }
+        public Col col
+        {
+            get { return _col; }
+            set
+            {
+                _col = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("col"));
+            }
+        }
+        public Col op
+        {
+            get { return _op; }
+            set
+            {
+                _op = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("op"));
+            }
+        }
+        public string value
+        {
+            get { return _value; }
+            set
+            {
+                _value = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("value"));
+            }
+        }
+        public string date1
+        {
+            get { return _date1; }
+            set
+            {
+                _date1 = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("date1"));
+            }
+        }
+        public string date2
+        {
+            get { return _date2; }
+            set
+            {
+                _date2 = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("date2"));
+            }
+        }
+        public Col pageSetup
+        {
+            get { return _pageSetup; }
+            set
+            {
+                _pageSetup = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("pageSetup"));
+            }
+        }
+        public string cond
+        {
+            get { return _cond; }
+            set
+            {
+                _cond = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("cond"));
+            }
+        }
+        public bool isDate
+        {
+            get { return _isDate; }
+            set
+            {
+                _isDate = value;
+                if (this.PropertyChanged != null)
+                {
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("isDate"));
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("isText"));
+                }
+                    
+            }
+        }
+        public bool isBetween
+        {
+            get { return _isBetween; }
+            set
+            {
+                _isBetween = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("isBetween"));
+            }
+        }
+        public bool isText
+        {
+            get { return !_isDate; }
+            set
+            {
+                _isDate = !value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("isText"));
+            }
+        }
+        private ObservableCollection<object> _pageSetups = new ObservableCollection<object>()
+        {
+            new Col("Portrait"),
+            new Col("Landscape"),
+        };
+        public ObservableCollection<object> repoNames
+        {
+            get { return _repoNames; }
+            set
+            {
+                _repoNames = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("repoNames"));
+            }
+        }
+        public ObservableCollection<object> cols
+        {
+            get { return _cols; }
+            set
+            {
+                _cols = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("cols"));
+            }
+        }
+        public ObservableCollection<object> ops
+        {
+            get { return _ops; }
+            set
+            {
+                _ops = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("ops"));
+            }
+        }
+        public ObservableCollection<object> pageSetups
+        {
+            get { return _pageSetups; }
+            set
+            {
+                _pageSetups = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("pageSetups"));
+            }
+        }
+
+        public void onReportNameChange(object sender, SelectionChangedEventArgs e)
+        {
+            Mysqldb sql = new Mysqldb();
+            cols = new ObservableCollection<object>();
+            DataTable dt = sql.Select("SELECT COLUMN_NAME FROM information_schema.columns WHERE table_name='"+repoName.id+"'");
+            foreach(DataRow r in dt.Rows)
+            {
+                cols.Add(new Col(r[0].ToString()));
+            }
+        }
+        public ReportViewerPage(Window w = null)
+        {
+            window = w;
+            Mysqldb sql = new Mysqldb();
+            DataTable dt = sql.Select("SHOW FULL TABLES WHERE TABLE_TYPE LIKE 'VIEW';");
+            repoNames = new ObservableCollection<object>();
+            foreach(DataRow r in dt.Rows)
+            {
+                repoNames.Add(new Col(r[0].ToString()));
+            }
+
+        }
+        public void onColChange(object sender, SelectionChangedEventArgs e)
+        {
+            if (col.name.ToLower().Contains("dat"))
+            {
+                isDate = true;
+            }
+            else
+            {
+                isDate = false;
+            }
+        }
+        public void onOpChange(object sender, SelectionChangedEventArgs e)
+        {
+            if (_isDate)
+            {
+               if (op.id.ToLower() == "between")
+                {
+                    isBetween = true;
+                }
+                else
+                {
+                    isBetween = false;
+                }
+            }
+            else
+            {
+                if (op.id.ToLower() == "between")
+                {
+                    isBetween = true;
+                }
+                else
+                {
+                    isBetween = false;
+                }
+                //MessageBox.Show("(Between) operator is used only with dates !!!");
+                //op = (Col)_ops[0];
+            }
+        }
+        public void addCondition(object sender, RoutedEventArgs e)
+        {
+            if (cond == "")
+            {
+                if(op.id == "between")
+                {
+                    cond = "Where (" + col.id + " " + op.id + " '" + date1 + "' and  '" + date2 + "' ) ";
+                }
+                else
+                {
+                    cond = "Where (" + col.id + " " + op.id + " '" + value + "' ) ";
+                }
+            }
+            else
+            {
+                if (op.id == "between")
+                {
+                    cond =cond + " and (" + col.id + " " + op.id + " '" + date1 + "' and  '" + date2 + "' ) ";
+                }
+                else
+                {
+                    cond =cond + " and (" + col.id + " " + op.id + " '" + value + "' ) ";
+                }
+            }
+        }
+        public void showReport(object sender, RoutedEventArgs e)
+        {
+            if (repoName == null) { MessageBox.Show("Please Select Report");return; }
+            Mysqldb sql = new Mysqldb();
+            DataTable dt = sql.Select("select * from " + repoName.id + " " + cond);
+            ReportBuilder rb = new ReportBuilder("Unilever", " ", translate.trans(repoName.id),dt,"   ",pageSetup);
+            rb.genReport();
+        }
+        public void clear(object sender, RoutedEventArgs e)
+        {
+            cond = "";
+        }
+        public void close(object sender, RoutedEventArgs e)
+        {
+            Global.removeWindow(window); window.Close();
+        }
+ 
+
+    }
+    public class MyReportData
+    {
+        public string Template { get; set; }
+        public DataTable table { get; set; }
+    }
+
+    public class ReportBuilder
+    {
+        public string header { get; set; }
+        public string description { get; set; }
+        public string title { get; set; }
+        public string summary { get; set; }
+        public DataTable dt { get; set; }
+        private string xml = Global.reportTemplate;
+
+
+        public ReportBuilder(string Header , string discription , string title , DataTable table , string _summary , Col pageSetup = null)
+        {
+            header = Header;this.description = discription; this.title = title;dt = table;summary = _summary;
+            // 29.7cm _PageHeight   ><  21cm _PageWidth
+            if(pageSetup == null || pageSetup.id == "Portrait")
+            {
+                xml = xml.Replace("_PageHeight", "29.7cm");
+                xml = xml.Replace("_PageWidth", "21cm");
+            }
+            else
+            {
+                xml = xml.Replace("_PageWidth", "29.7cm");
+                xml = xml.Replace("_PageHeight", "21cm");
+            }
+        }
+        public void genReport()
+        {
+            MyReportData repo = new MyReportData();
+           
+            xml = xml.Replace("RHeader", header);
+            xml = xml.Replace("RDescription", description);
+            xml = xml.Replace("RTitle", title);
+            string xmlTable = "" , xmlTableHeader="";
+            foreach (DataColumn c in dt.Columns)
+            {
+                //MessageBox.Show(c.ColumnName);
+                xmlTable = xmlTable + @" <TableCell>
+                                          <Paragraph TextAlignment=""Center"">
+                                                <xrd:InlineTableCellValue PropertyName = """ + c.ColumnName+ @"""  AggregateGroup="""+c.ColumnName+"s"+@"""/>
+                                          </Paragraph >
+                                         </TableCell > ";
+                xmlTableHeader = xmlTableHeader + @"<TableCell>
+                                                      <Paragraph TextAlignment=""Center"">
+                                                        <Bold>"+translate.trans(c.ColumnName)+@"</Bold>
+                                                      </Paragraph>
+                                                    </TableCell>";
+            }
+            xml = xml.Replace("RTableXml", xmlTable);
+            xml = xml.Replace("RTableHeaderXml", xmlTableHeader);
+            /*
+             There are
+                    <xrd:InlineAggregateValue AggregateGroup=""ItemCount"" AggregateValueType=""Count"" EmptyValue=""no"" FontWeight=""Bold"" /> item positions with a total of
+                    <xrd:InlineAggregateValue AggregateGroup=""ItemCount"" AggregateValueType=""Sum"" EmptyValue=""0"" FontWeight=""Bold"" /> items listed.
+             */
+
+            xml = xml.Replace("RSummary", summary);
+            dt.TableName = "RTable";
+            repo.table = dt;
+            repo.Template = xml;
+            ReportsWindow rpW = new ReportsWindow(repo);
+            rpW.Show();
+
+        }
+
+    }
+
+    /*
+SELECT ch.num as cheque , ch.dat as chequeDate,fno.num as fileNo , br.num as bankreceipt,e.num as export, e.dat as exportDate ,
+i.num as Invoice , i.performa , i.systemRef , cr.name as country, cn.name as company, b.name as brand, bc.name as entity ,id.usdVal , 
+(id.usdVal * id.supportPercentage) as PTR 
+from exportcertificate as e INNER JOIN invoice as i on (i.exportCertificate = e.id) INNER JOIN invoicedata as id on (id.invoice = i.id) 
+INNER JOIN country as cr on (e.country = cr.id) INNER JOIN company as cn on (cn.id = e.company) INNER JOIN brand as b on (b.id = id.brand) 
+INNER JOIN brandcat as bc on (bc.id = b.brandCat) INNER join client as cl on (cl.id = i.client) 
+INNER JOIN bankreceiptdata as brdata on (brdata.invoice = i.id) INNER join bankreceipt as br on (br.id = brdata.bankReceipt) 
+INNER JOIN fileno as fno on (fno.exportCertificate = e.id) INNER join chequedata as chdata on (chdata.fileNo = fno.id) 
+INNER JOIN cheque as ch on (ch.id = chdata.cheque) ORDER BY e.num 
+     
+     */
+
+
+
 }

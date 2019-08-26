@@ -103,7 +103,7 @@ namespace Memo
             new dic("egpval" , "السعر بالجنيه", "Price (EGP)" ),
             new dic("port" , "الميناء", "Port" ),
             new dic("ptregp" , "الدعم بالجنيه", "Support (EGP)" ),
-            new dic("brandcat" , "تصنيف", "Etinty" ),
+            new dic("brandcat" , "تصنيف", "Entity" ),
             new dic("brand" , "براند", "Brand" ),
             new dic("invoices" , "الفواتير", "Invoices" ),
             new dic("invoice" , "الفاتورة", "Invoice" ),
@@ -140,7 +140,7 @@ namespace Memo
             new dic("openchequedata" , "تتبع هذا الشيك", "Track This Cheque" ),
             new dic("chequedatas" , "الملفات المربوطة بالشيك", "fles binded with this Chequq" ),
             new dic("cheque" , "شيك بنكى", "Cheque" ),
-
+            new dic("chequerecieved" , "وصل شيك بنكى", "Cheque Recieved" ),
         };
         public static string trans(string str)
         {
@@ -564,9 +564,10 @@ namespace Memo
                 }
                 if(p.action != "")
                 {
-                    KeyEventHandler e = (KeyEventHandler)Delegate.CreateDelegate(
-                    typeof(KeyEventHandler), obj, obj.GetType().GetMethod(p.action));
-                    t.KeyDown += e;
+
+                    SelectionChangedEventHandler e = (SelectionChangedEventHandler)Delegate.CreateDelegate(
+                    typeof(SelectionChangedEventHandler), obj, obj.GetType().GetMethod(p.action));
+                    t.SelectionChanged += e;
                 }
                 t.IsEditable = true;
 

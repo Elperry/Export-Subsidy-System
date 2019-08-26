@@ -54,7 +54,7 @@ namespace Memo
             /* Here is seed up open*/
             ((User)usr).email = "admin@admin";
             ((User)usr).password = "123";
-            ((User)usr).lang = Global.langs[0];
+            ((User)usr).lang = Global.langs[1];
            ((User)usr).login(this,new RoutedEventArgs());
             //main m = new main();
             //m.Show();

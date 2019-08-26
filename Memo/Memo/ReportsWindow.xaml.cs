@@ -26,10 +26,11 @@ namespace Memo
     public partial class ReportsWindow : Window
     {
         private bool _firstActivated = true;
-
-        public ReportsWindow()
+        private MyReportData myReportData;
+        public ReportsWindow(MyReportData data = null)
         {
             InitializeComponent();
+            myReportData = data;
         }
 
         private void Window_Activated(object sender, EventArgs e)
@@ -37,17 +38,15 @@ namespace Memo
             if (!_firstActivated) return;
 
             _firstActivated = false;
-
+            if (myReportData == null) return;
             Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(delegate
             {
                 try
                 {
                     ReportDocument reportDocument = new ReportDocument();
 
-                    //StreamReader reader = new StreamReader(new FileStream(@"repoTemplates\reportTemplate1.xaml", FileMode.Open, FileAccess.Read));
-                    reportDocument.XamlData = Global.reportTemplate;//reader.ReadToEnd();
-                    //reportDocument.XamlImagePath = Path.Combine(Environment.CurrentDirectory, @"repoTemplates\");
-                    //reader.Close();
+                    reportDocument.XamlData = myReportData.Template;
+                    //reportDocument.XamlData = Global.reportTemplate;
 
                     ReportData data = new ReportData();
 
@@ -55,17 +54,7 @@ namespace Memo
                     data.ReportDocumentValues.Add("PrintDate", DateTime.Now); // print date is now
 
                     // sample table "Ean"
-                    DataTable table = new DataTable("Ean");
-                    table.Columns.Add("Position", typeof(string));
-                    table.Columns.Add("Item", typeof(string));
-                    table.Columns.Add("EAN", typeof(string));
-                    table.Columns.Add("Count", typeof(int));
-                    Random rnd = new Random(1234);
-                    for (int i = 1; i <= 10; i++)
-                    {
-                        // randomly create some items
-                        table.Rows.Add(new object[] { i, "Item " + i.ToString("0000"), "123456790123", rnd.Next(9) + 1 });
-                    }
+                    DataTable table = myReportData.table;
                     data.DataTables.Add(table);
 
                     DateTime dateTimeStart = DateTime.Now; // start time measure here
@@ -74,7 +63,7 @@ namespace Memo
                     documentViewer.Document = xps.GetFixedDocumentSequence();
 
                     // show the elapsed time in window title
-                    Title += " - generated in " + (DateTime.Now - dateTimeStart).TotalMilliseconds + "ms";
+                    //Title += " - generated in " + (DateTime.Now - dateTimeStart).TotalMilliseconds + "ms";
                 }
                 catch (Exception ex)
                 {

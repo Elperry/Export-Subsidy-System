@@ -82,8 +82,6 @@ I:\unilever2\Memo\Memo\obj\Debug\App.g.cs
 I:\unilever2\Memo\Memo\obj\Debug\GeneratedInternalTypeHelper.g.cs
 I:\unilever2\Memo\Memo\obj\Debug\Memo_MarkupCompile.cache
 I:\unilever2\Memo\Memo\obj\Debug\Memo_MarkupCompile.lref
-I:\unilever2\Memo\Memo\obj\Debug\Memo.exe
-I:\unilever2\Memo\Memo\obj\Debug\Memo.pdb
 I:\unilever2\Memo\Memo\bin\Debug\Memo.exe.config
 I:\unilever2\Memo\Memo\bin\Debug\Memo.exe.manifest
 I:\unilever2\Memo\Memo\bin\Debug\Memo.application
@@ -120,3 +118,5 @@ I:\unilever2\Memo\Memo\obj\Debug\Memo.csproj.CoreCompileInputs.cache
 I:\unilever2\Memo\Memo\obj\Debug\Memo.exe.manifest
 I:\unilever2\Memo\Memo\obj\Debug\Memo.application
 I:\unilever2\Memo\Memo\obj\Debug\Memo.csproj.CopyComplete
+I:\unilever2\Memo\Memo\obj\Debug\Memo.exe
+I:\unilever2\Memo\Memo\obj\Debug\Memo.pdb

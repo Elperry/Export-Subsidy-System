@@ -155,6 +155,7 @@ namespace Memo
             if(Global.clients == null)
             {
                 Global.clients = Client.getTable();
+                Global.countrys = Country.getTable();
             }
             t.template1(W, ref client, translate.trans("Clients"), new List<string>() { "name", "email", "fax", "phone", "country","address", "notes", "add", "edit", "del", "close" }, Global.clients, 0, 0, false);
             Global.addWindow((Window)W);
@@ -350,6 +351,28 @@ namespace Memo
                     w.Activate(); return;
                 }
             }
+
+            if (Global.usr.admin)
+            {
+                if (Global.companys == null)
+                {
+                    Global.companys = Company.getTable();
+                }
+                InputDialogSample inputDialog = new InputDialogSample(translate.trans("Please Select Company :"), Global.companys);
+                if (inputDialog.ShowDialog() == true)
+                {
+                    Global.company = (Company)inputDialog.Answer;
+                }
+                else
+                {
+                    return;
+                }
+                if (Global.company == null)
+                {
+                    return;
+                }
+
+            }
             template t = new template();
             object W = new Window();
             object fileNo = new FileNo((Window)W);
@@ -388,6 +411,27 @@ namespace Memo
                 {
                     w.Activate(); return;
                 }
+            }
+            if (Global.usr.admin)
+            {
+                if (Global.companys == null)
+                {
+                    Global.companys = Company.getTable();
+                }
+                InputDialogSample inputDialog = new InputDialogSample(translate.trans("Please Select Company :"), Global.companys);
+                if (inputDialog.ShowDialog() == true)
+                {
+                    Global.company = (Company)inputDialog.Answer;
+                }
+                else
+                {
+                    return;
+                }
+                if (Global.company == null)
+                {
+                    return;
+                }
+
             }
             template t = new template();
             object W = new Window();
@@ -430,6 +474,27 @@ namespace Memo
                     w.Activate(); return;
                 }
             }
+            if (Global.usr.admin)
+            {
+                if (Global.companys == null)
+                {
+                    Global.companys = Company.getTable();
+                }
+                InputDialogSample inputDialog = new InputDialogSample(translate.trans("Please Select Company :"), Global.companys);
+                if (inputDialog.ShowDialog() == true)
+                {
+                    Global.company = (Company)inputDialog.Answer;
+                }
+                else
+                {
+                    return;
+                }
+                if (Global.company == null)
+                {
+                    return;
+                }
+
+            }
             template t = new template();
             object W = new Window();
             object cheque = new Cheque((Window)W);
@@ -469,6 +534,27 @@ namespace Memo
                     w.Activate(); return;
                 }
             }
+            if (Global.usr.admin)
+            {
+                if (Global.companys == null)
+                {
+                    Global.companys = Company.getTable();
+                }
+                InputDialogSample inputDialog = new InputDialogSample(translate.trans("Please Select Company :"), Global.companys);
+                if (inputDialog.ShowDialog() == true)
+                {
+                    Global.company = (Company)inputDialog.Answer;
+                }
+                else
+                {
+                    return;
+                }
+                if (Global.company == null)
+                {
+                    return;
+                }
+
+            }
             template t = new template();
             object W = new Window();
             object booked = new Booked((Window)W);
@@ -498,10 +584,105 @@ namespace Memo
             }
            ((Window)W).Show();
         }
+        public void openEstiva()
+        {
+
+            foreach (Window w in Global.windows)
+            {
+                if (w.Name == translate.trans("Estiva"))
+                {
+                    w.Activate(); return;
+                }
+            }
+            if (Global.usr.admin)
+            {
+                if (Global.companys == null)
+                {
+                    Global.companys = Company.getTable();
+                }
+                InputDialogSample inputDialog = new InputDialogSample(translate.trans("Please Select Company :"), Global.companys);
+                if (inputDialog.ShowDialog() == true)
+                {
+                    Global.company = (Company)inputDialog.Answer;
+                }
+                else
+                {
+                    return;
+                }
+                if (Global.company == null)
+                {
+                    return;
+                }
+
+            }
+            template t = new template();
+            object W = new Window();
+            object estiva = new Booked((Window)W);
+            if (Global.estivas == null || Global.estivas.Count == 0)
+            {
+                Global.estivas = Estiva.getTable();
+                Global.exportCertificates = ExportCertificate.getTable();
+            }
+            List<Property> P = new List<Property>()
+            {
+                new Property("id","num" , _readOnly:true),
+                new Property("exportCertificate","cmb"),
+                new Property("dat","date"),
+                new Property("note","txt"),
+            };
+            List<TableCol> tbcs = new List<TableCol>()
+            {
+                new TableCol("id","id"),
+                new TableCol("exportCertificate","exportCertificate.num"),
+                new TableCol("dat","dat"),
+                new TableCol("note","note"),
+            };
+            t.Moderntemplate(W, ref estiva, translate.trans("Estiva"), P, new List<string>() { "add", "edit", "del", "close" }, Global.estivas, tbcs, 0, 0, false);
+            Global.addWindow((Window)W);
+
+            if (((Booked)Global.bookeds[0]).id == string.Empty || ((Booked)Global.bookeds[0]).id == "" || ((Booked)Global.bookeds[0]).id == null)
+            {
+                Global.bookeds.RemoveAt(0);
+            }
+   ((Window)W).Show();
+        }
         private void Login_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             close();
         }
+        public void openReportViewer()
+        {
+
+            foreach (Window w in Global.windows)
+            {
+                if (w.Name == translate.trans("Report Viewer"))
+                {
+                    w.Activate(); return;
+                }
+            }
+            template t = new template();
+            object W = new Window();
+            object reportViewerPage = new ReportViewerPage((Window)W);
+            List<Property> P = new List<Property>()
+            {
+                new Property("repoName","cmb",_action:"onReportNameChange"),
+                new Property("col","cmb",_action:"onColChange"),
+                new Property("op","cmb" , _action:"onOpChange"),
+                new Property("value","txt","isText"),
+                new Property("date1","date","isDate"),
+                new Property("date2","date","isBetween"),
+                new Property("pageSetup", "cmb"),
+                new Property("cond","txt",_readOnly:true),
+                
+            };
+           
+            t.Moderntemplate(W, ref reportViewerPage, translate.trans("Report Viewer"), P, new List<string>() { "addCondition", "showReport", "clear","close" },null, null, 0, 0, false);
+            Global.addWindow((Window)W);
+            ((Window)W).Show();
+
+
+        }
+
         public void openReports()
         {
             ReportsWindow rw = new ReportsWindow();

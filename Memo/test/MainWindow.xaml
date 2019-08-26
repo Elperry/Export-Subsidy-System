@@ -16,7 +16,8 @@
             <Button Content="Count my clicks" Click="Button_Click"/>
             <CheckBox Visibility="{Binding V, Converter={StaticResource BoolToVis}}" />
             <Button Content="Toggle" Click="Button_Click_1" />
-            
+            <ComboBox x:Name="comboBox" SelectionChanged="ComboBox_SelectionChanged"/>
+
         </StackPanel>
 
     </Grid>
