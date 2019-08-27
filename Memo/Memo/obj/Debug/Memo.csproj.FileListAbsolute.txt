@@ -73,7 +73,6 @@ G:\unilever2\Memo\Memo\bin\Debug\Microsoft.ReportViewer.ProcessingObjectModel.DL
 G:\unilever2\Memo\Memo\bin\Debug\Microsoft.ReportViewer.WebForms.DLL
 G:\unilever2\Memo\Memo\bin\Debug\CodeReason.Reports.dll
 G:\unilever2\Memo\Memo\bin\Debug\CodeReason.Reports.pdb
-I:\unilever2\Memo\Memo\obj\Debug\Memo.csprojAssemblyReference.cache
 I:\unilever2\Memo\Memo\obj\Debug\InputDialogSample .g.cs
 I:\unilever2\Memo\Memo\obj\Debug\main.g.cs
 I:\unilever2\Memo\Memo\obj\Debug\MainWindow.g.cs

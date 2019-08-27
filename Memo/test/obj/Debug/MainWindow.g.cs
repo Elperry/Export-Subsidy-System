@@ -115,6 +115,7 @@ namespace test
         }
 
         internal System.Windows.Controls.ComboBox comboBox;
+        internal System.Windows.Controls.CheckBox checkBox;
     }
 }
 

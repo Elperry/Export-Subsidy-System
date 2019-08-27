@@ -296,7 +296,7 @@ namespace Memo
                 }
                    
             }
-            if (Global.exportCertificates == null)
+            if (Global.exportCertificates == null || Global.exportCertificates.Count == 0)
             {
                 Global.exportCertificates = ExportCertificate.getTable();
                 Global.countrys = Country.getTable();
@@ -640,9 +640,9 @@ namespace Memo
             t.Moderntemplate(W, ref estiva, translate.trans("Estiva"), P, new List<string>() { "add", "edit", "del", "close" }, Global.estivas, tbcs, 0, 0, false);
             Global.addWindow((Window)W);
 
-            if (((Booked)Global.bookeds[0]).id == string.Empty || ((Booked)Global.bookeds[0]).id == "" || ((Booked)Global.bookeds[0]).id == null)
+            if (((Estiva)Global.estivas[0]).id == string.Empty || ((Estiva)Global.estivas[0]).id == "" || ((Estiva)Global.estivas[0]).id == null)
             {
-                Global.bookeds.RemoveAt(0);
+                Global.estivas.RemoveAt(0);
             }
    ((Window)W).Show();
         }

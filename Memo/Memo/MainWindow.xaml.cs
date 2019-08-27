@@ -52,10 +52,10 @@ namespace Memo
             template temp = new template();
             temp.template1(this, usr, "Login",lst,null,500,450);
             /* Here is seed up open*/
-            ((User)usr).email = "admin@admin";
-            ((User)usr).password = "123";
-            ((User)usr).lang = Global.langs[1];
-           ((User)usr).login(this,new RoutedEventArgs());
+            //((User)usr).email = "admin@admin";
+            //((User)usr).password = "123";
+            //((User)usr).lang = Global.langs[1];
+           //((User)usr).login(this,new RoutedEventArgs());
             //main m = new main();
             //m.Show();
         }

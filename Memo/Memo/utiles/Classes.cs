@@ -376,7 +376,7 @@ namespace Memo
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `brand` ";
+            string q = "SELECT * from brand INNER JOIN brandcat as bc on (bc.id = brand.brandCat)WHERE bc.company = "+Global.company.id;
             if (bc != null)
             {
                 q = "SELECT * FROM `brand` where brandCat = "+bc.id;
@@ -1534,7 +1534,7 @@ namespace Memo
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `client` SET `name` = '" + name + "' ,`email` = '" + email + "' ,`fax` = '" + fax + "' ,`phone` = '" + phone + "' ,`country` = '" + country + "' ,`address` = '" + address + "' ,`notes` = '" + notes + "' WHERE `Client`.`id` = "+this.id;
+            string q = "UPDATE `client` SET `name` = '" + name + "' ,`email` = '" + email + "' ,`fax` = '" + fax + "' ,`phone` = '" + phone + "' ,`country` = '" + country.id + "' ,`address` = '" + address + "' ,`notes` = '" + notes + "' WHERE `Client`.`id` = "+this.id;
             sql.Select(q);
             foreach (Client c in Global.clients)
             {
@@ -1822,7 +1822,7 @@ namespace Memo
             string q = "SELECT * FROM `exportCertificate` Where id = " + ID;
             DataTable dt = sql.Select(q);
             DataRow r = dt.Rows[0];
-            this.num = r["id"].ToString();
+            this.id = r["id"].ToString();
             this.num = r["num"].ToString();
             this.company = new Company(r["company"].ToString());
             this.dat = r["dat"].ToString();
@@ -1969,7 +1969,7 @@ namespace Memo
             
             if (Global.invoices == null || Global.invoices.Count == 0)
             {
-                Global.invoices = Invoice.getTable(this.id);
+                Global.invoices = Invoice.getTable(this);
                 Global.clients = Client.getTable();
             }
             t.template1(W, ref invoice, translate.trans("Invoices"), new List<string>() { "num","client", "performa", "systemRef", "add", "edit", "del", "openInvoiceData", "close" }, Global.invoices, 0, 0, false);
@@ -2007,7 +2007,7 @@ namespace Memo
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `notsubmitted` where company = '" + Global.company.name+ "' GROUP BY export";
+            string q = "SELECT * FROM `alldetailed` where company = '" + Global.company.name+ "' GROUP BY export";
             DataTable dt = sql.Select(q);
             if (dt.Rows.Count == 0)
             {
@@ -2284,12 +2284,13 @@ namespace Memo
             }
             ((Window)W).Show();
         }
-        public static ObservableCollection<object> getTable(string cerNum)
+        public static ObservableCollection<object> getTable(ExportCertificate e)
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `invoice` inner join `exportCertificate` as e on (e.id = invoice.`exportCertificate`) where e.company = "+Global.company.id+"  and `exportCertificate` like " + cerNum; DataTable dt = sql.Select(q);
-            if (dt.Rows.Count == 0)
+            string q = "SELECT * FROM `invoice` inner join `exportCertificate` as e on (e.id = invoice.`exportCertificate`) where e.company = "+Global.company.id+"  and `exportCertificate` like " + e.id;
+            DataTable dt = sql.Select(q);
+            if (dt == null || dt.Rows.Count == 0)
             {
                 Invoice tmp = new Invoice(new ExportCertificate()); c.Add(tmp); return c;
             }
@@ -2303,6 +2304,30 @@ namespace Memo
                 temp.performa = r["performa"].ToString();
                 temp.systemRef = r["systemRef"].ToString();
                 temp.bankReciete = Convert.ToBoolean(r["bankReciete"].ToString());
+                c.Add(temp);
+            }
+            return c;
+        }
+        public static ObservableCollection<object> getTable(string query)
+        {
+            ObservableCollection<object> c = new ObservableCollection<object>();
+            Mysqldb sql = new Mysqldb();
+            string q = query;
+            DataTable dt = sql.Select(q);
+            if (dt == null || dt.Rows.Count == 0)
+            {
+                Invoice tmp = new Invoice(new ExportCertificate()); c.Add(tmp); return c;
+            }
+            foreach (DataRow r in dt.Rows)
+            {
+                Invoice temp = new Invoice(new ExportCertificate());
+                temp.id = r["id"].ToString();
+                temp.num = r["num"].ToString();
+                temp.exportCertificate = new ExportCertificate(r["exportCertificate"].ToString());
+                temp.client = new Client(r["client"].ToString());
+                temp.performa = r["performa"].ToString();
+                temp.systemRef = r["systemRef"].ToString();
+                //temp.bankReciete = Convert.ToBoolean(r["bankReciete"].ToString());
                 c.Add(temp);
             }
             return c;
@@ -2483,6 +2508,8 @@ namespace Memo
             Global.brands = Brand.getTable(b.brandCat);
             this.brand = b;
             this.usdVal = ((InvoiceData)((ListViewItem)sender).Content).usdVal;
+            this.egpVal = ((InvoiceData)((ListViewItem)sender).Content).egpVal;
+            this.PTREgp = ((InvoiceData)((ListViewItem)sender).Content).PTREgp;
             this.supportPercentage = ((InvoiceData)((ListViewItem)sender).Content).supportPercentage;
             
         }
@@ -2552,7 +2579,11 @@ namespace Memo
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `invoicedata` where `invoice` = "+inv; DataTable dt = sql.Select(q);
+            string q = @"SELECT invoiceData.id ,	invoice ,brand ,usdVal ,supportPercentage ,(usdVal * e.usdToEgp) as egpVal,
+                        (usdVal * e.usdToEgp) * supportPercentage as PTREgp  
+                        FROM `invoicedata` INNER join invoice on(invoice.id = invoicedata.invoice) 
+                        INNER join exportcertificate as e on(e.id = invoice.exportCertificate) where `invoice` = "+inv;
+            DataTable dt = sql.Select(q);
             if (dt.Rows.Count == 0)
             {
                 InvoiceData tmp = new InvoiceData(new Invoice(new ExportCertificate()) ); c.Add(tmp); return c;
@@ -2565,8 +2596,9 @@ namespace Memo
                 temp.brand = new Brand(r["brand"].ToString());
                 temp.brandCat = temp.brand.brandCat;
                 temp.usdVal = r["usdVal"].ToString();
-                temp.egpVal = (Convert.ToDouble(r["usdVal"].ToString())*Convert.ToDouble(temp.invoice.exportCertificate.usdToEgp)).ToString();//r["egpVal"].ToString();
-                temp.PTREgp = (Convert.ToDouble(r["usdVal"].ToString()) * Convert.ToDouble(temp.invoice.exportCertificate.usdToEgp) * Convert.ToDouble(temp.brand.supportPercentage)).ToString();
+                temp.egpVal = r["egpVal"].ToString();//r["egpVal"].ToString();
+                temp.PTREgp = r["PTREgp"].ToString();
+                temp.supportPercentage = r["supportPercentage"].ToString();
                 c.Add(temp);
             }
             return c;
@@ -2723,7 +2755,7 @@ namespace Memo
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `fileno` as f WHERE company = " + Global.company.id+" and NOT EXISTS(SELECT * from chequedata WHERE chequedata.fileNo = f.num)" ; DataTable dt = sql.Select(q);
+            string q = "SELECT * FROM `fileno` as f WHERE company = " + Global.company.id ; DataTable dt = sql.Select(q);
             if (dt.Rows.Count == 0)
             {
                 FileNo tmp = new FileNo(); c.Add(tmp); return c;
@@ -2946,7 +2978,7 @@ namespace Memo
             if (!_rowSelected){MessageBox.Show(translate.trans("Please Select Record"));return;}
 
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `bankreceipt` SET `num` = '" + num + "' ,`client` = '" + client + "' ,`usd` = '" + usd + "' ,`dat` = " + Global.dateFormate(dat) + " WHERE `BankReceipt`.`id` = " + id + ";";
+            string q = "UPDATE `bankreceipt` SET `num` = '" + num + "' ,`client` = '" + client.id+ "' ,`usd` = '" + usd + "' ,`dat` = " + Global.dateFormate(dat) + " WHERE `BankReceipt`.`id` = " + id + ";";
             sql.Select(q);
             foreach (BankReceipt c in Global.bankReceipts)
             {
@@ -2990,7 +3022,12 @@ namespace Memo
             object W = new Window();
             object bankReceiptData = new BankReceiptData(this,(Window)W);
             Global.bankReceiptDatas = BankReceiptData.getTable(this);
-            Global.invoices = Invoice.getTable("'%'");
+            string query = @"SELECT * FROM invoice as i where not EXISTS 
+                            (select * from bankreceiptdata WHERE bankreceiptdata.invoice = i.id) 
+                            UNION SELECT ii.id,ii.num,ii.client,exportCertificate,performa,systemRef,bankReciete FROM invoice as ii 
+                            inner JOIN bankreceiptdata AS bdata on (bdata.invoice = ii.id) inner JOIN 
+                            bankreceipt on (bankReceipt.id = bdata.bankReceipt) where bankReceipt.id = "+this.id;
+            Global.invoices = Invoice.getTable(query);//
             List<Property> P = new List<Property>()
             {
                 new Property("txtbankReceipt","num" , _readOnly:true),
@@ -3086,7 +3123,6 @@ namespace Memo
                     this.PropertyChanged(this, new PropertyChangedEventArgs("invoice"));
             }
         }
-
         public string txtbankReceipt
         {
             get { return _bankReceipt.num; }
@@ -3287,10 +3323,22 @@ namespace Memo
             }
             // need to be calculated
             Mysqldb sql = new Mysqldb();
-            DataTable dt = sql.Select("SELECT t.export , sum(usdVal) as usd from notsubmitted as t WHERE t.country = '"+bankReceipt.client.country.name+ "' GROUP BY t.export order by usd DESC ");
+            string query = @"SELECT t.id , sum(usdVal) as usd from alldetailed as t 
+                            WHERE t.country = '"+this.bankReceipt.client.country.name+ @"' and not exists
+                            (select * from bankreceiptdata as bdata  INNER JOIN Invoice on (Invoice.id = bdata.invoice) 
+                            where t.Invoice = Invoice.num) GROUP BY t.id 
+                            UNION SELECT t.id , sum(usdVal) as usd from alldetailed as t 
+                            WHERE t.country = '" + this.bankReceipt.client.country.name + @"' and exists
+                            (select * from bankreceiptdata as bdata   where bdata.bankReceipt="+this.bankReceipt.id+@") GROUP BY t.id                         
+                            order by usd DESC";
+            DataTable dt = sql.Select(query);
             if (dt == null || dt.Rows.Count == 0)
             {
                 MessageBox.Show(translate.trans("There is no un Submitted Export Certificates in DataBase")); return;
+            }
+            foreach(object o in Global.bankReceiptDatas)
+            {
+                ((BankReceiptData)o).chck = false;
             }
             List<double> lst = new List<double>();
             foreach (DataRow r in dt.Rows)
@@ -3306,7 +3354,7 @@ namespace Memo
             // here we must select exportCer and invoices inside them  then select them in the table
             foreach(int i in indeces)
             {
-                ObservableCollection<object> t = Invoice.getTable(dt.Rows[i]["export"].ToString());
+                ObservableCollection<object> t = Invoice.getTable(new ExportCertificate(dt.Rows[i]["id"].ToString()));
                 foreach(object o in t)
                 {
                     int ii = Global.bankReceiptDatas.IndexOf(Global.bankReceiptDatas.Where(x => ((BankReceiptData)x).invoice.num == ((Invoice)o).num).First());
@@ -3333,7 +3381,10 @@ namespace Memo
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT bdata.id , bdata.bankReceipt , i.id as 'invoice' , sum(idata.usdVal) as 'usd' FROM bankreceiptdata as bdata INNER JOIN invoice as i on (bdata.invoice = i.id) INNER JOIN invoicedata as idata on (idata.invoice = i.id) INNER JOIN exportcertificate as e on(i.exportCertificate = e.id) INNER JOIN bankreceipt as b on(b.id = bdata.bankReceipt) where b.client like "+br.client.id+" AND bdata.bankReceipt like " + br.id+ " GROUP by(i.num)";
+            string q = @"SELECT bdata.id , bdata.bankReceipt , i.id as 'invoice' , sum(idata.usdVal) as 'usd' FROM bankreceiptdata as bdata " +
+                "INNER JOIN invoice as i on (bdata.invoice = i.id) INNER JOIN invoicedata as idata on (idata.invoice = i.id) " +
+                "INNER JOIN exportcertificate as e on(i.exportCertificate = e.id) INNER JOIN bankreceipt as b on(b.id = bdata.bankReceipt) " +
+                "where  bdata.bankReceipt = " + br.id+ " GROUP by(i.num)";
             DataTable dt = sql.Select(q);
 
             Global.tempsum = 0;
@@ -3349,7 +3400,10 @@ namespace Memo
                 temp.chck = true;
                 c.Add(temp);
             }
-            q = "SELECT i.id as 'invoice', sum(idata.usdVal) as 'usd' FROM invoice as i  INNER JOIN invoicedata as idata on (idata.invoice = i.id) INNER JOIN exportcertificate as e on(i.exportCertificate = e.id) where NOT EXISTS(select * from  bankreceiptdata WHERE bankreceiptdata.invoice = i.id) AND e.company like "+Global.company.id+" AND i.client like "+br.client.id+" group by(i.id)";
+            q = @"SELECT i.id as 'invoice', sum(idata.usdVal) as 'usd' FROM invoice as i  INNER JOIN 
+                invoicedata as idata on (idata.invoice = i.id) INNER JOIN exportcertificate as e on(i.exportCertificate = e.id) 
+                where NOT EXISTS(select * from  bankreceiptdata WHERE bankreceiptdata.invoice = i.id) 
+                AND e.company = "+Global.company.id+" and e.country = "+br.client.country.id+"  group by(i.id)";
             dt = sql.Select(q);
             foreach (DataRow r in dt.Rows)
             {
@@ -3451,7 +3505,7 @@ namespace Memo
         public void add(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `booked` (`id`,`valueEgp`,`dat`) VALUES ( NULL,'" + valueEgp + "','" + dat + "');";
+            string q = "INSERT INTO `booked` (`id`,`valueEgp`,`dat`) VALUES ( NULL,'" + valueEgp + "','" + Global.dateFormate(dat) + "');";
             sql.Select(q);
             id = (sql.nextAutoIncrement("booked") - 1).ToString();
             Global.bookeds.Add(clone()); clear();
@@ -3460,7 +3514,7 @@ namespace Memo
         {
             if (!_rowSelected) { MessageBox.Show(translate.trans("Please Select Record")); return; }
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `booked` SET `valueEgp` = '" + valueEgp + "' ,`dat` = '" + dat + "' WHERE `Booked`.`id` = " + id + ";";
+            string q = "UPDATE `booked` SET `valueEgp` = '" + valueEgp + "' ,`dat` = '" + Global.dateFormate(dat) + "' WHERE `Booked`.`id` = " + id + ";";
             sql.Select(q);
             foreach (Booked c in Global.bookeds)
             {

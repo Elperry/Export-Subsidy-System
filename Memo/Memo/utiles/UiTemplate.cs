@@ -75,7 +75,11 @@ namespace Memo
     }
     public static class translate
     {
-        public static string lang = (Global.Lang == null)?"EN": Global.Lang.id;
+        public static string lang
+        {
+            get { if (Global.Lang == null) return "EN"; else return Global.Lang.id; }
+            set { }
+        }
         public static List<dic> lst = new List<dic>() {
             new dic("id","م","Id"),
             new dic("name","الإسم","Name"),
@@ -141,6 +145,29 @@ namespace Memo
             new dic("chequedatas" , "الملفات المربوطة بالشيك", "fles binded with this Chequq" ),
             new dic("cheque" , "شيك بنكى", "Cheque" ),
             new dic("chequerecieved" , "وصل شيك بنكى", "Cheque Recieved" ),
+            new dic("basic info" , "البيانات الأساسية", "Basic Info" ),
+            new dic("actions" , "الحركات", "Actions" ),
+            new dic("reports" , "التقارير", "Reports" ),
+            new dic("opened windows" , "النوافذ المفتوحة", "Opened Windows" ),
+            new dic("companies" , "الشركات", "Companies" ),
+            new dic("brands" , "البراندات", "Brands" ),
+            new dic("shippin gcompany" , "شركة الشحن" , "Shipping Company"),
+            new dic("brand categories" , "تصنيفات البراندات", "Entities" ),
+            new dic("ports" , "الموانئ", "Ports" ),
+            new dic("users" , "المستخدمين", "Users" ),
+            new dic("export certificates" , "شهادات الصادر", "Export Certificates" ),
+            new dic("bankreceipt" , "الإيصال البنكى", "Bankreceipt" ),
+            new dic("booked" , "محجوزات", "Booked" ),
+            new dic("openreportviewer" , "عرض التقارير", "Report View" ),
+            new dic("openbankreceiptdata" , "الفواتير المتعلقة بهذا الإيصال البنكى", "Open Invoices related To this Bankreceipt" ),
+            new dic("op" , "أداة المقارنة", "Comparator Operator" ),
+            new dic("reponame" , "إسم التقرير", "Report Name" ),
+            new dic("col" , "الخانة", "Feild" ),
+            new dic("value" , "القيمة", "Value" ),
+            new dic("pagesetup" , "إعدادات صفحة التقارير", "Page Setup" ),
+            new dic("showreport" , "عرض التقرير", "Show Report" ),
+            new dic("cond" , "الشروط", "Condtion" ),
+            new dic("clear" , "مسح الخانات", "Clear" ),
         };
         public static string trans(string str)
         {
@@ -565,9 +592,18 @@ namespace Memo
                 if(p.action != "")
                 {
 
-                    SelectionChangedEventHandler e = (SelectionChangedEventHandler)Delegate.CreateDelegate(
-                    typeof(SelectionChangedEventHandler), obj, obj.GetType().GetMethod(p.action));
-                    t.SelectionChanged += e;
+                    try
+                    {
+                        SelectionChangedEventHandler e = (SelectionChangedEventHandler)Delegate.CreateDelegate(
+                        typeof(SelectionChangedEventHandler), obj, obj.GetType().GetMethod(p.action));
+                        t.SelectionChanged += e;
+                    }
+                    catch (Exception)
+                    {
+                        KeyEventHandler e = (KeyEventHandler)Delegate.CreateDelegate(
+                        typeof(KeyEventHandler), obj, obj.GetType().GetMethod(p.action));
+                        t.KeyUp += e;
+                    }
                 }
                 t.IsEditable = true;
 
@@ -990,6 +1026,8 @@ namespace Memo
             ((Window)form).Background = bgColor;
             ((Window)form).HorizontalAlignment = HorizontalAlignment.Center;
             ((Window)form).WindowStyle = WindowStyle.None;
+            ((Window)form).ShowInTaskbar = false;
+            ((Window)form).Topmost = true;
             if (translate.lang == "EN") { ((Window)form).FlowDirection = FlowDirection.LeftToRight; }
             else
             {
@@ -1156,6 +1194,9 @@ namespace Memo
             ((Window)form).Background = bgColor;
             ((Window)form).HorizontalAlignment = HorizontalAlignment.Center;
             ((Window)form).WindowStyle = WindowStyle.None;
+            
+            ((Window)form).ShowInTaskbar = false;
+            ((Window)form).Topmost = true;
             if (translate.lang == "EN") { ((Window)form).FlowDirection = FlowDirection.LeftToRight; }
             else
             {
@@ -1365,6 +1406,7 @@ namespace Memo
             ((Window)form).Background = bgColor;
             ((Window)form).HorizontalAlignment = HorizontalAlignment.Center;
             ((Window)form).WindowStyle = WindowStyle.SingleBorderWindow;
+            ((Window)form).WindowState = WindowState.Maximized;
             if (translate.lang == "EN") { ((Window)form).FlowDirection = FlowDirection.LeftToRight; }
             else
             {
@@ -1409,6 +1451,8 @@ namespace Memo
             ((Window)form).Background = bgColor;
             ((Window)form).HorizontalAlignment = HorizontalAlignment.Center;
             ((Window)form).WindowStyle = WindowStyle.None;
+            ((Window)form).ShowInTaskbar = false;
+            ((Window)form).Topmost = true;
             if (translate.lang == "EN") { ((Window)form).FlowDirection = FlowDirection.LeftToRight; }
             else
             {
