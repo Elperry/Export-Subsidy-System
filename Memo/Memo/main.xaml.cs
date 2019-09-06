@@ -1,21 +1,10 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+
 using System.Collections.ObjectModel;
-using System.Dynamic;
-using System.Reflection;
-using System.Reflection.Emit;
-using System.Globalization;
+
 
 
 namespace Memo
@@ -78,13 +67,13 @@ namespace Memo
             template t = new template();
             object W = new Window();
             object country = new Country((Window)W);
-         
-            t.template1(W,ref country, translate.trans("Countries"), new List<string>() { "name", "nolon", "manifest", "add", "edit", "del", "close" }, Global.countrys, 0, 0, false);
-            Global.addWindow((Window)W);
             if(Global.countrys == null)
             {
                 Global.countrys = Country.getTable();
             }
+            t.template1(W,ref country, translate.trans("Countries"), new List<string>() { "name", "nolon", "manifest", "add", "edit", "del", "close" }, Global.countrys, 0, 0, false);
+            Global.addWindow((Window)W);
+
             if (((Country)Global.countrys[0]).id == string.Empty || ((Country)Global.countrys[0]).id == "" || ((Country)Global.countrys[0]).id == null)
             {
                 Global.countrys.RemoveAt(0);
@@ -205,10 +194,28 @@ namespace Memo
             template t = new template();
             object W = new Window();
             object brandCat = new BrandCat((Window)W);
-           if(Global.brandCats == null)
+            if (Global.companys == null)
             {
-                Global.brandCats = BrandCat.getTable();
+                Global.companys = Company.getTable();
             }
+            if (Global.usr.admin)
+            {
+                InputDialogSample inputDialog = new InputDialogSample(translate.trans("Please Select Company :"), Global.companys);
+                if (inputDialog.ShowDialog() == true)
+                {
+                    Global.company = (Company)inputDialog.Answer;
+                }
+                else
+                {
+                    return;
+                }
+                if (Global.company == null)
+                {
+                    return;
+                }
+
+            }
+            Global.brandCats = BrandCat.getTable();
             t.template1(W, ref brandCat, translate.trans("Brand Categories"), new List<string>() { "name", "add", "edit", "del", "close" }, Global.brandCats, 0, 0, false);
             Global.addWindow((Window)W);
  
@@ -231,10 +238,29 @@ namespace Memo
             template t = new template();
             object W = new Window();
             object brand = new Brand((Window)W);
-            if(Global.brands == null)
+            if (Global.companys == null)
             {
-                Global.brands = Brand.getTable();
+                Global.companys = Company.getTable();
             }
+            if (Global.usr.admin)
+            {
+                InputDialogSample inputDialog = new InputDialogSample(translate.trans("Please Select Company :"), Global.companys);
+                if (inputDialog.ShowDialog() == true)
+                {
+                    Global.company = (Company)inputDialog.Answer;
+                }
+                else
+                {
+                    return;
+                }
+                if (Global.company == null)
+                {
+                    return;
+                }
+
+            }
+            Global.brands = Brand.getTable();
+            Global.brandCats = BrandCat.getTable();
             t.template1(W, ref brand, translate.trans("Brands"), new List<string>() { "name","brandCat", "supportPercentage", "add", "edit", "del", "close" }, Global.brands, 0, 0, false);
             Global.addWindow((Window)W);
 
@@ -298,11 +324,12 @@ namespace Memo
             }
             if (Global.exportCertificates == null || Global.exportCertificates.Count == 0)
             {
-                Global.exportCertificates = ExportCertificate.getTable();
+
                 Global.countrys = Country.getTable();
                 Global.shippingCompanys = ShippingCompany.getTable();
                 Global.ports = Port.getTable();
             }
+            Global.exportCertificates = ExportCertificate.getTable();
             t.Moderntemplate(W, ref exportCertificate, translate.trans(" Export Certificates"), P, new List<string>() { "add", "edit", "del", "openInvoice", "close" }, Global.exportCertificates,null, 0, 0, false);
             Global.addWindow((Window)W);
             ((Window)W).Show();
@@ -332,7 +359,15 @@ namespace Memo
                 Global.users = Users.getTable();
                 Global.companys = Company.getTable();
             }
-            t.template1(W, ref users, translate.trans("Users"), new List<string>() { "name", "email","pass","company","admin","add", "edit", "del", "close" }, Global.users, 0, 0, false);
+            List<Property> P = new List<Property>()
+            {
+                new Property("name"),
+                new Property("email"),
+                new Property("pass"),
+                new Property("company"),
+                new Property("admin","bool",_action:"chckClicked")
+            };
+            t.Moderntemplate(W, ref users, translate.trans("Users"),P, new List<string>() {"add", "edit", "del", "close" }, Global.users,parent:false);
             Global.addWindow((Window)W);
 
             if (((Users)Global.users[0]).id == string.Empty || ((Users)Global.users[0]).id == "" || ((Users)Global.users[0]).id == null)
@@ -376,9 +411,10 @@ namespace Memo
             template t = new template();
             object W = new Window();
             object fileNo = new FileNo((Window)W);
+            Global.fileNos = FileNo.getTable();
             if (Global.fileNos == null || Global.fileNos.Count == 0)
             {
-                Global.fileNos = FileNo.getTable();
+                
                 Global.exportCertificates = ExportCertificate.getTable();
             }
             List<Property> P = new List<Property>()
@@ -498,9 +534,10 @@ namespace Memo
             template t = new template();
             object W = new Window();
             object cheque = new Cheque((Window)W);
+            Global.cheques = Cheque.getTable();
             if (Global.cheques == null || Global.cheques.Count == 0)
             {
-                Global.cheques = Cheque.getTable();
+                
                 Global.exportCertificates = ExportCertificate.getTable();
             }
             List<Property> P = new List<Property>()
@@ -558,6 +595,7 @@ namespace Memo
             template t = new template();
             object W = new Window();
             object booked = new Booked((Window)W);
+            Global.bookeds = Booked.getTable();
             if (Global.bookeds == null || Global.bookeds.Count == 0)
             {
                 Global.bookeds = Booked.getTable();
@@ -618,9 +656,10 @@ namespace Memo
             template t = new template();
             object W = new Window();
             object estiva = new Booked((Window)W);
+            Global.estivas = Estiva.getTable();
             if (Global.estivas == null || Global.estivas.Count == 0)
             {
-                Global.estivas = Estiva.getTable();
+                
                 Global.exportCertificates = ExportCertificate.getTable();
             }
             List<Property> P = new List<Property>()

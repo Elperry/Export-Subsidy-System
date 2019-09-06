@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Data;
 using System.Windows.Controls;
@@ -41,34 +40,42 @@ namespace Memo
 
         public void login(object sender, RoutedEventArgs e)
         {
-            Mysqldb sql = new Mysqldb();
-            if(Global.usr.email == string.Empty || Global.usr.email == null) { MessageBox.Show(translate.trans("PLease Enter a Valid Email !!!"));return; }
-            if (Global.usr.password == string.Empty || Global.usr.password == null) { MessageBox.Show(translate.trans("PLease Enter your PassWord!!!"));return; }
-            if (Global.usr.lang ==  null) { MessageBox.Show(translate.trans("PLease Choose your Language !!!"));return; }
-            string q = "SELECT * from user where `email`='"+ Global.usr.email +"' and `pass`='"+ Global.usr.password +"';";
-            DataTable dt = sql.Select(q);
-            if (dt.Rows.Count > 0)
+            try
             {
-                // login success
-                MessageBox.Show("Login Successfull");
-                DataRow r = dt.Rows[0];
-                this.id = r["id"].ToString();
-                this.name = r["name"].ToString();
-                this.email = r["email"].ToString();
-                this.password = r["pass"].ToString();
-                this.admin = Convert.ToBoolean(r["admin"].ToString());
-                this.company = new Company(r["company"].ToString());
-                main m = new main();
-                m.Show();
-                ((Window)window).Hide();
-                Global.removeWindow(window);
+                Mysqldb sql = new Mysqldb();
+                if (Global.usr.email == string.Empty || Global.usr.email == null) { MessageBox.Show(translate.trans("PLease Enter a Valid Email !!!")); return; }
+                if (Global.usr.password == string.Empty || Global.usr.password == null) { MessageBox.Show(translate.trans("PLease Enter your PassWord!!!")); return; }
+                if (Global.usr.lang == null) { MessageBox.Show(translate.trans("PLease Choose your Language !!!")); return; }
+                string q = "SELECT * from user where `email`='" + Global.usr.email + "' and `pass`='" + Global.usr.password + "';";
+                DataTable dt = sql.Select(q);
+                if (dt.Rows.Count > 0)
+                {
+                    // login success
+                    //MessageBox.Show("Login Successfull");
+                    DataRow r = dt.Rows[0];
+                    this.id = r["id"].ToString();
+                    this.name = r["name"].ToString();
+                    this.email = r["email"].ToString();
+                    this.password = r["pass"].ToString();
+                    this.admin = Convert.ToBoolean(r["admin"].ToString());
+                    this.company = new Company(r["company"].ToString());
+                    main m = new main();
+                    m.Show();
+                    ((Window)window).Hide();
+                    Global.removeWindow(window);
 
+                }
+                else
+                {
+                    //fail
+                    MessageBox.Show(translate.trans("Wrong Email Or PassWord !!! /n Please Enter Correct ones."));
+
+                }
             }
-            else
+            catch (Exception ex)
             {
-                //fail
-                MessageBox.Show(translate.trans("Wrong Email Or PassWord !!! /n Please Enter Correct ones."));
-                
+
+                MessageBox.Show(ex.ToString());
             }
         }
         public void exit(object sender, RoutedEventArgs e)
@@ -105,7 +112,11 @@ namespace Memo
         }
         public string name
         {
-            get { return _name; }
+            get
+            {
+                if (_name != "") return _name;
+                else { return " "; }
+            }
             set
             {
                 _name = value;
@@ -150,30 +161,56 @@ namespace Memo
         }
         public void add(object sender, RoutedEventArgs e)
         {
-            Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `brandcat` (`id`,`name`,`company`) VALUES ( NULL,'" + name + "','" + Global.company.id + "');";
-            sql.Select(q);
-            id = (sql.nextAutoIncrement("brandcat") - 1).ToString();
-            Global.brandCats.Add(clone()); clear();
+            try
+            {
+                if (name == string.Empty)
+                {
+                    MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
+                }
+                Mysqldb sql = new Mysqldb();
+                string q = "INSERT INTO  uniexport.`brandcat` (`id`,`name`,`company`) VALUES ( NULL,'" + name + "','" + Global.company.id + "');";
+                id = (sql.nextAutoIncrement("brandcat")).ToString();
+                sql.Select(q);
+
+                Global.brandCats.Add(clone());
+                clear();
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.ToString());
+            }
         }
         public void edit(object sender, RoutedEventArgs e)
         {
-            Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `brandcat` SET   `name` = '" + name + "' WHERE `BrandCat`.`id` = "+this.id;
-            sql.Select(q);
-            foreach (BrandCat c in Global.brandCats)
+            try
             {
-                if (c.id == _id)
+                if (name == string.Empty)
                 {
-                    Global.brandCats[Global.brandCats.IndexOf(c)] = clone(); return;
+                    MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
                 }
+                Mysqldb sql = new Mysqldb();
+                string q = "UPDATE uniexport.`brandcat` SET   `name` = '" + name + "' WHERE `BrandCat`.`id` = " + this.id;
+                sql.Select(q);
+                foreach (BrandCat c in Global.brandCats)
+                {
+                    if (c.id == _id)
+                    {
+                        Global.brandCats[Global.brandCats.IndexOf(c)] = clone(); return;
+                    }
+                }
+                clear();
             }
-            clear();
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.ToString());
+            }
         }
         public void del(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "DELETE FROM `brandcat` WHERE `brandcat`.`id` = " + id;
+            string q = "DELETE FROM  uniexport.`brandcat` WHERE `brandcat`.`id` = " + id;
             sql.Select(q);
             foreach (BrandCat temp in Global.brandCats)
             {
@@ -190,14 +227,15 @@ namespace Memo
         }
         public void clear()
         {
-            _id = null;
-            _name = null;
+            id = null;
+            name = null;
         }
         public static ObservableCollection<object> getTable()
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `brandcat` where company ="+Global.company.id; DataTable dt = sql.Select(q);
+            string q = "SELECT * FROM `brandcat` where company ="+Global.company.id;
+            DataTable dt = sql.Select(q);
             if (dt.Rows.Count == 0)
             {
                 BrandCat tmp = new BrandCat(); c.Add(tmp); return c;
@@ -207,6 +245,7 @@ namespace Memo
                 BrandCat temp = new BrandCat();
                 temp.id = r["id"].ToString();
                 temp.name = r["name"].ToString();
+                //MessageBox.Show(temp.name);
                 c.Add(temp);
             }
             return c;
@@ -232,7 +271,11 @@ namespace Memo
         }
         public string name
         {
-            get { return _name; }
+            get
+            {
+                if (_name != "")  return _name;
+                else { return " "; }
+            }
             set
             {
                 _name = value;
@@ -326,16 +369,25 @@ namespace Memo
         }
         public void add(object sender, RoutedEventArgs e)
         {
+            if (name == string.Empty || brandCat == null || !Global.isNum(supportPercentage))
+            {
+                MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
+            }
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `brand` (`id`,`name`,`brandCat`,`supportPercentage`) VALUES ( NULL,'" + name + "','" + brandCat.id + "','" + supportPercentage + "');";
+            string q = "INSERT INTO  uniexport.`brand` (`id`,`name`,`brandCat`,`supportPercentage`) VALUES ( NULL,'" + name + "','" + brandCat.id + "','" + supportPercentage + "');";
+            id = (sql.nextAutoIncrement("brand")).ToString();
             sql.Select(q);
-            id = (sql.nextAutoIncrement("brand") - 1).ToString();
+            
             Global.brands.Add(clone()); clear();
         }
         public void edit(object sender, RoutedEventArgs e)
         {
+            if (name == string.Empty || brandCat == null || !Global.isNum(supportPercentage))
+            {
+                MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
+            }
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `brand` SET   `name` = '" + name + "' ,`brandCat` = '" + brandCat + "' ,`supportPercentage` = '" + supportPercentage + "' WHERE `Brand`.`id` = "+this.id;
+            string q = "UPDATE uniexport.`brand` SET   `name` = '" + name + "' ,`brandCat` = '" + brandCat.id + "' ,`supportPercentage` = '" + supportPercentage + "' WHERE `Brand`.`id` = "+this.id;
             sql.Select(q);
             foreach (Brand c in Global.brands)
             {
@@ -349,7 +401,7 @@ namespace Memo
         public void del(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "DELETE FROM `brand` WHERE `brand`.`id` = " + id;
+            string q = "DELETE FROM  uniexport.`brand` WHERE `brand`.`id` = " + id;
             sql.Select(q);
             foreach (Brand temp in Global.brands)
             {
@@ -367,10 +419,10 @@ namespace Memo
         }
         public void clear()
         {
-            _id = null;
-            _name = null;
-            _brandCat = null;
-            _supportPercentage = null;
+            id = null;
+            name = null;
+            brandCat = null;
+            supportPercentage = null;
         }
         public static ObservableCollection<object> getTable(BrandCat bc = null)
         {
@@ -502,16 +554,25 @@ namespace Memo
         }
         public void add(object sender, RoutedEventArgs e)
         {
+            if (name == string.Empty)
+            {
+                MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
+            }
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `country` (`id`,`name`,`nolon`,`manifest`) VALUES ( NULL,'" + name + "','" + ((nolon) ? "1" : "0") + "','" + ((manifest) ? "1" : "0") + "');";
+            string q = "INSERT INTO  uniexport.`country` (`id`,`name`,`nolon`,`manifest`) VALUES ( NULL,'" + name + "','" + ((nolon) ? "1" : "0") + "','" + ((manifest) ? "1" : "0") + "');";
+            id = (sql.nextAutoIncrement("country")).ToString();
             sql.Select(q);
-            id = (sql.nextAutoIncrement("country") - 1).ToString();
+            
             Global.countrys.Add(clone()); clear();
         }
         public void edit(object sender, RoutedEventArgs e)
         {
+            if (name == string.Empty)
+            {
+                MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
+            }
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `country` SET   `name` = '" + name + "' ,`nolon` = '" + ((nolon) ? "1" : "0") + "' ,`manifest` = '" + ((manifest) ? "1" : "0") + "' WHERE `Country`.`id` = "+this.id;
+            string q = "UPDATE uniexport.`country` SET   `name` = '" + name + "' ,`nolon` = '" + ((nolon) ? "1" : "0") + "' ,`manifest` = '" + ((manifest) ? "1" : "0") + "' WHERE `Country`.`id` = "+this.id;
             sql.Select(q);
             foreach (Country c in Global.countrys)
             {
@@ -525,7 +586,7 @@ namespace Memo
         public void del(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "DELETE FROM `country` WHERE `country`.`id` = " + id;
+            string q = "DELETE FROM  uniexport.`country` WHERE `country`.`id` = " + id;
             sql.Select(q);
             foreach (Country temp in Global.countrys)
             {
@@ -542,10 +603,10 @@ namespace Memo
         }
         public void clear()
         {
-            _id = null;
-            _name = null;
-            _nolon = false;
-            _manifest = false;
+            id = null;
+            name = null;
+            nolon = false;
+            manifest = false;
         }
         public static ObservableCollection<object> getTable()
         {
@@ -656,16 +717,25 @@ namespace Memo
         }
         public void add(object sender, RoutedEventArgs e)
         {
+            if (name == string.Empty)
+            {
+                MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
+            }
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `port` (`id`,`name`,`notes`) VALUES ( NULL,'" + name + "','" + notes + "');";
+            string q = "INSERT INTO  uniexport.`port` (`id`,`name`,`notes`) VALUES ( NULL,'" + name + "','" + notes + "');";
+            id = (sql.nextAutoIncrement("port")).ToString();
             sql.Select(q);
-            id = (sql.nextAutoIncrement("port") - 1).ToString();
+            
             Global.ports.Add(clone()); clear();
         }
         public void edit(object sender, RoutedEventArgs e)
         {
+            if (name == string.Empty)
+            {
+                MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
+            }
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `port` SET   `name` = '" + name + "' ,`notes` = '" + notes + "' WHERE `Port`.`id` = "+this.id;
+            string q = "UPDATE uniexport.`port` SET   `name` = '" + name + "' ,`notes` = '" + notes + "' WHERE `Port`.`id` = "+this.id;
             sql.Select(q);
             foreach (Port c in Global.ports)
             {
@@ -679,7 +749,7 @@ namespace Memo
         public void del(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "DELETE FROM `port` WHERE `port`.`id` = " + id;
+            string q = "DELETE FROM  uniexport.`port` WHERE `port`.`id` = " + id;
             sql.Select(q);
             foreach (Port temp in Global.ports)
             {
@@ -696,9 +766,9 @@ namespace Memo
         }
         public void clear()
         {
-            _id = null;
-            _name = null;
-            _notes = null;
+            id = null;
+            name = null;
+            notes = null;
         }
         public static ObservableCollection<object> getTable()
         {
@@ -868,16 +938,25 @@ namespace Memo
         }
         public void add(object sender, RoutedEventArgs e)
         {
+            if (name == string.Empty)
+            {
+                MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
+            }
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `shippingcompany` (`id`,`name`,`email`,`phone`,`fax`,`address`,`notes`) VALUES ( NULL,'" + name + "','" + email + "','" + phone + "','" + fax + "','" + address + "','" + notes + "');";
+            string q = "INSERT INTO  uniexport.`shippingcompany` (`id`,`name`,`email`,`phone`,`fax`,`address`,`notes`) VALUES ( NULL,'" + name + "','" + email + "','" + phone + "','" + fax + "','" + address + "','" + notes + "');";
+            id = (sql.nextAutoIncrement("shippingcompany")).ToString();
             sql.Select(q);
-            id = (sql.nextAutoIncrement("shippingcompany") - 1).ToString();
+            
             Global.shippingCompanys.Add(clone()); clear();
         }
         public void edit(object sender, RoutedEventArgs e)
         {
+            if (name == string.Empty)
+            {
+                MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
+            }
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `shippingcompany` SET   `name` = '" + name + "' ,`email` = '" + email + "' ,`phone` = '" + phone + "' ,`fax` = '" + fax + "' ,`address` = '" + address + "' ,`notes` = '" + notes + "' WHERE `ShippingCompany`.`id` = "+this.id;
+            string q = "UPDATE uniexport.`shippingcompany` SET   `name` = '" + name + "' ,`email` = '" + email + "' ,`phone` = '" + phone + "' ,`fax` = '" + fax + "' ,`address` = '" + address + "' ,`notes` = '" + notes + "' WHERE `ShippingCompany`.`id` = "+this.id;
             sql.Select(q);
             foreach (ShippingCompany c in Global.shippingCompanys)
             {
@@ -891,7 +970,7 @@ namespace Memo
         public void del(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "DELETE FROM `shippingcompany` WHERE `shippingcompany`.`id` = " + id;
+            string q = "DELETE FROM  uniexport.`shippingcompany` WHERE `shippingcompany`.`id` = " + id;
             sql.Select(q);
             foreach (ShippingCompany temp in Global.shippingCompanys)
             {
@@ -908,13 +987,13 @@ namespace Memo
         }
         public void clear()
         {
-            _id = null;
-            _name = null;
-            _email = null;
-            _phone = null;
-            _fax = null;
-            _address = null;
-            _notes = null;
+            id = null;
+            name = null;
+            email = null;
+            phone = null;
+            fax = null;
+            address = null;
+            notes = null;
         }
         public static ObservableCollection<object> getTable()
         {
@@ -1028,6 +1107,12 @@ namespace Memo
         public Company(string ID, Window W = null)
         {
             window = W;
+            if(ID == "0")
+            {
+                this.id = "0";
+                this.name = "All";
+                return;
+            }
             Mysqldb sql = new Mysqldb();
             string q = "SELECT * FROM `company` Where id = " + ID;
             DataTable dt = sql.Select(q);
@@ -1078,16 +1163,25 @@ namespace Memo
         }
         public void add(object sender, RoutedEventArgs e)
         {
+            if (name == string.Empty)
+            {
+                MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
+            }
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `company` (`id`,`name`,`email`,`phone`,`fax`,`address`,`notes`) VALUES ( NULL,'" + name + "','" + email + "','" + phone + "','" + fax + "','" + address + "','" + notes + "');";
+            string q = "INSERT INTO  uniexport.`company` (`id`,`name`,`email`,`phone`,`fax`,`address`,`notes`) VALUES ( NULL,'" + name + "','" + email + "','" + phone + "','" + fax + "','" + address + "','" + notes + "');";
+            id = (sql.nextAutoIncrement("company")).ToString();
             sql.Select(q);
-            id = (sql.nextAutoIncrement("company") - 1).ToString();
+            
             Global.companys.Add(clone()); clear();
         }
         public void edit(object sender, RoutedEventArgs e)
         {
+            if (name == string.Empty)
+            {
+                MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
+            }
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `company` SET   `name` = '" + name + "' ,`email` = '" + email + "' ,`phone` = '" + phone + "' ,`fax` = '" + fax + "' ,`address` = '" + address + "' ,`notes` = '" + notes + "' WHERE `Company`.`id` = "+this.id;
+            string q = "UPDATE uniexport.`company` SET   `name` = '" + name + "' ,`email` = '" + email + "' ,`phone` = '" + phone + "' ,`fax` = '" + fax + "' ,`address` = '" + address + "' ,`notes` = '" + notes + "' WHERE `Company`.`id` = "+this.id;
             sql.Select(q);
             foreach (Company c in Global.companys)
             {
@@ -1101,7 +1195,7 @@ namespace Memo
         public void del(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "DELETE FROM `company` WHERE `company`.`id` = " + id;
+            string q = "DELETE FROM  uniexport.`company` WHERE `company`.`id` = " + id;
             sql.Select(q);
             foreach (Company temp in Global.companys)
             {
@@ -1118,13 +1212,13 @@ namespace Memo
         }
         public void clear()
         {
-            _id = null;
-            _name = null;
-            _email = null;
-            _phone = null;
-            _fax = null;
-            _address = null;
-            _notes = null;
+            id = null;
+            name = null;
+            email = null;
+            phone = null;
+            fax = null;
+            address = null;
+            notes = null;
         }
         public static ObservableCollection<object> getTable()
         {
@@ -1268,6 +1362,7 @@ namespace Memo
             temp.email = this._email;
             temp.pass = this._pass;
             temp.company = this._company.clone();
+            temp.admin = this.admin;
             return temp;
         }
         public void selectItem(object sender, MouseButtonEventArgs e)
@@ -1277,22 +1372,74 @@ namespace Memo
             this.email = ((Users)((ListViewItem)sender).Content).email;
             this.pass = ((Users)((ListViewItem)sender).Content).pass;
             this.admin = ((Users)((ListViewItem)sender).Content).admin;
-            this.company = (Company)Global.companys.Where(x=>((Company)x).name == ((Users)((ListViewItem)sender).Content).company.name).First();
+            if (this.admin == true)
+            {
+                try
+                {
+                    int i = Global.companys.IndexOf(Global.companys.Where(x => ((Company)x).name == "All").First());
+                    this.company =(Company)Global.companys[i];
+                }
+                catch (Exception)
+                {
+                    Company c2 = new Company(); c2.name = "All"; c2.id = "0";
+                    Global.companys.Add(c2);
+                    this.company = c2;
+                    //throw;
+                }
+
+
+            }
+            else
+            {
+                try
+                {
+                    int i = Global.companys.IndexOf(Global.companys.Where(x => ((Company)x).name == "All").First());
+                    Global.companys.RemoveAt(i);
+                    i = Global.companys.IndexOf(Global.companys.Where(x => ((Company)x).name == ((Users)((ListViewItem)sender).Content).company.name).First());
+                    this.company = (Company)Global.companys[i];
+                }
+                catch (Exception)
+                {
+
+                    int i = Global.companys.IndexOf(Global.companys.Where(x => ((Company)x).name == ((Users)((ListViewItem)sender).Content).company.name).First());
+                    this.company = (Company)Global.companys[i];
+                }
+            }
         }
         public void add(object sender, RoutedEventArgs e)
         {
-            Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `user` (`id`,`name`,`email`,`pass`,`company`,`admin`) VALUES ( NULL,'" + name + "','" + email + "','" + pass + "','" + company.id + "','"+((admin)?"1":"0")+"');";
-            sql.Select(q);
-            id = (sql.nextAutoIncrement("user") - 1).ToString();
-            Global.users.Add(clone()); clear();
+            try
+            {
+                if (company == null || name == string.Empty || email == string.Empty || pass == string.Empty)
+                {
+                    MessageBox.Show(translate.trans("Please Enter Valid Data"));
+                    return;
+                }
+                Mysqldb sql = new Mysqldb();
+                string q = "INSERT INTO uniexport.`user` (`id`,`name`,`email`,`pass`,`company`,`admin`) VALUES ( NULL,'" + name + "','" + email + "','" + pass + "','" + company.id + "','" + ((admin) ? "1" : "0") + "');";
+                id = (sql.nextAutoIncrement("user")).ToString();
+                sql.Select(q);
+                Global.users.Add(clone()); clear();
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.ToString());
+            }
+
         }
         public void edit(object sender, RoutedEventArgs e)
         {
+            if (company == null || name == string.Empty || email == string.Empty || pass == string.Empty)
+            {
+                MessageBox.Show(translate.trans("Please Enter Valid Data"));
+                return;
+            }
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `user` SET `name` = '" + name + "' ,`email` = '" + email + "' ,`pass` = '" + pass + "' ,`company` = '" + company + "' `admin`, = '" + ((admin) ? "1" : "0") + "' WHERE `User`.`id` = "+id+" ; ";
+            string q = "UPDATE uniexport.`user` SET `name` = '" + name + "' ,`email` = '" + email + "' ,`pass` = '" + pass + "' ,`company` = '" + company.id + "', `admin` = " + ((admin) ? "1" : "0") + "    WHERE `User`.`id` = '"+id+"' ; ";
+            string s = q;
             sql.Select(q);
-            foreach (User c in Global.users)
+            foreach (Users c in Global.users)
             {
                 if (c.id == _id)
                 {
@@ -1303,30 +1450,64 @@ namespace Memo
         }
         public void del(object sender, RoutedEventArgs e)
         {
-            Mysqldb sql = new Mysqldb();
-            string q = "DELETE FROM `user` WHERE `user`.`id` = " + id;
-            sql.Select(q);
-            foreach (User temp in Global.users)
+            try
             {
-                if (temp.id == _id)
+                Mysqldb sql = new Mysqldb();
+                string q = "DELETE FROM  uniexport.`user` WHERE `user`.`id` = " + id;
+                sql.Select(q);
+                foreach (Users temp in Global.users)
                 {
-                    Global.users.Remove(temp); return;
+                    if (temp.id == _id)
+                    {
+                        Global.users.Remove(temp); clear(); return;
+                    }
                 }
+                clear();
             }
-            clear();
+            catch (Exception ex )
+            {
+
+                MessageBox.Show(ex.ToString());
+            }
         }
         public void close(object sender, RoutedEventArgs e)
         {
             Global.removeWindow(window); window.Close();
         }
+        public void chckClicked(object sender, RoutedEventArgs e)
+        {
+            CheckBox c = (CheckBox)sender;
+            if (c.IsChecked == true)
+            {
+                Company c2 = new Company();c2.name = "All";c2.id = "0";
+                Global.companys.Add(c2);
+                this.company = c2;
+                
+            }
+            else
+            {
+                try
+                {
+                    int i = Global.companys.IndexOf(Global.companys.Where(x => ((Company)x).name == "All").First());
+                    Global.companys.RemoveAt(i);
+                    this.company = null;
+                }
+                catch (Exception)
+                {
+
+                    //throw;
+                }
+            }
+
+        }
         public void clear()
         {
-            _id = null;
-            _name = null;
-            _email = null;
-            _pass = null;
-            _company = null;
-            _admin = false;
+            id = null;
+            name = null;
+            email = null;
+            pass = null;
+            company = null;
+            admin = false;
         }
         public static ObservableCollection<object> getTable()
         {
@@ -1525,16 +1706,25 @@ namespace Memo
         }
         public void add(object sender, RoutedEventArgs e)
         {
+            if (name == string.Empty)
+            {
+                MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
+            }
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `client` (`id`,`company`,`name`,`email`,`fax`,`phone`,`country`,`address`,`notes`) VALUES ( NULL,'" + Global.company.id + "','" + name + "','" + email + "','" + fax + "','" + phone + "','" + country.id + "','" + address + "','" + notes + "');";
+            string q = "INSERT INTO  uniexport.`client` (`id`,`company`,`name`,`email`,`fax`,`phone`,`country`,`address`,`notes`) VALUES ( NULL,'" + Global.company.id + "','" + name + "','" + email + "','" + fax + "','" + phone + "','" + country.id + "','" + address + "','" + notes + "');";
+            id = (sql.nextAutoIncrement("client")).ToString();
             sql.Select(q);
-            id = (sql.nextAutoIncrement("client") - 1).ToString();
+            
             Global.clients.Add(clone()); clear();
         }
         public void edit(object sender, RoutedEventArgs e)
         {
+            if (name == string.Empty)
+            {
+                MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
+            }
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `client` SET `name` = '" + name + "' ,`email` = '" + email + "' ,`fax` = '" + fax + "' ,`phone` = '" + phone + "' ,`country` = '" + country.id + "' ,`address` = '" + address + "' ,`notes` = '" + notes + "' WHERE `Client`.`id` = "+this.id;
+            string q = "UPDATE uniexport.`client` SET `name` = '" + name + "' ,`email` = '" + email + "' ,`fax` = '" + fax + "' ,`phone` = '" + phone + "' ,`country` = '" + country.id + "' ,`address` = '" + address + "' ,`notes` = '" + notes + "' WHERE `Client`.`id` = "+this.id;
             sql.Select(q);
             foreach (Client c in Global.clients)
             {
@@ -1548,7 +1738,7 @@ namespace Memo
         public void del(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "DELETE FROM `client` WHERE `client`.`id` = " + id;
+            string q = "DELETE FROM  uniexport.`client` WHERE `client`.`id` = " + id;
             sql.Select(q);
             foreach (Client temp in Global.clients)
             {
@@ -1565,14 +1755,14 @@ namespace Memo
         }
         public void clear()
         {
-            _id = null;
-            _name = null;
-            _email = null;
-            _fax = null;
-            _phone = null;
-            _country = null;
-            _address = null;
-            _notes = null;
+            id = null;
+            name = null;
+            email = null;
+            fax = null;
+            phone = null;
+            country = null;
+            address = null;
+            notes = null;
         }
         public static ObservableCollection<object> getTable()
         {
@@ -1886,7 +2076,6 @@ namespace Memo
         {
             this.id = ((ExportCertificate)((ListViewItem)sender).Content).id;
             this.num = ((ExportCertificate)((ListViewItem)sender).Content).num;
-            //this.company = ((ExportCertificate)((ListViewItem)sender).Content).company;
             this.dat = ((ExportCertificate)((ListViewItem)sender).Content).dat;
             this.country = (Country)Global.countrys.Where(x => ((Country)x).name == ((ExportCertificate)((ListViewItem)sender).Content).country.name).First();
             this.port = (Port)Global.ports.Where(x=>((Port)x).name == ((ExportCertificate)((ListViewItem)sender).Content).port.name).First();
@@ -1894,7 +2083,6 @@ namespace Memo
             this.boles = ((ExportCertificate)((ListViewItem)sender).Content).boles;
             this.nolon = ((ExportCertificate)((ListViewItem)sender).Content).nolon;
             this.manifesto = ((ExportCertificate)((ListViewItem)sender).Content).manifesto;
-            //this.estifa = ((ExportCertificate)((ListViewItem)sender).Content).estifa;
             this.usdToEgp = ((ExportCertificate)((ListViewItem)sender).Content).usdToEgp;          
             this.submitDate = ((ExportCertificate)((ListViewItem)sender).Content).submitDate;
             this.accrualDate = ((ExportCertificate)((ListViewItem)sender).Content).accrualDate;
@@ -1907,16 +2095,18 @@ namespace Memo
         public void add(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `exportcertificate` (`num`,`company`,`dat`,`country`,`port`,`shippingCompany`,`boles`,`nolon`,`manifesto`,`usdToEgp`,`submitDate`,`accrualDate`) VALUES " +
+            string q = "INSERT INTO  uniexport.`exportcertificate` (`num`,`company`,`dat`,`country`,`port`,`shippingCompany`,`boles`,`nolon`,`manifesto`,`usdToEgp`,`submitDate`,`accrualDate`) VALUES " +
                 "('" + num + "','" + Global.company.id + "'," + Global.dateFormate(dat) + ",'" + country.id + "','" + port.id + "','" + shippingCompany.id + "','" + ((boles) ? "1" : "0") + "','" + nolon + "','" + ((manifesto) ? "1" : "0") + "','" + usdToEgp + "'," + Global.dateFormate(submitDate) + "," + Global.dateFormate(accrualDate) + ");";
+
+            id = (sql.nextAutoIncrement("exportcertificate")).ToString();
             sql.Select(q);
-            num = (sql.nextAutoIncrement("exportcertificate") - 1).ToString();
+            
             Global.exportCertificates.Add(clone()); clear();
         }
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `exportcertificate` SET `num` = '" + num + "' ,`company` = '" + Global.company.id + "' ,`dat` = " + Global.dateFormate(dat) + " ,`country` = '" + country.id + "' ,`port` = '" + port.id + "' ,`shippingCompany` = '" + shippingCompany.id + "' ,`boles` = '" + ((boles) ? "1" : "0") + "' ,`nolon` = '" + ((nolon)) + "' ,`manifesto` = '" + ((manifesto) ? "1" : "0") + "'  ,`usdToEgp` = '" + usdToEgp + "' ,`submitDate` = " + Global.dateFormate(submitDate) + " ,`accrualDate` = " + Global.dateFormate(accrualDate) + " WHERE `ExportCertificate`.`id` = "+id+";";
+            string q = "UPDATE uniexport.`exportcertificate` SET `num` = '" + num + "' ,`company` = '" + Global.company.id + "' ,`dat` = " + Global.dateFormate(dat) + " ,`country` = '" + country.id + "' ,`port` = '" + port.id + "' ,`shippingCompany` = '" + shippingCompany.id + "' ,`boles` = '" + ((boles) ? "1" : "0") + "' ,`nolon` = '" + ((nolon)) + "' ,`manifesto` = '" + ((manifesto) ? "1" : "0") + "'  ,`usdToEgp` = '" + usdToEgp + "' ,`submitDate` = " + Global.dateFormate(submitDate) + " ,`accrualDate` = " + Global.dateFormate(accrualDate) + " WHERE `ExportCertificate`.`id` = "+id+";";
             sql.Select(q);
             foreach (ExportCertificate c in Global.exportCertificates)
             {
@@ -1930,7 +2120,7 @@ namespace Memo
         public void del(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "DELETE FROM `exportcertificate` WHERE `exportcertificate`.`num` = " + num;
+            string q = "DELETE FROM  uniexport.`exportcertificate` WHERE `exportcertificate`.`num` = " + num;
             sql.Select(q);
             foreach (ExportCertificate temp in Global.exportCertificates)
             {
@@ -1987,19 +2177,18 @@ namespace Memo
         }
         public void clear()
         {
-            _num = null;
-            _dat = null;
-            _country = null;
-            _port = null;
-            _shippingCompany = null;
-            _ptr_nolon_man = null;
-            _boles = false;
-            _usdToEgp = null;
-
-            _PTREgp = null;
-            _totalEgp = null;
-            _submitDate = null;
-            _accrualDate = null;
+            num = null;
+            dat = null;
+            country = null;
+            port = null;
+            shippingCompany = null;
+            ptr_nolon_man = null;
+            boles = false;
+            usdToEgp = null;
+            PTREgp = null;
+            totalEgp = null;
+            submitDate = null;
+            accrualDate = null;
             _rowSelected = false;
         }
         
@@ -2189,15 +2378,16 @@ namespace Memo
         public void add(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `invoice` (`num`,`client`,`exportCertificate`,`performa`,`systemRef`,`bankReciete`) VALUES ( '" + num+ "','" + client.id + "','" + exportCertificate.num + "','" + performa + "','" + systemRef + "','" + ((bankReciete)?"1":"0") + "');";
+            string q = "INSERT INTO  uniexport.`invoice` (`num`,`client`,`exportCertificate`,`performa`,`systemRef`,`bankReciete`) VALUES ( '" + num+ "','" + client.id + "','" + exportCertificate.num + "','" + performa + "','" + systemRef + "','" + ((bankReciete)?"1":"0") + "');";
+            id = (sql.nextAutoIncrement("invoice") ).ToString();
             sql.Select(q);
-            id = (sql.nextAutoIncrement("invoice") - 1).ToString();
             Global.invoices.Add(clone()); clear();
+
         }
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `invoice` SET `num` = '" + num + "' ,`client` = '"+client.id+"' ,`exportCertificate` = '" + exportCertificate.id + "' ,`performa` = '" + performa + "' ,`systemRef` = '" + systemRef + "' ,`bankReciete` = '" + ((bankReciete) ? "1" : "0") + "' WHERE `Invoice`.`id` = " + id+" ;";
+            string q = "UPDATE uniexport.`invoice` SET `num` = '" + num + "' ,`client` = '"+client.id+"' ,`exportCertificate` = '" + exportCertificate.id + "' ,`performa` = '" + performa + "' ,`systemRef` = '" + systemRef + "' ,`bankReciete` = '" + ((bankReciete) ? "1" : "0") + "' WHERE `Invoice`.`id` = " + id+" ;";
             sql.Select(q);
             foreach (Invoice c in Global.invoices)
             {
@@ -2211,7 +2401,7 @@ namespace Memo
         public void del(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "DELETE FROM `invoice` WHERE `invoice`.`id` = " + id;
+            string q = "DELETE FROM  uniexport.`invoice` WHERE `invoice`.`id` = " + id;
             sql.Select(q);
             foreach (Invoice temp in Global.invoices)
             {
@@ -2228,12 +2418,12 @@ namespace Memo
         }
         public void clear()
         {
-            _num = null;
+            num = null;
             id = "";
-            _performa = null;
-            _systemRef = null;
+            performa = null;
+            systemRef = null;
             _rowSelected = false;
-            _bankReciete = false;
+            bankReciete = false;
         }
         public void openInvoiceData(object sender, RoutedEventArgs e)
         {
@@ -2516,15 +2706,16 @@ namespace Memo
         public void add(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `invoicedata` (`id`,`invoice`,`brand`,`usdVal`,`supportPercentage`) VALUES ( NULL,'" + invoice.id + "','" + brand.id + "','" + usdVal + "','" + supportPercentage + "');";
+            string q = "INSERT INTO  uniexport.`invoicedata` (`id`,`invoice`,`brand`,`usdVal`,`supportPercentage`) VALUES ( NULL,'" + invoice.id + "','" + brand.id + "','" + usdVal + "','" + supportPercentage + "');";
+            id = (sql.nextAutoIncrement("invoicedata")).ToString();
             sql.Select(q);
-            id = (sql.nextAutoIncrement("invoicedata") - 1).ToString();
+            
             Global.invoiceDatas.Add(clone()); clear();
         }
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `invoicedata` SET `invoice` = '" + invoice.id + "' ,`brand` = '" + brand.id + "' ,`usdVal` = '" + usdVal + "' ,`supportPercentage` = '" + supportPercentage + "'  WHERE `InvoiceData`.`id` ="+id+" ;";
+            string q = "UPDATE uniexport.`invoicedata` SET `invoice` = '" + invoice.id + "' ,`brand` = '" + brand.id + "' ,`usdVal` = '" + usdVal + "' ,`supportPercentage` = '" + supportPercentage + "'  WHERE `InvoiceData`.`id` ="+id+" ;";
             sql.Select(q);
             foreach (InvoiceData c in Global.invoiceDatas)
             {
@@ -2538,7 +2729,7 @@ namespace Memo
         public void del(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "DELETE FROM `invoicedata` WHERE `invoicedata`.`id` = " + id;
+            string q = "DELETE FROM  uniexport.`invoicedata` WHERE `invoicedata`.`id` = " + id;
             sql.Select(q);
             foreach (InvoiceData temp in Global.invoiceDatas)
             {
@@ -2561,11 +2752,11 @@ namespace Memo
         }
         public void clear()
         {
-            _id = null;
-            _brand = null;
-            _usdVal = null;
-            _egpVal = null;
-            _PTREgp = null;
+            id = null;
+            brand = null;
+            usdVal = null;
+            egpVal = null;
+            PTREgp = null;
         }
         public void onBrandCatChange(object sender, SelectionChangedEventArgs e)
         {
@@ -2709,15 +2900,15 @@ namespace Memo
         public void add(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `fileno` (`id`,`num`,`company`,`dat`,`exportCertificate`) VALUES ( NULL ,'" + num + "','" + Global.company.id + "'," + Global.dateFormate(dat) + ",'" + exportCertificate.id + "');";
+            string q = "INSERT INTO  uniexport.`fileno` (`id`,`num`,`company`,`dat`,`exportCertificate`) VALUES ( NULL ,'" + num + "','" + Global.company.id + "'," + Global.dateFormate(dat) + ",'" + exportCertificate.id + "');";
+            id = (sql.nextAutoIncrement("fileno")).ToString();
             sql.Select(q);
-            id = (sql.nextAutoIncrement("fileno") - 1).ToString();
             Global.fileNos.Add(clone()); clear();
         }
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `fileno` SET `num` = '" + num + "' ,`dat` = " + Global.dateFormate(dat) + ",`exportCertificate` = '" + exportCertificate.id + "'  WHERE `FileNo`.`id` = "+id+" ;";
+            string q = "UPDATE uniexport.`fileno` SET `num` = '" + num + "' ,`dat` = " + Global.dateFormate(dat) + ",`exportCertificate` = '" + exportCertificate.id + "'  WHERE `FileNo`.`id` = "+id+" ;";
             sql.Select(q);
             foreach (FileNo c in Global.fileNos)
             {
@@ -2731,7 +2922,7 @@ namespace Memo
         public void del(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "DELETE FROM `fileno` WHERE `fileno`.`id` = " + id;
+            string q = "DELETE FROM  uniexport.`fileno` WHERE `fileno`.`id` = " + id;
             sql.Select(q);
             foreach (FileNo temp in Global.fileNos)
             {
@@ -2748,8 +2939,8 @@ namespace Memo
         }
         public void clear()
         {
-            _id = null;
-            _dat = null;
+            id = null;
+            dat = null;
         }
         public static ObservableCollection<object> getTable()
         {
@@ -2968,9 +3159,10 @@ namespace Memo
         public void add(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `bankreceipt` (`id`,`company`,`num`,`client`,`usd`,`dat`) VALUES ( NULL,'" + Global.company.id + "','" + num + "','" + client.id + "','" + usd + "'," + Global.dateFormate(dat) + ");";
+            string q = "INSERT INTO  uniexport.`bankreceipt` (`id`,`company`,`num`,`client`,`usd`,`dat`) VALUES ( NULL,'" + Global.company.id + "','" + num + "','" + client.id + "','" + usd + "'," + Global.dateFormate(dat) + ");";
+            id = (sql.nextAutoIncrement("bankreceipt")).ToString();
             sql.Select(q);
-            id = (sql.nextAutoIncrement("bankreceipt") - 1).ToString();
+            
             Global.bankReceipts.Add(clone()); clear();
         }
         public void edit(object sender, RoutedEventArgs e)
@@ -2978,7 +3170,7 @@ namespace Memo
             if (!_rowSelected){MessageBox.Show(translate.trans("Please Select Record"));return;}
 
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `bankreceipt` SET `num` = '" + num + "' ,`client` = '" + client.id+ "' ,`usd` = '" + usd + "' ,`dat` = " + Global.dateFormate(dat) + " WHERE `BankReceipt`.`id` = " + id + ";";
+            string q = "UPDATE uniexport.`bankreceipt` SET `num` = '" + num + "' ,`client` = '" + client.id+ "' ,`usd` = '" + usd + "' ,`dat` = " + Global.dateFormate(dat) + " WHERE `BankReceipt`.`id` = " + id + ";";
             sql.Select(q);
             foreach (BankReceipt c in Global.bankReceipts)
             {
@@ -2993,7 +3185,7 @@ namespace Memo
         {
             if (!_rowSelected) { MessageBox.Show(translate.trans("Please Select Record")); return; }
             Mysqldb sql = new Mysqldb();
-            string q = "DELETE FROM `bankreceipt` WHERE `bankreceipt`.`id` = " + id;
+            string q = "DELETE FROM  uniexport.`bankreceipt` WHERE `bankreceipt`.`id` = " + id;
             sql.Select(q);
             foreach (BankReceipt temp in Global.bankReceipts)
             {
@@ -3053,11 +3245,11 @@ namespace Memo
         }
         public void clear()
         {
-            _id = null;
-            _num = null;
-            _client = null;
-            _usd = null;
-            _dat = null;
+            id = null;
+            num = null;
+            client = null;
+            usd = null;
+            dat = null;
             _rowSelected = false;
         }
         public static ObservableCollection<object> getTable()
@@ -3243,12 +3435,12 @@ namespace Memo
             try
             {
                 Mysqldb sql = new Mysqldb();
-                string q = "DELETE FROM `bankreceiptdata` WHERE `bankreceiptdata`.`bankReceipt` = " + bankReceipt.id;
+                string q = "DELETE FROM  uniexport.`bankreceiptdata` WHERE `bankreceiptdata`.`bankReceipt` = " + bankReceipt.id;
                 sql.Select(q);
                 foreach(object obj in Global.bankReceiptDatas)
                 {
                     if (!((BankReceiptData)obj).chck) break;
-                    q = "INSERT INTO `bankreceiptdata` (`id`, `bankReceipt`, `invoice`) VALUES (NULL, '"+ bankReceipt.id+"', '"+ ((BankReceiptData)obj).invoice.id+"');";
+                    q = "INSERT INTO  uniexport.`bankreceiptdata` (`id`, `bankReceipt`, `invoice`) VALUES (NULL, '"+ bankReceipt.id+"', '"+ ((BankReceiptData)obj).invoice.id+"');";
                     sql.Select(q);
                 }
             }
@@ -3372,9 +3564,9 @@ namespace Memo
         }
         public void clear()
         {
-            _id = null;
-            _bankReceipt = null;
-            _invoice = null;
+            id = null;
+            bankReceipt = null;
+            invoice = null;
             _rowSelected = false;
         }
         public static ObservableCollection<object> getTable(BankReceipt br)
@@ -3505,16 +3697,17 @@ namespace Memo
         public void add(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `booked` (`id`,`valueEgp`,`dat`) VALUES ( NULL,'" + valueEgp + "','" + Global.dateFormate(dat) + "');";
+            string q = "INSERT INTO  uniexport.`booked` (`id`,`valueEgp`,`dat`) VALUES ( NULL,'" + valueEgp + "','" + Global.dateFormate(dat) + "');";
+            id = (sql.nextAutoIncrement("booked")).ToString();
             sql.Select(q);
-            id = (sql.nextAutoIncrement("booked") - 1).ToString();
+            
             Global.bookeds.Add(clone()); clear();
         }
         public void edit(object sender, RoutedEventArgs e)
         {
             if (!_rowSelected) { MessageBox.Show(translate.trans("Please Select Record")); return; }
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `booked` SET `valueEgp` = '" + valueEgp + "' ,`dat` = '" + Global.dateFormate(dat) + "' WHERE `Booked`.`id` = " + id + ";";
+            string q = "UPDATE uniexport.`booked` SET `valueEgp` = '" + valueEgp + "' ,`dat` = '" + Global.dateFormate(dat) + "' WHERE `Booked`.`id` = " + id + ";";
             sql.Select(q);
             foreach (Booked c in Global.bookeds)
             {
@@ -3529,7 +3722,7 @@ namespace Memo
         {
             if (!_rowSelected) { MessageBox.Show(translate.trans("Please Select Record")); return; }
             Mysqldb sql = new Mysqldb();
-            string q = "DELETE FROM `booked` WHERE `booked`.`id` = " + id;
+            string q = "DELETE FROM  uniexport.`booked` WHERE `booked`.`id` = " + id;
             sql.Select(q);
             foreach (Booked temp in Global.bookeds)
             {
@@ -3546,9 +3739,9 @@ namespace Memo
         }
         public void clear()
         {
-            _id = null;
-            _valueEgp = null;
-            _dat = null;
+            id = null;
+            valueEgp = null;
+            dat = null;
             _rowSelected = false;
         }
         public static ObservableCollection<object> getTable()
@@ -3685,9 +3878,10 @@ namespace Memo
         public void add(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `cheque` (`id`,`num`,`company`,`valueEgp`,`dat`) VALUES ( NULL,'" + num + "','" + Global.company.id + "','" + valueEgp + "'," + Global.dateFormate(dat) + ");";
+            string q = "INSERT INTO  uniexport.`cheque` (`id`,`num`,`company`,`valueEgp`,`dat`) VALUES ( NULL,'" + num + "','" + Global.company.id + "','" + valueEgp + "'," + Global.dateFormate(dat) + ");";
+            id = (sql.nextAutoIncrement("cheque")).ToString();
             sql.Select(q);
-            id = (sql.nextAutoIncrement("cheque") - 1).ToString();
+            
             Global.cheques.Add(clone()); clear();
         }
         public void edit(object sender, RoutedEventArgs e)
@@ -3695,7 +3889,7 @@ namespace Memo
             if (!_rowSelected) { MessageBox.Show(translate.trans("Please Select Record")); return; }
 
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `cheque` SET `num` = '" + num + "' ,`valueEgp` = '" + valueEgp + "' ,`dat` = " + Global.dateFormate(dat) + " WHERE `Cheque`.`id` = " + id + ";";
+            string q = "UPDATE uniexport.`cheque` SET `num` = '" + num + "' ,`valueEgp` = '" + valueEgp + "' ,`dat` = " + Global.dateFormate(dat) + " WHERE `Cheque`.`id` = " + id + ";";
             sql.Select(q);
             foreach (Cheque c in Global.cheques)
             {
@@ -3710,7 +3904,7 @@ namespace Memo
         {
             if (!_rowSelected) { MessageBox.Show(translate.trans("Please Select Record")); return; }
             Mysqldb sql = new Mysqldb();
-            string q = "DELETE FROM `cheque` WHERE `cheque`.`id` = " + id;
+            string q = "DELETE FROM  uniexport.`cheque` WHERE `cheque`.`id` = " + id;
             sql.Select(q);
             foreach (Cheque temp in Global.cheques)
             {
@@ -3765,10 +3959,10 @@ namespace Memo
         }
         public void clear()
         {
-            _id = null;
-            _num = null;
-            _valueEgp = null;
-            _dat = null;
+            id = null;
+            num = null;
+            valueEgp = null;
+            dat = null;
             _rowSelected = false;
         }
         public static ObservableCollection<object> getTable()
@@ -3794,7 +3988,7 @@ namespace Memo
     }
     public class ChequeData : INotifyPropertyChanged
     {
-        private bool _rowSelected = false;
+       
         private string _id;
         private Cheque _cheque;
         private FileNo _fileNo;
@@ -3942,24 +4136,17 @@ namespace Memo
             temp.fileNo = this._fileNo.clone();
             return temp;
         }
-        public void selectItem(object sender, MouseButtonEventArgs e)
-        {
-            this._rowSelected = true;
-            this.id = ((ChequeData)((ListViewItem)sender).Content).id;
-            this.cheque = (Cheque)Global.cheques.Where(x => ((Cheque)x).id == ((ChequeData)((ListViewItem)sender).Content).cheque.id).First();
-            this.fileNo = (FileNo)Global.fileNos.Where(x => ((FileNo)x).id == ((ChequeData)((ListViewItem)sender).Content).fileNo.id).First();
-        }
         public void save(object sender, RoutedEventArgs e)
         {
             try
             {
                 Mysqldb sql = new Mysqldb();
-                string q = "DELETE FROM `chequedata` WHERE `chequedata`.`cheque` = " + cheque.id;
+                string q = "DELETE FROM  uniexport.`chequedata` WHERE `chequedata`.`cheque` = " + cheque.id;
                 sql.Select(q);
                 foreach (object obj in Global.chequeDatas)
                 {
                     if (!((ChequeData)obj).chck) break;
-                    q = "INSERT INTO `chequedata` (`id`, `cheque`, `fileNo`) VALUES (NULL, '" + cheque.id + "', '" + ((ChequeData)obj).fileNo.id + "');";
+                    q = "INSERT INTO  uniexport.`chequedata` (`id`, `cheque`, `fileNo`) VALUES (NULL, '" + cheque.id + "', '" + ((ChequeData)obj).fileNo.id + "');";
                     sql.Select(q);
                 }
             }
@@ -4014,32 +4201,31 @@ namespace Memo
         }
         public void clear()
         {
-            _id = null;
-            _cheque = null;
-            _fileNo = null;
-            _rowSelected = false;
+            id = null;
+            cheque = null;
+            fileNo = null;
         }
         public static ObservableCollection<object> getTable(Cheque br)
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT cdata.id , cdata.cheque , f.id as 'fileNo', sum(e.PTREgp + e.nolon_Man) as 'totalSupport' from chequedata as cdata INNER JOIN cheque as c on(c.id = cdata.cheque) INNER JOIN fileno as f on (f.id = cdata.fileNo) INNER JOIN exptable as e on(e.id = f.exportCertificate) where e.company = "+Global.company.id+" and cdata.cheque = "+br.id+ "  group by(f.id)";
+            string q = "select `ch`.`id` AS `cheque`,`chdata`.`id` AS `chdataId`,`ch`.`dat` AS `chequeDate`,`fno`.`id` AS `fileNo`,`e`.`id` AS `export`,`e`.`dat` AS `exportDate`,`cr`.`id` AS `country`,`cn`.`id` AS `company`,sum(((`id`.`usdVal` * `id`.`supportPercentage`) * `e`.`usdToEgp`)) AS `PTR`,if(`cr`.`nolon`,sum(((`e`.`nolon` * `e`.`usdToEgp`) * 0.05)),0) AS `nolon`,if(`cr`.`manifest`,(sum(((`id`.`usdVal` * `id`.`supportPercentage`) * `e`.`usdToEgp`)) * 0.5),0) AS `manifesto` from (((((((`uniexport`.`exportcertificate` `e` join `uniexport`.`invoice` `i` on((`i`.`exportCertificate` = `e`.`id`))) join `uniexport`.`invoicedata` `id` on((`id`.`invoice` = `i`.`id`))) join `uniexport`.`country` `cr` on((`e`.`country` = `cr`.`id`))) join `uniexport`.`company` `cn` on((`cn`.`id` = `e`.`company`))) join `uniexport`.`fileno` `fno` on((`fno`.`exportCertificate` = `e`.`id`))) join `uniexport`.`chequedata` `chdata` on((`chdata`.`fileNo` = `fno`.`id`))) join `uniexport`.`cheque` `ch` on((`ch`.`id` = `chdata`.`cheque`))) where ch.id = '"+br.id+"' group by `fno`.`id` order by `e`.`dat`";
             DataTable dt = sql.Select(q);
 
             Global.tempsum = 0;
-            foreach (DataRow r in dt.Rows)
+            foreach (DataRow r in dt.Rows)     
             {
                 if (r[0].ToString() == "") break;
                 ChequeData temp = new ChequeData();
-                temp.id = r["id"].ToString();
+                temp.id = r["chdataId"].ToString();
                 temp.cheque = new Cheque(r["cheque"].ToString());
                 temp.fileNo = new FileNo(r["fileNo"].ToString());
-                temp.totalEgp = r["totalSupport"].ToString();
-                Global.tempsum += Convert.ToDouble(r["totalSupport"].ToString());
+                temp.totalEgp = (Convert.ToDouble(r["PTR"].ToString())+Convert.ToDouble(r["nolon"])+Convert.ToDouble(r["manifesto"])).ToString();
+                Global.tempsum += (Convert.ToDouble(r["PTR"].ToString()) + Convert.ToDouble(r["nolon"]) + Convert.ToDouble(r["manifesto"]));
                 temp.chck = true;
                 c.Add(temp);
             }
-            q = "SELECT f.id as 'fileNo',sum(e.PTREgp + e.nolon_Man) as 'totalSupport'  FROM fileno as f INNER JOIN exptable as e on(e.id = f.exportCertificate) where NOT EXISTS(select * from  chequedata WHERE chequedata.fileNo = f.id) AND e.company = "+Global.company.id+" group by(f.id)";
+            q = "select `fno`.`id` AS `fileNo`,`e`.`id` AS `export`,`e`.`dat` AS `exportDate`,`cr`.`id` AS `country`,`cn`.`id` AS `company`,sum(((`id`.`usdVal` * `id`.`supportPercentage`) * `e`.`usdToEgp`)) AS `PTR`,if(`cr`.`nolon`,sum(((`e`.`nolon` * `e`.`usdToEgp`) * 0.05)),0) AS `nolon`,if(`cr`.`manifest`,(sum(((`id`.`usdVal` * `id`.`supportPercentage`) * `e`.`usdToEgp`)) * 0.5),0) AS `manifesto` from `uniexport`.`exportcertificate` `e` join `uniexport`.`invoice` `i` on((`i`.`exportCertificate` = `e`.`id`)) join `uniexport`.`invoicedata` `id` on((`id`.`invoice` = `i`.`id`)) join `uniexport`.`country` `cr` on((`e`.`country` = `cr`.`id`)) join `uniexport`.`company` `cn` on((`cn`.`id` = `e`.`company`)) join `uniexport`.`fileno` `fno` on((`fno`.`exportCertificate` = `e`.`id`))  WHERE NOT EXISTS(select * from chequeData where chequeData.fileNo = fno.id) and fno.company = "+Global.company.id+" group by `fno`.`id`";
             dt = sql.Select(q);
             foreach (DataRow r in dt.Rows)
             {
@@ -4048,7 +4234,7 @@ namespace Memo
                 temp.id = "null";
                 temp.cheque = br;
                 temp.fileNo = new FileNo(r["fileNo"].ToString());
-                temp.totalEgp = r["totalSupport"].ToString();
+                temp.totalEgp = (Convert.ToDouble(r["PTR"].ToString()) + Convert.ToDouble(r["nolon"]) + Convert.ToDouble(r["manifesto"])).ToString();
                 temp.chck = false;
                 c.Add(temp);
             }
@@ -4191,9 +4377,10 @@ namespace Memo
         public void add(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "INSERT INTO `estiva` (`id`,`company`,`exportCertificate`,`dat`,`note`) VALUES ( NULL,'" + company.id + "','" + exportCertificate.id + "','" + dat + "','" + note + "');";
+            string q = "INSERT INTO  uniexport.`estiva` (`id`,`company`,`exportCertificate`,`dat`,`note`) VALUES ( NULL,'" + company.id + "','" + exportCertificate.id + "','" + dat + "','" + note + "');";
+            id = (sql.nextAutoIncrement("estiva")).ToString();
             sql.Select(q);
-            id = (sql.nextAutoIncrement("estiva") - 1).ToString();
+            
             Global.estivas.Add(clone()); clear();
         }
         public void edit(object sender, RoutedEventArgs e)
@@ -4203,7 +4390,7 @@ namespace Memo
                 MessageBox.Show(translate.trans("Please Select Record")); return;
             }
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE `estiva` SET `company` = '" + company + "' ,`exportCertificate` = '" + exportCertificate + "' ,`dat` = '" + dat + "' ,`note` = '" + note + "' WHERE `Estiva`.`id` = " + id + ";";
+            string q = "UPDATE uniexport.`estiva` SET `company` = '" + company + "' ,`exportCertificate` = '" + exportCertificate + "' ,`dat` = '" + dat + "' ,`note` = '" + note + "' WHERE `Estiva`.`id` = " + id + ";";
             sql.Select(q);
             foreach (Estiva c in Global.estivas)
             {
@@ -4217,7 +4404,7 @@ namespace Memo
         public void del(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "DELETE FROM `estiva` WHERE `estiva`.`id` = " + id;
+            string q = "DELETE FROM  uniexport.`estiva` WHERE `estiva`.`id` = " + id;
             sql.Select(q);
             foreach (Estiva temp in Global.estivas)
             {
@@ -4234,11 +4421,11 @@ namespace Memo
         }
         public void clear()
         {
-            _id = null;
-            _company = null;
-            _exportCertificate = null;
-            _dat = null;
-            _note = null;
+            id = null;
+            company = null;
+            exportCertificate = null;
+            dat = null;
+            note = null;
         }
         public static ObservableCollection<object> getTable()
         {

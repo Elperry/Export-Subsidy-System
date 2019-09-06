@@ -89,9 +89,6 @@ I:\unilever2\Memo\Memo\bin\Debug\Memo.pdb
 I:\unilever2\Memo\Memo\bin\Debug\CodeReason.Reports.dll
 I:\unilever2\Memo\Memo\bin\Debug\MaterialDesignColors.dll
 I:\unilever2\Memo\Memo\bin\Debug\MaterialDesignThemes.Wpf.dll
-I:\unilever2\Memo\Memo\bin\Debug\Microsoft.ReportViewer.Common.dll
-I:\unilever2\Memo\Memo\bin\Debug\Microsoft.ReportViewer.ProcessingObjectModel.DLL
-I:\unilever2\Memo\Memo\bin\Debug\Microsoft.ReportViewer.WebForms.DLL
 I:\unilever2\Memo\Memo\bin\Debug\MySqlConnector.dll
 I:\unilever2\Memo\Memo\bin\Debug\System.Buffers.dll
 I:\unilever2\Memo\Memo\bin\Debug\System.Memory.dll
@@ -119,3 +116,4 @@ I:\unilever2\Memo\Memo\obj\Debug\Memo.application
 I:\unilever2\Memo\Memo\obj\Debug\Memo.csproj.CopyComplete
 I:\unilever2\Memo\Memo\obj\Debug\Memo.exe
 I:\unilever2\Memo\Memo\obj\Debug\Memo.pdb
+I:\unilever2\Memo\Memo\obj\Debug\Memo.csprojAssemblyReference.cache

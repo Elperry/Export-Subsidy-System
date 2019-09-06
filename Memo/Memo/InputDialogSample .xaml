@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Memo"
         mc:Ignorable="d"
         Title="Input" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen"
-        ContentRendered="Window_ContentRendered">
+        ContentRendered="Window_ContentRendered" Topmost="True">
     <Grid Margin="15">
     <Grid.ColumnDefinitions>
         <ColumnDefinition Width="Auto" />

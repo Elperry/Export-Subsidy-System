@@ -61,8 +61,8 @@ public static class connString
 public class Mysqldb
 {
     private MySqlConnection connection;
-    private string server;
-    private string database;
+    private string server = "127.0.0.1";
+    private string database = "uniexport";
     private string uid;
     string charset;
     private string password;
@@ -79,7 +79,7 @@ public class Mysqldb
     {
         try
         {
-            connString.host = "51.51.51.168";//"197.56.194.225";
+            connString.host = "127.0.0.1";//"197.56.194.225";
             connString.port = "3306";
             connString.database = "uniexport";
             connString.charset = "utf8";
@@ -169,30 +169,64 @@ public class Mysqldb
 
         connection = new MySqlConnection(connectionString);
 
-        string query = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = '" + database + "' AND TABLE_NAME = '" + tableName + "'";
-        DataTable dt = new DataTable(); ;
-        if (this.OpenConnection() == true)
+        try
         {
-            //Create Command
-            MySqlCommand cmd = new MySqlCommand(query, connection);
-            //Create a data reader and Execute the command
-
-            using (MySqlDataAdapter dataAd = new MySqlDataAdapter(cmd))
+            string query = "SET @@SESSION.information_schema_stats_expiry = 0;SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = '" + database + "' AND TABLE_NAME = '" + tableName + "'";
+            DataTable dt = new DataTable(); ;
+            if (this.OpenConnection() == true)
             {
-                dataAd.Fill(dt);
-            }
+                //Create Command
+                MySqlCommand cmd = new MySqlCommand(query, connection);
+                //Create a data reader and Execute the command
 
-            //close Connection
-            this.CloseConnection();
+                using (MySqlDataAdapter dataAd = new MySqlDataAdapter(cmd))
+                {
+                    dataAd.Fill(dt);
+                }
 
-            //return list to be displayed
-            int i = 0;
-            if (!Int32.TryParse(dt.Rows[0][0].ToString(), out i))
-            {
-                i = -1;
+                //close Connection
+                this.CloseConnection();
+
+                //return list to be displayed
+                int i = 0;
+                if (!Int32.TryParse(dt.Rows[0][0].ToString(), out i))
+                {
+                    i = -1;
+                }
+                return i;
             }
-            return i;
         }
+        catch (Exception)
+        {
+
+            string query = "SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = '" + database + "' AND TABLE_NAME = '" + tableName + "'";
+            DataTable dt = new DataTable(); ;
+            if (this.OpenConnection() == true)
+            {
+                //Create Command
+                MySqlCommand cmd = new MySqlCommand(query, connection);
+                //Create a data reader and Execute the command
+
+                using (MySqlDataAdapter dataAd = new MySqlDataAdapter(cmd))
+                {
+                    dataAd.Fill(dt);
+                }
+
+                //close Connection
+                this.CloseConnection();
+
+                //return list to be displayed
+                int i = 0;
+                if (!Int32.TryParse(dt.Rows[0][0].ToString(), out i))
+                {
+                    i = -1;
+                }
+                return i;
+            }
+        }
+
+
+
         return 0;
     }
     public void Insert(string table, string values)

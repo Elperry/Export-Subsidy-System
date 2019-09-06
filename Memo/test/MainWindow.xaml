@@ -11,13 +11,13 @@
     </Window.Resources>
     <Grid Background="White" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
-        <StackPanel x:Name="stk" Orientation="Vertical">
+        <StackPanel x:Name="stk" Orientation="Vertical" HorizontalAlignment="Right" FlowDirection="RightToLeft">
             <TextBox Text="{Binding MyString}" KeyDown="TextBox_KeyDown"/>
             <Button Content="Count my clicks" Click="Button_Click"/>
             <CheckBox Visibility="{Binding V, Converter={StaticResource BoolToVis}}" />
             <Button Content="Toggle" Click="Button_Click_1" />
             <ComboBox x:Name="comboBox" SelectionChanged="ComboBox_SelectionChanged"/>
-
+            <Label  Content="ffdf" HorizontalAlignment="Left" FlowDirection="RightToLeft" HorizontalContentAlignment="Right" RenderTransformOrigin="-5.855,0.57"  />
         </StackPanel>
 
     </Grid>

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Memo"
         mc:Ignorable="d"
         xmlns:c="clr-namespace:CodeReason.Reports.Controls;assembly=CodeReason.Reports"
-       Title="Reports Window Copy Right 2019" Height="600" Width="600" WindowState="Maximized" Activated="Window_Activated">
+       Title="Reports Window Copy Right 2019" Height="600" Width="600" WindowState="Maximized" Activated="Window_Activated" Topmost="True">
     <Grid>
         <c:BusyDecorator Name="busyDecorator" IsBusyIndicatorHidden="False">
             <DocumentViewer Name="documentViewer" />

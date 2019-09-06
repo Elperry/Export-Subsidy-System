@@ -152,6 +152,8 @@ namespace Memo
             new dic("companies" , "الشركات", "Companies" ),
             new dic("brands" , "البراندات", "Brands" ),
             new dic("shippin gcompany" , "شركة الشحن" , "Shipping Company"),
+            new dic("shippingcompanies" , "شركات الشحن" , "Shipping Companies"),
+            new dic("phone" , "الهاتف" , "Phone"),
             new dic("brand categories" , "تصنيفات البراندات", "Entities" ),
             new dic("ports" , "الموانئ", "Ports" ),
             new dic("users" , "المستخدمين", "Users" ),
@@ -168,6 +170,7 @@ namespace Memo
             new dic("showreport" , "عرض التقرير", "Show Report" ),
             new dic("cond" , "الشروط", "Condtion" ),
             new dic("clear" , "مسح الخانات", "Clear" ),
+            new dic("num" , "رقم", "Number" ),
         };
         public static string trans(string str)
         {
@@ -356,10 +359,19 @@ namespace Memo
                 l.Foreground = fColor;
                 l.FontSize = 13;
                 l.FontWeight = fontWeight;
-                
-                if(translate.lang == "EN") { l.FlowDirection = FlowDirection.LeftToRight;l.HorizontalAlignment = HorizontalAlignment.Left; }
-                else { l.FlowDirection = FlowDirection.RightToLeft; l.HorizontalAlignment = HorizontalAlignment.Right; }
 
+                if (translate.lang == "EN")
+                {
+                    l.FlowDirection = FlowDirection.LeftToRight;
+                    l.HorizontalAlignment = HorizontalAlignment.Left;
+                    l.HorizontalContentAlignment = HorizontalAlignment.Left;
+                }
+                else
+                {
+                    //l.FlowDirection = FlowDirection.RightToLeft;
+                   // l.HorizontalAlignment = HorizontalAlignment.Right;
+                    //l.HorizontalContentAlignment = HorizontalAlignment.Right;
+                }
                 //l.Margin = new Thickness(5, 0, 5, 0);
 
             }
@@ -380,13 +392,24 @@ namespace Memo
                 l.Foreground = fColor;
                 l.FontSize = 13;
                 l.FontWeight = fontWeight;
+                //l.BorderBrush = Brushes.Black;///////////////
                 if (p.visiblityBind != "")
                 {
                     Binding b2 = new Binding { Path = new PropertyPath(p.visiblityBind), Source = obj, Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
                     l.SetBinding(Label.VisibilityProperty, b2);
                 }
-                if (translate.lang == "EN") { l.FlowDirection = FlowDirection.LeftToRight; l.HorizontalAlignment = HorizontalAlignment.Left; }
-                else { l.FlowDirection = FlowDirection.RightToLeft; l.HorizontalAlignment = HorizontalAlignment.Right; }
+                if (translate.lang == "EN")
+                {
+                    l.FlowDirection = FlowDirection.LeftToRight;
+                    l.HorizontalAlignment = HorizontalAlignment.Left;
+                    l.HorizontalContentAlignment = HorizontalAlignment.Left;
+                }
+                else
+                {
+                    //l.FlowDirection = FlowDirection.RightToLeft;
+                   // l.HorizontalAlignment = HorizontalAlignment.Right;
+                    //l.HorizontalContentAlignment = HorizontalAlignment.Right;
+                }
 
                 //l.Margin = new Thickness(5, 0, 5, 0);
 
@@ -1078,16 +1101,12 @@ namespace Memo
             int n = sizes.getScreenSize(width);
             int i = 0;
             StackPanel hs = hStack();
+            StackPanel ss = vStack();
+            S.Children.Add(ss);
             foreach (var prop in obj.GetType().GetProperties())
             {
                 if (memberLst != null && !memberLst.Contains(prop.Name)) { continue; }
-                StackPanel stp = new StackPanel();
-                if (translate.lang == "EN") { stp.FlowDirection = FlowDirection.LeftToRight;stp.HorizontalAlignment = HorizontalAlignment.Left; }
-                else
-                {
-                    stp.FlowDirection = FlowDirection.RightToLeft;
-                    stp.HorizontalAlignment = HorizontalAlignment.Right;
-                }
+                StackPanel stp = vStack(false);
                 stp.Width = sizes.fieldWidth(width);
                 if (prop.PropertyType.ToString() == "System.Int32" ||
                    prop.PropertyType.ToString() == "System.Double" ||
@@ -1109,7 +1128,7 @@ namespace Memo
                 }
                 if (i == n)
                 {
-                    S.Children.Add(hs);
+                    ss.Children.Add(hs);
                     hs = hStack();
                     hs.Children.Add(stp);
                     i = 0;
@@ -1121,7 +1140,7 @@ namespace Memo
                 i++;
                 //MessageBox.Show(prop.PropertyType.ToString());     
             }
-            S.Children.Add(hs);
+            ss.Children.Add(hs);
             // generate buttons for methodes
             i = 0;
             hs = hStack();

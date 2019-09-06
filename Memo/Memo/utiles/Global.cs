@@ -140,8 +140,6 @@ namespace Memo {
                                 MenuItems = new ObservableCollection<MenuItemViewModel>
                                 {
                                     new MenuItemViewModel { Header =  translate.trans("openReportViewer") , Command = new CommandViewModel(mainWindow.openReportViewer) },
-                                    new MenuItemViewModel { Header =  translate.trans("Monthes Report") },
-                                    new MenuItemViewModel { Header =  translate.trans("FileNO") },
 
                                 }
                 },
@@ -173,8 +171,6 @@ namespace Memo {
                                 MenuItems = new ObservableCollection<MenuItemViewModel>
                                 {
                                     new MenuItemViewModel { Header =  translate.trans("openReportViewer") , Command = new CommandViewModel(mainWindow.openReportViewer) },
-                                    new MenuItemViewModel { Header =  translate.trans("Monthes Report") },
-                                    new MenuItemViewModel { Header =  translate.trans("FileNO") },
 
                                 }
                 },
@@ -190,7 +186,19 @@ namespace Memo {
             
             
         }
+        public static bool isNum(string s)
+        {
+            try
+            {
+                double d = Convert.ToDouble(s);
+                return true;
+            }
+            catch (Exception)
+            {
 
+                return false;
+            }
+        }
         public static string reportTemplate = @"<FlowDocument xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation""
                           xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml""
                           xmlns:xrd=""clr-namespace:CodeReason.Reports.Document;assembly=CodeReason.Reports""
