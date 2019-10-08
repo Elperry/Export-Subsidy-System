@@ -1,0 +1,1 @@
+ALTER TABLE `exportcertificate` ADD `notes` VARCHAR(1000) NOT NULL DEFAULT '' AFTER `accrualDate`;

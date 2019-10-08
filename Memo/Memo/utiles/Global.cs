@@ -13,6 +13,7 @@ namespace Memo {
     public static class Global
     {
         public static double tempsum { get; set; }
+        public static double tempsum2 { get; set; }
         public static List<Window> windows { get; set; }
         public static User usr { get; set; }
         public static lang Lang { get; set; }
@@ -87,6 +88,10 @@ namespace Memo {
         }
         public static string dateFormate(string s)
         {
+            if(s == string.Empty || s == null)
+            {
+                return "NULL";
+            }
 
             DateTime theDate;
             if(s.Length < 10)
@@ -253,12 +258,24 @@ namespace Memo {
                       </xrd:TableRowForDataTable>
                     </TableRowGroup>
                   </Table>
-                  <Paragraph>
+                  <Paragraph FontSize=""14"" FontWeight=""Bold"">
                     RSummary
                   </Paragraph>
                 </xrd:SectionDataGroup>
               </Section>
             </FlowDocument>
             ";
+        public static double ToDouble(string s)
+        {
+            try
+            {
+                return Convert.ToDouble(s);
+            }
+            catch (Exception)
+            {
+
+                return 0.00;
+            }
+        }
     }
 }

@@ -81,6 +81,12 @@ namespace Memo
             set { }
         }
         public static List<dic> lst = new List<dic>() {
+            new dic("clear","تصفير الخانات","Clear Fields"),
+            new dic("wannaclose","هل تريد إغلاق هذه النافذه ؟","Do you want To close this window ?"),
+            new dic("reposubmission","تقرير الملفات المُقدمة","Submission Report"),
+            new dic("submitdate","تاريخ التقديم","Submit Date"),
+            new dic("month","الشهر","Month"),
+            new dic("company","الشركة","Company"),
             new dic("id","م","Id"),
             new dic("name","الإسم","Name"),
             new dic("country","الدولة","Country"),
@@ -114,7 +120,7 @@ namespace Memo
             new dic("exportcertificate" , "شهادة الصادر", "Export Certificate" ),
             new dic("dat" , "التاريخ", "Date" ),
             new dic("submitdate" , "تاريخ التقديم", "Submit Date" ),
-            new dic("accrualdate" , "تاريخ الإستحقاق", "Accrual Date" ),
+            new dic("accrualdate" , "تاريخ الإستلام", "Receive Date" ),
             new dic("totalegp" , "إجمالى الدعم بالجنيه", "Total PTR()" ),
             new dic("client" , "العميل", "Client" ),
             new dic("clients" , "العملاء", "Clients" ),
@@ -135,7 +141,7 @@ namespace Memo
             new dic("serial" , "كود التفعيل", "License" ),
             new dic("lang" , "اللغة", "Language" ),
             new dic("boles" , "بوليصة الشحن", "Shipping Policy" ),
-            new dic("bankreciete" , "إصال البنك", "Bank Receipt" ),
+            new dic("bankreciete" , "إيصال البنك", "Bank Receipt" ),
             new dic("ptrnolon_man" , "النولون + المانيفستو", "Nolon + Manifesto" ),
             new dic("ptr_nolon_man" , "النولون + المانيفستو", "Nolon + Manifesto" ),
             new dic("txtbankReceipt" , "إصال البنك", "Bank Receipt Number" ),
@@ -161,7 +167,7 @@ namespace Memo
             new dic("bankreceipt" , "الإيصال البنكى", "Bankreceipt" ),
             new dic("booked" , "محجوزات", "Booked" ),
             new dic("openreportviewer" , "عرض التقارير", "Report View" ),
-            new dic("openbankreceiptdata" , "الفواتير المتعلقة بهذا الإيصال البنكى", "Open Invoices related To this Bankreceipt" ),
+            new dic("openbankreceiptdata" , "الشهادات المدفوعة بهذا الإيصال البنكى", "Export Certificates paid with this Bankreceipt" ),
             new dic("op" , "أداة المقارنة", "Comparator Operator" ),
             new dic("reponame" , "إسم التقرير", "Report Name" ),
             new dic("col" , "الخانة", "Feild" ),
@@ -171,6 +177,10 @@ namespace Memo
             new dic("cond" , "الشروط", "Condtion" ),
             new dic("clear" , "مسح الخانات", "Clear" ),
             new dic("num" , "رقم", "Number" ),
+            new dic("exportUsd","قيمة شهادة الصادر بالدولار","USD"),
+            new dic("manifestosupport","قيمة دعم المانيفستو","Manifesto Support (EGP)"),
+            new dic("nolonsupport","قيمة دعم النولون","Nolon Support (EGP)"),
+            new dic("errcountry","خطأ \n  شهادة الصادر هذه تحتوى على عملاء من دولة مختلفة","Error \n This Export Certification Has Clients from Different Country"),
         };
         public static string trans(string str)
         {
@@ -732,12 +742,12 @@ namespace Memo
             if(translate.lang == "EN")
             {
                 s.FlowDirection = FlowDirection.LeftToRight;
-                s.HorizontalAlignment = (center)?HorizontalAlignment.Center:HorizontalAlignment.Left;
+                s.HorizontalAlignment = (center)?HorizontalAlignment.Center:HorizontalAlignment.Right;
             }
             else
             {
                 s.FlowDirection = FlowDirection.RightToLeft;
-                s.HorizontalAlignment = (center) ? HorizontalAlignment.Center : HorizontalAlignment.Right;
+                s.HorizontalAlignment = (center) ? HorizontalAlignment.Center : HorizontalAlignment.Left;
             }
             
 
@@ -968,7 +978,22 @@ namespace Memo
 
             return btn;
         }
-        
+
+        public void close(object sender, EventArgs e)
+        {
+            var userInput = MessageBox.Show(translate.trans("wannaclose"), translate.trans("Confirmation"), MessageBoxButton.YesNo);
+            //MessageBox.Show(userInput.ToString());
+            if (userInput == MessageBoxResult.Yes)
+            {
+                // PASS
+                Global.removeWindow(((Window)sender)); ((Window)sender).Close();
+            }
+            else
+            {
+                // FAIL
+            }
+
+        }
         public Grid miniHeader(List<MenuItem> l)
         {
             Grid gr = new Grid();
@@ -1049,8 +1074,8 @@ namespace Memo
             ((Window)form).Background = bgColor;
             ((Window)form).HorizontalAlignment = HorizontalAlignment.Center;
             ((Window)form).WindowStyle = WindowStyle.None;
-            ((Window)form).ShowInTaskbar = false;
-            ((Window)form).Topmost = true;
+            ((Window)form).ShowInTaskbar = true;
+            //((Window)form).Topmost = true;
             if (translate.lang == "EN") { ((Window)form).FlowDirection = FlowDirection.LeftToRight; }
             else
             {
@@ -1065,6 +1090,7 @@ namespace Memo
             {
                 ((Window)form).Title = translate.trans(header);
             }
+            ((Window)form).Closed += close;
             //MessageBox.Show(translate.trans(form.GetType().Name));
             StackPanel S = new StackPanel();
             S.HorizontalAlignment = HorizontalAlignment.Center;
@@ -1214,8 +1240,8 @@ namespace Memo
             ((Window)form).HorizontalAlignment = HorizontalAlignment.Center;
             ((Window)form).WindowStyle = WindowStyle.None;
             
-            ((Window)form).ShowInTaskbar = false;
-            ((Window)form).Topmost = true;
+            ((Window)form).ShowInTaskbar = true;
+            //((Window)form).Topmost = true;
             if (translate.lang == "EN") { ((Window)form).FlowDirection = FlowDirection.LeftToRight; }
             else
             {
@@ -1230,6 +1256,7 @@ namespace Memo
             {
                 ((Window)form).Title = translate.trans(header);
             }
+            ((Window)form).Closed += close;
             //MessageBox.Show(translate.trans(form.GetType().Name));
             StackPanel S = new StackPanel();
             S.HorizontalAlignment = HorizontalAlignment.Center;
@@ -1431,13 +1458,14 @@ namespace Memo
             {
                 ((Window)form).FlowDirection = FlowDirection.RightToLeft;
             }
+            ((Window)form).Closed += close;
             DockPanel dock = new DockPanel();
             dock.LastChildFill = true;
             Menu m = ClassicalMenueBar(MenueHeader);
             dock.Children.Add(m);
 
-
-            Label l = lbl("Hello , this App Created By Eng: Mohammad Al-Berry Email:Mohammedelpry@yahoo.com Phone:01147264224 ");
+            //Hello , this App Created By Eng: Mohammad Al-Berry Email:Mohammedelpry@yahoo.com Phone:01147264224 
+            Label l = lbl("");
             DockPanel.SetDock(l, Dock.Bottom);
             dock.Children.Add(l);
 
@@ -1470,8 +1498,8 @@ namespace Memo
             ((Window)form).Background = bgColor;
             ((Window)form).HorizontalAlignment = HorizontalAlignment.Center;
             ((Window)form).WindowStyle = WindowStyle.None;
-            ((Window)form).ShowInTaskbar = false;
-            ((Window)form).Topmost = true;
+            ((Window)form).ShowInTaskbar = true;
+            //((Window)form).Topmost = true;
             if (translate.lang == "EN") { ((Window)form).FlowDirection = FlowDirection.LeftToRight; }
             else
             {
@@ -1486,6 +1514,7 @@ namespace Memo
             {
                 ((Window)form).Title = translate.trans(header);
             }
+            ((Window)form).Closed += close;
             //MessageBox.Show(translate.trans(form.GetType().Name));
             StackPanel S = new StackPanel();
             S.HorizontalAlignment = HorizontalAlignment.Center;

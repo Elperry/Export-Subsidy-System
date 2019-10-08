@@ -59,7 +59,6 @@ G:\unilever2\Memo\Memo\obj\Debug\MainWindow.baml
 G:\unilever2\Memo\Memo\obj\Debug\Memo.g.resources
 G:\unilever2\Memo\Memo\obj\Debug\Memo.Properties.Resources.resources
 G:\unilever2\Memo\Memo\obj\Debug\Memo.csproj.GenerateResource.cache
-G:\unilever2\Memo\Memo\obj\Debug\Memo.csproj.CoreCompileInputs.cache
 G:\unilever2\Memo\Memo\obj\Debug\Memo.csproj.CopyComplete
 G:\unilever2\Memo\Memo\obj\Debug\Memo.exe
 G:\unilever2\Memo\Memo\obj\Debug\Memo.pdb
@@ -68,9 +67,6 @@ G:\unilever2\Memo\Memo\bin\Debug\Memo.exe.manifest
 G:\unilever2\Memo\Memo\bin\Debug\Memo.application
 G:\unilever2\Memo\Memo\obj\Debug\Memo.exe.manifest
 G:\unilever2\Memo\Memo\obj\Debug\Memo.application
-G:\unilever2\Memo\Memo\bin\Debug\Microsoft.ReportViewer.Common.dll
-G:\unilever2\Memo\Memo\bin\Debug\Microsoft.ReportViewer.ProcessingObjectModel.DLL
-G:\unilever2\Memo\Memo\bin\Debug\Microsoft.ReportViewer.WebForms.DLL
 G:\unilever2\Memo\Memo\bin\Debug\CodeReason.Reports.dll
 G:\unilever2\Memo\Memo\bin\Debug\CodeReason.Reports.pdb
 I:\unilever2\Memo\Memo\obj\Debug\InputDialogSample .g.cs
@@ -116,4 +112,6 @@ I:\unilever2\Memo\Memo\obj\Debug\Memo.application
 I:\unilever2\Memo\Memo\obj\Debug\Memo.csproj.CopyComplete
 I:\unilever2\Memo\Memo\obj\Debug\Memo.exe
 I:\unilever2\Memo\Memo\obj\Debug\Memo.pdb
+G:\unilever2\Memo\Memo\obj\Debug\ReportsWindow.g.cs
+G:\unilever2\Memo\Memo\obj\Debug\ReportsWindow.baml
 I:\unilever2\Memo\Memo\obj\Debug\Memo.csprojAssemblyReference.cache

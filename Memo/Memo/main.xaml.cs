@@ -59,7 +59,7 @@ namespace Memo
             
             foreach( Window w in Global.windows)
             {
-                if(w.Name == translate.trans("Countries"))
+                if(w.Title == translate.trans("Countries"))
                 {
                     w.Activate();return;
                 }
@@ -85,7 +85,7 @@ namespace Memo
 
             foreach (Window w in Global.windows)
             {
-                if (w.Name == translate.trans("ShippingCompanies"))
+                if (w.Title == translate.trans("ShippingCompanies"))
                 {
                     w.Activate(); return;
                 }
@@ -107,7 +107,7 @@ namespace Memo
 
             foreach (Window w in Global.windows)
             {
-                if (w.Name == translate.trans("Companies"))
+                if (w.Title == translate.trans("Companies"))
                 {
                     w.Activate(); return;
                 }
@@ -131,9 +131,30 @@ namespace Memo
         public void openClient()
         {
 
+            if (Global.companys == null)
+            {
+                Global.companys = Company.getTable();
+            }
+            if (Global.usr.admin)
+            {
+                InputDialogSample inputDialog = new InputDialogSample(translate.trans("Please Select Company :"), Global.companys);
+                if (inputDialog.ShowDialog() == true)
+                {
+                    Global.company = (Company)inputDialog.Answer;
+                }
+                else
+                {
+                    return;
+                }
+                if (Global.company == null)
+                {
+                    return;
+                }
+
+            }
             foreach (Window w in Global.windows)
             {
-                if (w.Name == translate.trans("Clients"))
+                if (w.Title == translate.trans("Clients"))
                 {
                     w.Activate(); return;
                 }
@@ -141,10 +162,11 @@ namespace Memo
             template t = new template();
             object W = new Window();
             object client = new Client((Window)W);
-            if(Global.clients == null)
+            Global.clients = Client.getTable();
+            Global.countrys = Country.getTable();
+            if (Global.clients == null)
             {
-                Global.clients = Client.getTable();
-                Global.countrys = Country.getTable();
+                
             }
             t.template1(W, ref client, translate.trans("Clients"), new List<string>() { "name", "email", "fax", "phone", "country","address", "notes", "add", "edit", "del", "close" }, Global.clients, 0, 0, false);
             Global.addWindow((Window)W);
@@ -160,7 +182,7 @@ namespace Memo
 
             foreach (Window w in Global.windows)
             {
-                if (w.Name == translate.trans("Ports"))
+                if (w.Title == translate.trans("Ports"))
                 {
                     w.Activate(); return;
                 }
@@ -186,7 +208,7 @@ namespace Memo
 
             foreach (Window w in Global.windows)
             {
-                if (w.Name == translate.trans("Brand Categories"))
+                if (w.Title == translate.trans("Brand Categories"))
                 {
                     w.Activate(); return;
                 }
@@ -230,7 +252,7 @@ namespace Memo
 
             foreach (Window w in Global.windows)
             {
-                if (w.Name == translate.trans("Brands"))
+                if (w.Title == translate.trans("Brands"))
                 {
                     w.Activate(); return;
                 }
@@ -275,7 +297,7 @@ namespace Memo
 
             foreach (Window w in Global.windows)
             {
-                if (w.Name == translate.trans(" Export Certificates"))
+                if (w.Title == translate.trans("Export Certificates"))
                 {
                     w.Activate(); return;
                 }
@@ -294,11 +316,11 @@ namespace Memo
                 new Property("boles"),
                 new Property("nolon","num","country.nolon"),
                 new Property("manifesto","bool","country.manifest"),
-                new Property("submitDate","date"),
                 new Property("accrualDate","date"),
                 new Property("PTREgp","txt",_readOnly:true),
                 new Property("ptr_nolon_man","txt",_readOnly:true),
                 new Property("totalEgp","txt",_readOnly:true),
+                new Property("notes","txt"),
 
             };
             if(Global.companys == null)
@@ -322,15 +344,12 @@ namespace Memo
                 }
                    
             }
-            if (Global.exportCertificates == null || Global.exportCertificates.Count == 0)
-            {
 
-                Global.countrys = Country.getTable();
-                Global.shippingCompanys = ShippingCompany.getTable();
-                Global.ports = Port.getTable();
-            }
+            Global.countrys = Country.getTable();
+            Global.shippingCompanys = ShippingCompany.getTable();
+            Global.ports = Port.getTable();
             Global.exportCertificates = ExportCertificate.getTable();
-            t.Moderntemplate(W, ref exportCertificate, translate.trans(" Export Certificates"), P, new List<string>() { "add", "edit", "del", "openInvoice", "close" }, Global.exportCertificates,null, 0, 0, false);
+            t.Moderntemplate(W, ref exportCertificate, translate.trans("Export Certificates"), P, new List<string>() { "add", "edit", "del", "openInvoice","clear", "close" }, Global.exportCertificates,null, 0, 0, false);
             Global.addWindow((Window)W);
             ((Window)W).Show();
             //MessageBox.Show("++"+((ExportCertificate)Global.exportCertificates[0]).num+"++");
@@ -346,7 +365,7 @@ namespace Memo
 
             foreach (Window w in Global.windows)
             {
-                if (w.Name == translate.trans("Users"))
+                if (w.Title == translate.trans("Users"))
                 {
                     w.Activate(); return;
                 }
@@ -381,7 +400,7 @@ namespace Memo
 
             foreach (Window w in Global.windows)
             {
-                if (w.Name == translate.trans("FileNo"))
+                if (w.Title == translate.trans("FileNo"))
                 {
                     w.Activate(); return;
                 }
@@ -412,14 +431,11 @@ namespace Memo
             object W = new Window();
             object fileNo = new FileNo((Window)W);
             Global.fileNos = FileNo.getTable();
-            if (Global.fileNos == null || Global.fileNos.Count == 0)
-            {
-                
-                Global.exportCertificates = ExportCertificate.getTable();
-            }
+            Global.exportCertificates = ExportCertificate.getTable();
+
             List<Property> P = new List<Property>()
             {
-                new Property("num","num"),
+                new Property("num","txt"),
                 new Property("dat","date"),
                 new Property("exportCertificate","cmb",_displayPath : "num"),
             };
@@ -443,7 +459,7 @@ namespace Memo
 
             foreach (Window w in Global.windows)
             {
-                if (w.Name == translate.trans("BankReceipt"))
+                if (w.Title == translate.trans("BankReceipt"))
                 {
                     w.Activate(); return;
                 }
@@ -472,15 +488,13 @@ namespace Memo
             template t = new template();
             object W = new Window();
             object bankReceipt = new BankReceipt((Window)W);
-            if (Global.bankReceipts == null || Global.bankReceipts.Count == 0)
-            {
                 Global.bankReceipts = BankReceipt.getTable();
-                Global.clients = Client.getTable();
-            }
+                Global.countrys = Country.getTable();
+
             List<Property> P = new List<Property>()
             {
-                new Property("num","num"),
-                new Property("client","cmb",_displayPath:"name"),
+                new Property("num","txt"),
+                new Property("country","cmb",_displayPath:"name"),
                 new Property("usd","num"),
                 new Property("dat","date"),
             };
@@ -505,7 +519,7 @@ namespace Memo
 
             foreach (Window w in Global.windows)
             {
-                if (w.Name == translate.trans("Cheque"))
+                if (w.Title == translate.trans("Cheque"))
                 {
                     w.Activate(); return;
                 }
@@ -542,7 +556,7 @@ namespace Memo
             }
             List<Property> P = new List<Property>()
             {
-                new Property("num","num"),
+                new Property("num","txt"),
                 new Property("valueEgp","num"),
                 new Property("dat","date"),
             };
@@ -566,7 +580,7 @@ namespace Memo
 
             foreach (Window w in Global.windows)
             {
-                if (w.Name == translate.trans("Booked"))
+                if (w.Title == translate.trans("Booked"))
                 {
                     w.Activate(); return;
                 }
@@ -627,7 +641,7 @@ namespace Memo
 
             foreach (Window w in Global.windows)
             {
-                if (w.Name == translate.trans("Estiva"))
+                if (w.Title == translate.trans("Estiva"))
                 {
                     w.Activate(); return;
                 }
@@ -655,17 +669,14 @@ namespace Memo
             }
             template t = new template();
             object W = new Window();
-            object estiva = new Booked((Window)W);
+            object estiva = new Estiva((Window)W);
             Global.estivas = Estiva.getTable();
-            if (Global.estivas == null || Global.estivas.Count == 0)
-            {
-                
-                Global.exportCertificates = ExportCertificate.getTable();
-            }
+            Global.exportCertificates = ExportCertificate.getTable();
+
             List<Property> P = new List<Property>()
             {
                 new Property("id","num" , _readOnly:true),
-                new Property("exportCertificate","cmb"),
+                 new Property("exportCertificate","cmb",_displayPath : "num"),
                 new Property("dat","date"),
                 new Property("note","txt"),
             };
@@ -691,10 +702,30 @@ namespace Memo
         }
         public void openReportViewer()
         {
+            if (Global.companys == null)
+            {
+                Global.companys = Company.getTable();
+            }
+            if (Global.usr.admin)
+            {
+                InputDialogSample inputDialog = new InputDialogSample(translate.trans("Please Select Company :"), Global.companys);
+                if (inputDialog.ShowDialog() == true)
+                {
+                    Global.company = (Company)inputDialog.Answer;
+                }
+                else
+                {
+                    return;
+                }
+                if (Global.company == null)
+                {
+                    return;
+                }
 
+            }
             foreach (Window w in Global.windows)
             {
-                if (w.Name == translate.trans("Report Viewer"))
+                if (w.Title == translate.trans("Report Viewer"))
                 {
                     w.Activate(); return;
                 }
@@ -708,6 +739,7 @@ namespace Memo
                 new Property("col","cmb",_action:"onColChange"),
                 new Property("op","cmb" , _action:"onOpChange"),
                 new Property("value","txt","isText"),
+                new Property("value2","txt","isBetweenV"),
                 new Property("date1","date","isDate"),
                 new Property("date2","date","isBetween"),
                 new Property("pageSetup", "cmb"),

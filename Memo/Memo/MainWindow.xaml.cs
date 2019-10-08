@@ -17,10 +17,8 @@ namespace Memo
         }
         public List<string> lst = new List<string>(){ "email", "password" ,"lang","login" , "exit" };
         public MainWindow()
-        {
+        { 
             
-                
-
             InitializeComponent();
             if (!activation.check()){
                
