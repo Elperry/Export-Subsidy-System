@@ -7,6 +7,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Threading.Tasks;
+using System.Threading;
 
 
 namespace Memo
@@ -714,11 +716,19 @@ namespace Memo
 
                 q = "SELECT * FROM `port` Where name = '" + ID + "'";
             }
-            DataTable dt = sql.Select(q);
-            DataRow r = dt.Rows[0];
-            this.id = r["id"].ToString();
-            this.name = r["name"].ToString();
-            this.notes = r["notes"].ToString();
+            try
+            {
+                DataTable dt = sql.Select(q);
+                DataRow r = dt.Rows[0];
+                this.id = r["id"].ToString();
+                this.name = r["name"].ToString();
+                this.notes = r["notes"].ToString();
+            }
+            catch (Exception)
+            {
+
+                //throw;
+            }
         }
         public void complete(string ID)
         {
@@ -926,15 +936,23 @@ namespace Memo
 
                 q = "SELECT * FROM `shippingCompany` Where name = '" + ID + "'";
             }
-            DataTable dt = sql.Select(q);
-            DataRow r = dt.Rows[0];
-            this.id = r["id"].ToString();
-            this.name = r["name"].ToString();
-            this.email = r["email"].ToString();
-            this.phone = r["phone"].ToString();
-            this.fax = r["fax"].ToString();
-            this.address = r["address"].ToString();
-            this.notes = r["notes"].ToString();
+            try
+            {
+                DataTable dt = sql.Select(q);
+                DataRow r = dt.Rows[0];
+                this.id = r["id"].ToString();
+                this.name = r["name"].ToString();
+                this.email = r["email"].ToString();
+                this.phone = r["phone"].ToString();
+                this.fax = r["fax"].ToString();
+                this.address = r["address"].ToString();
+                this.notes = r["notes"].ToString();
+            }
+            catch (Exception)
+            {
+
+                //throw;
+            }
         }
         public void complete(string ID)
         {
@@ -1870,8 +1888,8 @@ namespace Memo
         private string _PTREgp = "0";
         private string _totalEgp = "0";
         private string _manifestoSupport = "0";
-        private string _submitDate;
-        private string _accrualDate;
+        private bool _manualWork;
+        private string _receiptDate;
         private string _notes;
         public event PropertyChangedEventHandler PropertyChanged;
         private Window window { get; set; }
@@ -2095,6 +2113,16 @@ namespace Memo
 
             }
         }
+        public bool manualWork
+        {
+            get { return _manualWork; }
+            set
+            {
+                _manualWork = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("manualWork"));
+            }
+        }
         public string usdVal
         {
             get { return _usdVal; }
@@ -2138,24 +2166,14 @@ namespace Memo
                     this.PropertyChanged(this, new PropertyChangedEventArgs("totalEgp"));
             }
         }
-        private string submitDate
+        public string receiptDate
         {
-            get { return _submitDate; }
+            get { return _receiptDate; }
             set
             {
-                _submitDate = value;
+                _receiptDate = value;
                 if (this.PropertyChanged != null)
-                    this.PropertyChanged(this, new PropertyChangedEventArgs("submitDate"));
-            }
-        }
-        public string accrualDate
-        {
-            get { return _accrualDate; }
-            set
-            {
-                _accrualDate = value;
-                if (this.PropertyChanged != null)
-                    this.PropertyChanged(this, new PropertyChangedEventArgs("accrualDate"));
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("receiptDate"));
             }
         }
         public string notes
@@ -2193,8 +2211,8 @@ namespace Memo
             //this.egpVal = r["egpVal"].ToString();
             //this.PTREgp = r["PTREgp"].ToString();
             //this.totalEgp = r["totalEgp"].ToString();
-            this.submitDate = r["submitDate"].ToString();
-            this.accrualDate = r["accrualDate"].ToString();
+            this.manualWork = Convert.ToBoolean((r["manualWork"].ToString()== "")?"0": r["manualWork"]);
+            this.receiptDate = r["receiptDate"].ToString();
         }
         public void complete(string ID)
         {
@@ -2215,19 +2233,19 @@ namespace Memo
             this.usdToEgp = r["usdToEgp"].ToString();
             this.PTREgp = r["PTREgp"].ToString();
             this.totalEgp = r["totalEgp"].ToString();
-            this.submitDate = r["submitDate"].ToString();
-            this.accrualDate = r["accrualDate"].ToString();
+            this.manualWork = Convert.ToBoolean((r["manualWork"].ToString() == "") ? "0" : r["manualWork"]);
+            this.receiptDate = r["receiptDate"].ToString();
             this.notes = r["notes"].ToString();
         }
         public ExportCertificate clone()
         {
             ExportCertificate temp = new ExportCertificate();
             temp.id = this.id;
-            temp.num = this._num;
+            temp.num = this.num;
             temp.company = Global.company.clone();
-            temp.dat = this._dat;
-            temp.country = this._country.clone();
-            temp.port = this._port.clone();
+            temp.dat = this.dat;
+            temp.country = this.country.clone();
+            temp.port = this.port.clone();
             temp.shippingCompany = this._shippingCompany.clone();
             temp.manifesto = this.manifesto;
             temp.manifestoSupport = this.manifestoSupport;
@@ -2235,12 +2253,12 @@ namespace Memo
             temp.nolon = this.nolon;
             temp.nolonSupport = this.nolonSupport;
             temp.usdVal = this.usdVal;
-            temp.usdToEgp = this._usdToEgp;
+            temp.usdToEgp = this.usdToEgp;
             temp.ptr_nolon_man = this.ptr_nolon_man;
             temp.PTREgp = this._PTREgp;
-            temp.totalEgp = this._totalEgp;
-            temp.submitDate = this._submitDate;
-            temp.accrualDate = this._accrualDate;
+            temp.totalEgp = this.totalEgp;
+            temp.manualWork = this.manualWork;
+            temp.receiptDate = this.receiptDate;
             temp.notes = this.notes;
             return temp;
         }
@@ -2256,9 +2274,10 @@ namespace Memo
             this.nolon = ((ExportCertificate)((ListViewItem)sender).Content).nolon;
             this.manifesto = ((ExportCertificate)((ListViewItem)sender).Content).manifesto;
             this.usdToEgp = ((ExportCertificate)((ListViewItem)sender).Content).usdToEgp;
-            this.submitDate = ((ExportCertificate)((ListViewItem)sender).Content).submitDate;
-            this.accrualDate = ((ExportCertificate)((ListViewItem)sender).Content).accrualDate;
+            this.manualWork = ((ExportCertificate)((ListViewItem)sender).Content).manualWork;
+            this.receiptDate = ((ExportCertificate)((ListViewItem)sender).Content).receiptDate;
             this._rowSelected = true;
+            this.usdVal = ((ExportCertificate)((ListViewItem)sender).Content).usdVal;
             // needs Edits
             this.ptr_nolon_man = ((ExportCertificate)((ListViewItem)sender).Content).ptr_nolon_man;
             this.PTREgp = ((ExportCertificate)((ListViewItem)sender).Content).PTREgp;
@@ -2279,8 +2298,8 @@ namespace Memo
                     return;
                 }
                 Mysqldb sql = new Mysqldb();
-                string q = "INSERT INTO  uniexport.`exportcertificate` (`num`,`company`,`dat`,`country`,`port`,`shippingCompany`,`boles`,`nolon`,`manifesto`,`usdToEgp`,`submitDate`,`accrualDate`,`notes`) VALUES " +
-                    "('" + num + "','" + Global.company.id + "'," + Global.dateFormate(dat) + ",'" + country.id + "','" + port.id + "','" + shippingCompany.id + "','" + ((boles) ? "1" : "0") + "','" + nolon + "','" + ((manifesto) ? "1" : "0") + "','" + usdToEgp + "'," + Global.dateFormate(submitDate) + "," + Global.dateFormate(accrualDate) + ",'" + notes + "' );";
+                string q = "INSERT INTO  uniexport.`exportcertificate` (`num`,`company`,`dat`,`country`,`port`,`shippingCompany`,`boles`,`nolon`,`manifesto`,`usdToEgp`,`manualWork`,`receiptDate`,`notes`) VALUES " +
+                    "('" + num + "','" + Global.company.id + "'," + Global.dateFormate(dat) + ",'" + country.id + "','" + port.id + "','" + shippingCompany.id + "','" + ((boles) ? "1" : "0") + "','" + nolon + "','" + ((manifesto) ? "1" : "0") + "','" + usdToEgp + "'," + ((manualWork)?"1":"0") + "," + Global.dateFormate(receiptDate) + ",'" + notes + "' );";
                 id = (sql.nextAutoIncrement("exportcertificate")).ToString();
                 if (sql.Select(q) != null)
                 {
@@ -2308,14 +2327,14 @@ namespace Memo
             {
                 MessageBox.Show(translate.trans("errcountry"));
             }
-            string q = "UPDATE uniexport.`exportcertificate` SET `num` = '" + num + "' ,`company` = '" + Global.company.id + "' ,`dat` = " + Global.dateFormate(dat) + " ,`country` = '" + country.id + "' ,`port` = '" + port.id + "' ,`shippingCompany` = '" + shippingCompany.id + "' ,`boles` = '" + ((boles) ? "1" : "0") + "' ,`nolon` = '" + ((nolon)) + "' ,`manifesto` = '" + ((manifesto) ? "1" : "0") + "'  ,`usdToEgp` = '" + usdToEgp + "' ,`submitDate` = " + Global.dateFormate(submitDate) + " ,`accrualDate` = " + Global.dateFormate(accrualDate) + ",`notes` = '" + notes + "' WHERE `ExportCertificate`.`id` = " + id + ";";
+            string q = "UPDATE uniexport.`exportcertificate` SET `num` = '" + num + "' ,`company` = '" + Global.company.id + "' ,`dat` = " + Global.dateFormate(dat) + " ,`country` = '" + country.id + "' ,`port` = '" + port.id + "' ,`shippingCompany` = '" + shippingCompany.id + "' ,`boles` = '" + ((boles) ? "1" : "0") + "' ,`nolon` = '" + ((nolon)) + "' ,`manifesto` = '" + ((manifesto) ? "1" : "0") + "'  ,`usdToEgp` = '" + usdToEgp + "' ,`manualWork` = " + ((manualWork)?"1":"0") + " ,`receiptDate` = " + Global.dateFormate(receiptDate) + ",`notes` = '" + notes + "' WHERE `ExportCertificate`.`id` = " + id + ";";
             sql.Select(q);
 
             this.manifestoSupport = (Global.ToDouble(PTREgp) * 0.5).ToString();
             //this.ptr_nolon_man = (Global.ToDouble(nolonSupport)+ Global.ToDouble(manifestoSupport)).ToString();
             foreach (ExportCertificate c in Global.exportCertificates)
             {
-                if (c.num == _num)
+                if (c.num == num)
                 {
                     Global.exportCertificates[Global.exportCertificates.IndexOf(c)] = clone(); return;
                 }
@@ -2327,8 +2346,17 @@ namespace Memo
             Mysqldb sql = new Mysqldb();
             string q = "DELETE FROM  uniexport.`exportcertificate` WHERE `exportcertificate`.`id` = " + id;
             sql.Select(q);
-            q = "DELETE FROM  `invoice` WHERE `exportCertificate` = " + id;
+            ////////// Delete invoices and invoicesData
+            ///
+            q = "DELETE invoicedata , invoice FROM invoicedata INNER join invoice on (invoice.id = invoicedata.invoice)  WHERE invoice.exportCertificate = " + id;
             sql.Select(q);
+            //////// Delete file NO and bankreceipt and check
+            ///
+            q = "DELETE FROM `bankreceiptdata` WHERE `exportCertificate` = " + id;
+            sql.Select(q);
+            q = "DELETE fileno , chequedata FROM fileno INNER join chequedata on (fileno.id = chequedata.fileNo)  WHERE fileno.exportCertificate = " + id;
+            sql.Select(q);
+
             foreach (ExportCertificate temp in Global.exportCertificates)
             {
                 if (temp.num == _num)
@@ -2366,7 +2394,16 @@ namespace Memo
 
             Global.invoices = Invoice.getTable(this);
             Global.clients = Client.getTable(country);
-            t.template1(W, ref invoice, translate.trans("Invoices"), new List<string>() { "num", "client", "performa", "systemRef", "add", "edit", "del", "openInvoiceData", "clear", "close" }, Global.invoices, 0, 0, false);
+            List<Property> P = new List<Property>()
+            {
+                new Property("num","txt",_action:"select"),
+                new Property("client","cmb"),
+                new Property("performa","txt"),
+                new Property("systemRef","txt"),
+                
+
+            };
+            t.Moderntemplate(W, ref invoice, translate.trans("Invoices"), P,new List<string>() { "add", "edit", "del", "openInvoiceData", "clear", "close" }, Global.invoices, null,0, 0, false);
             Global.addWindow((Window)W);
 
             if (((Invoice)Global.invoices[0]).id == string.Empty || ((Invoice)Global.invoices[0]).id == "" || ((Invoice)Global.invoices[0]).id == null)
@@ -2391,17 +2428,57 @@ namespace Memo
             usdToEgp = "0";
             PTREgp = "0";
             totalEgp = "0";
-            submitDate = null;
-            accrualDate = null;
+            manualWork = false;
+            receiptDate = null;
             notes = "";
             _rowSelected = false;
         }
+        public void select(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                try
+                {
+                    string export = ((TextBox)sender).Text;
+                    ExportCertificate temp = (ExportCertificate)Global.exportCertificates.Where(x => ((ExportCertificate)x).num == export).First();
+                    this.id = temp.id;
+                    this.num = temp._num;
+                    this.company = temp.company;
+                    this.dat = temp.dat;
+                    this.country = (Country)Global.countrys.Where(cc=>((Country)cc).id==temp.country.id).First();//Global.companys.Where(c=>((Company)c).id = temp.company.id).First();
+                    this.port = (Port)Global.ports.Where(p=> ((Port)p).id == temp.port.id).First();//
+                    this.shippingCompany = (ShippingCompany)Global.shippingCompanys.Where(sh=>((ShippingCompany)sh).id== temp.shippingCompany.id).First();//
+                    this.manifesto = temp.manifesto;
+                    this.manifestoSupport = temp.manifestoSupport;
+                    this.boles = temp.boles;
+                    this.nolon = temp.nolon;
+                    this.nolonSupport = temp.nolonSupport;
+                    this.usdVal = temp.usdVal;
+                    this.usdToEgp = temp.usdToEgp;
+                    this.ptr_nolon_man = temp.ptr_nolon_man;
+                    this.PTREgp = temp.PTREgp;
+                    this.totalEgp = temp.totalEgp;
+                    this.manualWork = temp.manualWork;
+                    this.receiptDate = temp.receiptDate;
+                    this.notes = temp.notes;
+                    this._rowSelected = true;
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Can't find this Export Certificate!!");
+                }
+            }
+            else
+            {
+                return;
+            }
 
+        }
         public static ObservableCollection<object> getTable()
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT `id`,`export`,`usdToEgp`,`shippingCompany`,`boles`,`PORT`,`exportDate`,`submitDate`,`accrualDate`,`nolon`,`manifesto`,`Invoice`,`performa`,`systemRef`,`CLIENT`,`country`,`Cnolon`,`Cmanifest`,`company`,`brand`,`entity`,sum(`usdVal`)as 'usdVal',sum(`PTR`) as 'PTR',`nolonSupport`,sum(`manifestoSupport`) as 'manifestoSupport' ,`notes`  FROM `alldetailed` where company = '" + Global.company.name + "' GROUP BY export";
+            string q = "SELECT `id`,`export`,`usdToEgp`,`shippingCompany`,`boles`,`PORT`,`exportDate`,`manualWork`,`receiptDate`,`nolon`,`manifesto`,`Invoice`,`performa`,`systemRef`,`CLIENT`,`country`,`Cnolon`,`Cmanifest`,`company`,`brand`,`entity`,sum(`usdVal`)as 'usdVal',sum(`PTR`) as 'PTR',`nolonSupport`,sum(`manifestoSupport`) as 'manifestoSupport' ,`notes`  FROM `alldetailed` where company = '" + Global.company.name + "' GROUP BY export";
             DataTable dt = sql.Select(q);
             if (dt.Rows.Count == 0)
             {
@@ -2438,8 +2515,9 @@ namespace Memo
                 //temp.egpVal = r["egpVal"].ToString();
                 temp.PTREgp = r["PTR"].ToString();
                 temp.totalEgp = (Global.ToDouble(temp.PTREgp) + Global.ToDouble(temp.ptr_nolon_man)).ToString();
-                temp.submitDate = r["submitDate"].ToString();
-                temp.accrualDate = r["accrualDate"].ToString();
+                string x = (r["manualWork"].ToString() == "") ? "False" : r["manualWork"].ToString();
+                temp.manualWork = Convert.ToBoolean(x); 
+                temp.receiptDate = r["receiptDate"].ToString();
                 c.Add(temp);
             }
             return c;
@@ -2665,6 +2743,33 @@ namespace Memo
             systemRef = null;
             _rowSelected = false;
             bankReciete = false;
+        }
+        public void select(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                try
+                {
+                    string inv = ((TextBox)sender).Text;
+                    Invoice temp = (Invoice)Global.invoices.Where(x => ((Invoice)x).num == inv).First();
+                    this.id = temp.id;
+                    this.num = temp.num;
+                    this.client = (Client)Global.clients.Where(x => ((Client)x).id == temp.client.id).First();
+                    this.performa = temp.performa;
+                    this.systemRef = temp.systemRef;
+                    this.exportCertificate = temp.exportCertificate;
+                    _rowSelected = true;
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Can't find this Invoice!!");
+                }
+            }
+            else
+            {
+                return;
+            }
+
         }
         public void openInvoiceData(object sender, RoutedEventArgs e)
         {
@@ -3088,6 +3193,7 @@ namespace Memo
         private string _id;
         private string _num;
         private string _dat;
+        private ObservableCollection<object> _exportCertificates;
         private ExportCertificate _exportCertificate;
         public event PropertyChangedEventHandler PropertyChanged;
         private Window window { get; set; }
@@ -3133,18 +3239,35 @@ namespace Memo
         }
         public ObservableCollection<object> exportCertificates
         {
-            get { return Global.exportCertificates; }
+            get { return _exportCertificates; }
             set
             {
-                Global.exportCertificates = value;
+                _exportCertificates = value;
                 if (this.PropertyChanged != null)
                     this.PropertyChanged(this, new PropertyChangedEventArgs("exportCertificate"));
             }
         }
-
+      
         public FileNo(Window W = null)
         {
             window = W;
+            _exportCertificates = new ObservableCollection<object>();
+
+            Thread thread = new Thread(() =>
+            {   
+                Mysqldb sql = new Mysqldb();
+                string q = "SELECT id , num FROM exportcertificate WHERE company = "+Global.company.id+" and id not in (SELECT `id` from `fileno` WHERE 1)";
+                DataTable dt = sql.Select(q);
+                foreach (DataRow r in dt.Rows)
+                {
+                    ExportCertificate temp = new ExportCertificate();
+                    temp.id = r["id"].ToString();
+                    temp.num = r["num"].ToString();
+                    exportCertificates.Add(temp);
+                }
+            });
+            thread.Start();
+            //thread.Join();
         }
         public FileNo(string ID, Window W = null)
         {
@@ -3193,7 +3316,7 @@ namespace Memo
                 string q = "INSERT INTO  uniexport.`fileno` (`id`,`num`,`company`,`dat`,`exportCertificate`) VALUES ( NULL ,'" + num + "','" + Global.company.id + "'," + Global.dateFormate(dat) + ",'" + exportCertificate.id + "');";
                 id = (sql.nextAutoIncrement("fileno")).ToString();
                 if (sql.Select(q) != null) { Global.fileNos.Add(clone()); clear(); }
-
+                exportCertificates.Remove(exportCertificates.Where(ex=> ((ExportCertificate)ex).num == num).First());
             }
             catch (Exception ex)
             {
@@ -3259,7 +3382,6 @@ namespace Memo
             return c;
         }
     }
-
     public class Activation : INotifyPropertyChanged
     {
         private string _hwKey;
@@ -3315,14 +3437,13 @@ namespace Memo
 
 
     }
-
     public class BankReceipt : INotifyPropertyChanged
     {
         private bool _rowSelected = false;
         private string _id;
         private string _num;
         private Country _country;
-
+        private string _notEmpty;
         private string _usd;
         private string _dat;
         public event PropertyChangedEventHandler PropertyChanged;
@@ -3385,6 +3506,16 @@ namespace Memo
                 _usd = value;
                 if (this.PropertyChanged != null)
                     this.PropertyChanged(this, new PropertyChangedEventArgs("usd"));
+            }
+        }
+        public string notEmpty
+        {
+            get { return _notEmpty; }
+            set
+            {
+                _notEmpty = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("notEmpty"));
             }
         }
         public string dat
@@ -3451,6 +3582,32 @@ namespace Memo
             this.country = (Country)Global.countrys.Where(x => ((Country)x).id == ((BankReceipt)((ListViewItem)sender).Content).country.id).First();
             this.usd = ((BankReceipt)((ListViewItem)sender).Content).usd;
             this.dat = ((BankReceipt)((ListViewItem)sender).Content).dat;
+        }
+        public void select(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                try
+                {
+                    string b = ((TextBox)sender).Text;
+                    BankReceipt temp = (BankReceipt)Global.bankReceipts.Where(x => ((BankReceipt)x).num == b).First();
+                    this.id = temp.id;
+                    this.num = temp.num;
+                    this.company = temp.company;
+                    this.dat = temp.dat;
+                    this.country = (Country)Global.countrys.Where(cc => ((Country)cc).id == temp.country.id).First();//Global.companys.Where(c=>((Company)c).id = temp.company.id).First();
+                    this.usd = temp.usd;
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("Can't find this Export Certificate!!");
+                }
+            }
+            else
+            {
+                return;
+            }
+
         }
         public void add(object sender, RoutedEventArgs e)
         {
@@ -3563,7 +3720,8 @@ namespace Memo
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * FROM `bankreceipt` where company = " + Global.company.id; DataTable dt = sql.Select(q);
+            string q = "SELECT `id`,`company`,`num`,`country`,`usd`,`dat`,if(id in(SELECT bankreceipt from bankreceiptdata),'True','False') as 'notEmpty' FROM `bankreceipt` where company = " + Global.company.id;
+            DataTable dt = sql.Select(q);
             if (dt.Rows.Count == 0)
             {
                 BankReceipt tmp = new BankReceipt(); c.Add(tmp); return c;
@@ -3576,6 +3734,7 @@ namespace Memo
                 temp.country = new Country(r["country"].ToString());
                 temp.usd = r["usd"].ToString();
                 temp.dat = r["dat"].ToString();
+                temp.notEmpty = r["notEmpty"].ToString();
                 c.Add(temp);
             }
             return c;
@@ -3940,7 +4099,6 @@ namespace Memo
             return c;
         }
     }
-
     public class Booked : INotifyPropertyChanged
     {
         private bool _rowSelected = false;
@@ -4096,7 +4254,6 @@ namespace Memo
             return c;
         }
     }
-
     public class Cheque : INotifyPropertyChanged
     {
         private bool _rowSelected = false;
@@ -4244,6 +4401,8 @@ namespace Memo
             if (!_rowSelected) { MessageBox.Show(translate.trans("Please Select Record")); return; }
             Mysqldb sql = new Mysqldb();
             string q = "DELETE FROM  uniexport.`cheque` WHERE `cheque`.`id` = " + id;
+            sql.Select(q);
+            q = "DELETE FROM `chequedata` WHERE `cheque` = " + id;
             sql.Select(q);
             foreach (Cheque temp in Global.cheques)
             {
@@ -4646,7 +4805,6 @@ namespace Memo
             return c;
         }
     }
-
     public class Estiva : INotifyPropertyChanged
     {
         private bool _rowSelected = false;
@@ -4858,8 +5016,6 @@ namespace Memo
             return c;
         }
     }
-
-
     public class Col
     {
         public string id { get; set; }
@@ -4963,7 +5119,7 @@ namespace Memo
     }
     public class ReportViewerPage : INotifyPropertyChanged
     {
-        private string _subCond1, _subCond2;
+        private string _subCond1, _subCond2 , d1 ="", d2="";
         private string _cond = "where ( company ='" + Global.company.name + "' ) ";
         private Col _repoName;
         private Col _col;
@@ -5202,7 +5358,7 @@ namespace Memo
         }
         public void onColChange(object sender, SelectionChangedEventArgs e)
         {
-            if (col.id.ToLower().Contains("dat") || col.name.ToLower().Contains("تاريخ"))
+            if (col != null && (col.id.ToLower().Contains("dat") || col.name.ToLower().Contains("تاريخ")))
             {
                 isDate = true;
                 if(op != null && op.id == "between")
@@ -5223,7 +5379,7 @@ namespace Memo
         }
         public void onOpChange(object sender, SelectionChangedEventArgs e)
         {
-            if (op.id.ToLower() == "between")
+            if (op != null && op.id.ToLower() == "between")
             {
                 if (isDate)
                 {
@@ -5255,13 +5411,14 @@ namespace Memo
                 {
                     if (op.id == "between")
                     {
-                        _subCond1 = _subCond1 + " and (" + col.id + " " + op.id + " '" + date1 + "' and  '" + date2 + "' ) ";
-                        _subCond2 = _subCond2 + " and (" + "bookeddata.date" + " " + op.id + " '" + date1 + "' and  '" + date2 + "' ) ";
+                        _subCond1 = _subCond1 + " and (" + col.id + " " + op.id + " " + Global.dateFormate(date1) + " and  " + Global.dateFormate(date2) + " ) ";
+                        _subCond2 = _subCond2 + " and (" + "bookeddata.date" + " " + op.id + " " + Global.dateFormate(date1) + " and  " + Global.dateFormate(date2) + " ) ";
+                        d1 = Global.dateFormate(date1);d2 = Global.dateFormate(date2);
                     }
                     else
                     {
-                        _subCond1 = _subCond1 + " and (" + col.id + " " + op.id + " '" + date1 + "' ) ";
-                        _subCond2 = _subCond2 + " and (" + "bookeddata.date" + " " + op.id + " '" + date1 + "' ) ";
+                        _subCond1 = _subCond1 + " and (" + col.id + " " + op.id + " " + Global.dateFormate(date1) + " ) ";
+                        _subCond2 = _subCond2 + " and (" + "bookeddata.date" + " " + op.id + " " + Global.dateFormate(date1) + " ) ";
                     }
                 }
                 else
@@ -5283,22 +5440,22 @@ namespace Memo
                   
                 if (op.id == "between")
                 {
-                    cond = "Where (" + col.id + " " + op.id + " '" + ((isD)?date1:value) + "' and  '" + ((isD) ? date2 : value2) + "' ) ";                   
+                    cond = "Where (" + col.id + " " + op.id + " " + ((isD)? Global.dateFormate(date1) : "'"+ value+"'") + " and  " + ((isD) ? Global.dateFormate(date2) :"'" +value2+"'") + " ) ";                   
                 }
                 else
                 {
-                    cond = cond + " and (" + col.id + " " + op.id + " '" + ((isD) ? date1 : value) + "' ) ";
+                    cond = cond + " and (" + col.id + " " + op.id + " " + ((isD) ? Global.dateFormate(date1) :"'"+ value+"'") + " ) ";
                 }
             }
             else
             {
                 if (op.id == "between")
                 {
-                    cond = cond + " and (" + col.id + " " + op.id + " '" + ((isD) ? date1 : value) + "' and  '" + ((isD) ? date2 : value2) + "' ) ";
+                    cond = cond + " and (" + col.id + " " + op.id + " '" + ((isD) ? Global.dateFormate(date1) : value) + "' and  '" + ((isD) ? Global.dateFormate(date2) : value2) + "' ) ";
                 }
                 else
                 {
-                    cond = cond + " and (" + col.id + " " + op.id + " '" + ((isD) ? date1 : value) + "' ) ";
+                    cond = cond + " and (" + col.id + " " + op.id + " '" + ((isD) ? Global.dateFormate(date1) : value) + "' ) ";
 
                 }
             }
@@ -5368,6 +5525,8 @@ namespace Memo
             date1 = null;
             date2 = null;
             cond = "where ( company ='" + Global.company.name + "' ) ";
+            _subCond1 = "";
+            _subCond2 = "";
         }
         public void close(object sender, RoutedEventArgs e)
         {
@@ -5402,16 +5561,16 @@ namespace Memo
             dtCloned.Columns.RemoveAt(0);
             DataRow r = dtCloned.NewRow();
             r[0] = "Total";
-            r[1] = dtCloned.Compute("Sum(PTR)", string.Empty).ToString();
-            r[2] = dtCloned.Compute("Sum(manifestoSupport)", string.Empty).ToString();
-            r[3] = dtCloned.Compute("Sum(nolonSupport)", string.Empty).ToString();
-            r[4] = dtCloned.Compute("Sum(booked)", string.Empty).ToString();
+            r[1] = (dtCloned.Compute("Sum(PTR)", "PTR IS NOT NULL").ToString() == "") ? "0" : dtCloned.Compute("Sum(PTR)", "PTR IS NOT NULL").ToString();
+            r[2] = (dtCloned.Compute("Sum(manifestoSupport)", "manifestoSupport IS NOT NULL").ToString() == "") ? "0" : dtCloned.Compute("Sum(manifestoSupport)", "manifestoSupport IS NOT NULL").ToString();
+            r[3] = (dtCloned.Compute("Sum(nolonSupport)", "nolonSupport IS NOT NULL").ToString() == "") ? "0" : dtCloned.Compute("Sum(nolonSupport)", "nolonSupport IS NOT NULL").ToString();
+            r[4] = (dtCloned.Compute("Sum(booked)", "[booked] IS NOT NULL").ToString() == "")?"0": dtCloned.Compute("Sum(booked)", "[booked] IS NOT NULL").ToString();
             double total = Global.ToDouble(r[1].ToString()) + Global.ToDouble(r[2].ToString()) + Global.ToDouble(r[3].ToString());
             dtCloned.Rows.Add(r);
             dt = dtCloned;
             string sumBooked = r[4].ToString();
             summary = "<TextBlock Text=\"Total Support = " + total.ToString() + "  &#x0a;Total Booked = " + sumBooked + "&#x0a; Net = " + (total - Global.ToDouble(sumBooked)).ToString()+"  \"/> ";
-            ReportBuilder rb = new ReportBuilder("Unilever", Global.company.name, translate.trans(repoName.id), dt, summary, pageSetup);
+            ReportBuilder rb = new ReportBuilder("Unilever", Global.company.name, ((d1 !="" && d2 != "")? "<TextBlock Text=\""+ translate.trans(repoName.id) + " &#x0a; from " + d1 + " to " + d2+ "\"/>": translate.trans(repoName.id)), dt, summary, pageSetup);
             rb.genReport();
         }
 
@@ -5421,7 +5580,6 @@ namespace Memo
         public string Template { get; set; }
         public DataTable table { get; set; }
     }
-
     public class ReportBuilder
     {
         public string header { get; set; }

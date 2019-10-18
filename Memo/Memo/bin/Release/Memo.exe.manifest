@@ -54,6 +54,30 @@
     </dependentAssembly>
   </dependency>
   <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="EPPlus.dll" size="1295360">
+      <assemblyIdentity name="EPPlus" version="4.5.2.1" publicKeyToken="EA159FDAA78159A1" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>gQ2hf6OeFeGDJDSlr2Vw8eQOZ7naXEmiwG0Oph9TfiY=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Jeylabs.XmlToExcelConverter.dll" size="13824">
+      <assemblyIdentity name="Jeylabs.XmlToExcelConverter" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
+        <dsig:DigestValue>meKUoWn+uOjdCAzQH+EDvPX8AkyW+xm1FTdLvM57hBU=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
     <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="MaterialDesignColors.dll" size="284672">
       <assemblyIdentity name="MaterialDesignColors" version="1.2.0.325" language="neutral" processorArchitecture="msil" />
       <hash>
@@ -78,14 +102,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Memo.exe" size="36432824">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Memo.exe" size="36444088">
       <assemblyIdentity name="Memo" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>2nd4zjeOKagpJR2Z/swPoh6g6Pekqm7AQv4gsVZl5iY=</dsig:DigestValue>
+        <dsig:DigestValue>26feX0WtvrDA9HnvgzlmSLK7gA4X/FbqcYBA0Uz2CgI=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

@@ -20,7 +20,6 @@ G:\unilever2\Memo\Memo\bin\Release\System.Buffers.xml
 G:\unilever2\Memo\Memo\bin\Release\System.Memory.xml
 G:\unilever2\Memo\Memo\bin\Release\System.Runtime.CompilerServices.Unsafe.xml
 G:\unilever2\Memo\Memo\bin\Release\System.Threading.Tasks.Extensions.xml
-G:\unilever2\Memo\Memo\obj\Release\Memo.csprojAssemblyReference.cache
 G:\unilever2\Memo\Memo\obj\Release\InputDialogSample .g.cs
 G:\unilever2\Memo\Memo\obj\Release\main.g.cs
 G:\unilever2\Memo\Memo\obj\Release\MainWindow.g.cs
@@ -85,3 +84,8 @@ I:\unilever2\Memo\Memo\obj\Release\Memo.csproj.CopyComplete
 I:\unilever2\Memo\Memo\obj\Release\Memo.exe
 I:\unilever2\Memo\Memo\obj\Release\Memo.pdb
 I:\unilever2\Memo\Memo\obj\Release\Memo.csprojAssemblyReference.cache
+G:\unilever2\Memo\Memo\bin\Release\EPPlus.dll
+G:\unilever2\Memo\Memo\bin\Release\Jeylabs.XmlToExcelConverter.dll
+G:\unilever2\Memo\Memo\bin\Release\EPPlus.xml
+G:\unilever2\Memo\Memo\obj\Release\Memo.csproj.ResolveComReference.cache
+G:\unilever2\Memo\Memo\obj\Release\Memo.csprojAssemblyReference.cache

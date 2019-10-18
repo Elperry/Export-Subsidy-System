@@ -307,7 +307,7 @@ namespace Memo
             object exportCertificate = new ExportCertificate((Window)W);
             List<Property> P = new List<Property>()
             {
-                new Property("num","txt",""),
+                new Property("num","txt",_action:"select"),
                 new Property("dat","date"),
                 new Property("country","cmb"),
                 new Property("port","cmb"),
@@ -316,7 +316,8 @@ namespace Memo
                 new Property("boles"),
                 new Property("nolon","num","country.nolon"),
                 new Property("manifesto","bool","country.manifest"),
-                new Property("accrualDate","date"),
+                new Property("receiptDate","date"),
+                new Property("manualWork","bool"),
                 new Property("PTREgp","txt",_readOnly:true),
                 new Property("ptr_nolon_man","txt",_readOnly:true),
                 new Property("totalEgp","txt",_readOnly:true),
@@ -431,7 +432,7 @@ namespace Memo
             object W = new Window();
             object fileNo = new FileNo((Window)W);
             Global.fileNos = FileNo.getTable();
-            Global.exportCertificates = ExportCertificate.getTable();
+            //Global.exportCertificates = ExportCertificate.getTable();
 
             List<Property> P = new List<Property>()
             {
@@ -493,7 +494,7 @@ namespace Memo
 
             List<Property> P = new List<Property>()
             {
-                new Property("num","txt"),
+                new Property("num","txt",_action:"select"),
                 new Property("country","cmb",_displayPath:"name"),
                 new Property("usd","num"),
                 new Property("dat","date"),

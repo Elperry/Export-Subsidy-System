@@ -20,7 +20,7 @@ namespace Memo
         { 
             
             InitializeComponent();
-            if (!activation.check()){
+            if (activation.check()){
                
                 Window w = new Window();
                 object A = new Activation(w);

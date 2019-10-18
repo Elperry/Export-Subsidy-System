@@ -115,3 +115,11 @@ I:\unilever2\Memo\Memo\obj\Debug\Memo.pdb
 G:\unilever2\Memo\Memo\obj\Debug\ReportsWindow.g.cs
 G:\unilever2\Memo\Memo\obj\Debug\ReportsWindow.baml
 I:\unilever2\Memo\Memo\obj\Debug\Memo.csprojAssemblyReference.cache
+G:\unilever2\Memo\Memo\bin\Debug\EPPlus.dll
+G:\unilever2\Memo\Memo\bin\Debug\Jeylabs.XmlToExcelConverter.dll
+G:\unilever2\Memo\Memo\bin\Debug\EPPlus.xml
+G:\unilever2\Memo\Memo\obj\Debug\Memo.csproj.ResolveComReference.cache
+I:\unilever2\Memo\Memo\bin\Debug\EPPlus.dll
+I:\unilever2\Memo\Memo\bin\Debug\Jeylabs.XmlToExcelConverter.dll
+I:\unilever2\Memo\Memo\bin\Debug\EPPlus.xml
+I:\unilever2\Memo\Memo\obj\Debug\Memo.csproj.ResolveComReference.cache

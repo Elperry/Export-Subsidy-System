@@ -82,6 +82,17 @@ namespace Memo
         }
         public static List<dic> lst = new List<dic>() {
             new dic("clear","تصفير الخانات","Clear Fields"),
+            new dic("manualwork","العمل اليدوى","Manual Work"),
+            new dic("repounderpreparing","تحت التجهيز","Under Preparing"),
+            new dic("repoemptybankreceipt","إشعارات بنكية خالية","Empty Bank Receipt"),
+            new dic("addcondition","إضافة شرط","Add Condition"),
+            new dic("shipping companies","شركات الشحن","Shipping Companies"),
+            new dic("repochequerecieved","تقرير الشيكات المستلمة","Received Bank Check Report"),
+            new dic("exportdate","تاريخ التصدير","Export Date"),
+            new dic("chequedate","تاريخ الشيك","Cheque Date"),
+            new dic("repoerror","تقرير الأخطاء","Error Report"),
+            new dic("export","شهادة الصادر","Export Certificate"),
+            new dic("repowarning","تقرير التحذير بقرب مرور عام","Warning Report"),
             new dic("wannaclose","هل تريد إغلاق هذه النافذه ؟","Do you want To close this window ?"),
             new dic("reposubmission","تقرير الملفات المُقدمة","Submission Report"),
             new dic("submitdate","تاريخ التقديم","Submit Date"),
@@ -120,7 +131,7 @@ namespace Memo
             new dic("exportcertificate" , "شهادة الصادر", "Export Certificate" ),
             new dic("dat" , "التاريخ", "Date" ),
             new dic("submitdate" , "تاريخ التقديم", "Submit Date" ),
-            new dic("accrualdate" , "تاريخ الإستلام", "Receive Date" ),
+            new dic("receiptdate" , "تاريخ الإستلام", "Receive Date" ),
             new dic("totalegp" , "إجمالى الدعم بالجنيه", "Total PTR()" ),
             new dic("client" , "العميل", "Client" ),
             new dic("clients" , "العملاء", "Clients" ),
@@ -132,7 +143,7 @@ namespace Memo
             new dic("delete" , "حذف", "Delete" ),
             new dic("del" , "حذف", "Delete" ),
             new dic("close" , "إغلاق", "Close" ),
-            new dic("openinvoice" , "فتح الفواتيرفى هذه الشهادة", "Open Invoices in this Certificate" ),
+            new dic("openinvoice" , "فتح الفواتير فى هذه الشهادة", "Open Invoices in this Certificate" ),
             new dic("openinvoicedata" , "البراندات فى هذه الفاتورة", "Open Brands in this Invoice" ),
             new dic("fileno" , "رقم الملف", "File Number" ),
             new dic("estiva" , "إستيفا", "Estiva" ),
@@ -900,8 +911,14 @@ namespace Memo
                 Handler = (MouseButtonEventHandler)Delegate.CreateDelegate(
                 typeof(MouseButtonEventHandler), obj, obj.GetType().GetMethod("selectItem"))
             });
+            DataTrigger dTrigger = new DataTrigger();
+            dTrigger.Binding = new Binding("notEmpty");
+            dTrigger.Value = "False";
+            dTrigger.Setters.Add(new Setter(ListBoxItem.BackgroundProperty,Brushes.Red));
+            style.Triggers.Add(dTrigger);
             l.ItemContainerStyle = style;
             l.ItemsSource = dt;
+            
             s.Content = l;
 
             GridView grdV = new GridView(); // needed to be a func later
@@ -981,18 +998,7 @@ namespace Memo
 
         public void close(object sender, EventArgs e)
         {
-            var userInput = MessageBox.Show(translate.trans("wannaclose"), translate.trans("Confirmation"), MessageBoxButton.YesNo);
-            //MessageBox.Show(userInput.ToString());
-            if (userInput == MessageBoxResult.Yes)
-            {
-                // PASS
-                Global.removeWindow(((Window)sender)); ((Window)sender).Close();
-            }
-            else
-            {
-                // FAIL
-            }
-
+            Global.removeWindow(((Window)sender)); ((Window)sender).Close();
         }
         public Grid miniHeader(List<MenuItem> l)
         {

@@ -16,14 +16,15 @@ using System.Windows;
 using System.Windows.Threading;
 using System.Windows.Xps.Packaging;
 using CodeReason.Reports;
-
-
+using System.Runtime.InteropServices;
+using Microsoft.Office.Interop.Excel;
+using Jeylabs.XmlToExcelConverter;
 namespace Memo
 {
     /// <summary>
     /// Interaction logic for ReportsWindow.xaml
     /// </summary>
-    public partial class ReportsWindow : Window
+    public partial class ReportsWindow : System.Windows.Window
     {
         private bool _firstActivated = true;
         private MyReportData myReportData;
@@ -39,7 +40,7 @@ namespace Memo
 
             _firstActivated = false;
             if (myReportData == null) return;
-            Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(delegate
+            Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new System.Action(delegate
             {
                 try
                 {
@@ -54,7 +55,7 @@ namespace Memo
                     data.ReportDocumentValues.Add("PrintDate", DateTime.Now); // print date is now
 
                     // sample table "Ean"
-                    DataTable table = myReportData.table;
+                    System.Data.DataTable table = myReportData.table;
                     data.DataTables.Add(table);
 
                     DateTime dateTimeStart = DateTime.Now; // start time measure here
@@ -75,6 +76,45 @@ namespace Memo
                     busyDecorator.IsBusyIndicatorHidden = true;
                 }
             }));
+        }
+
+        private void ExportDataTableToExcel(object sender, KeyEventArgs e)
+        {
+            System.Data.DataTable table = new System.Data.DataTable();
+            Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application();
+            Workbook book = excel.Application.Workbooks.Add(Type.Missing);
+            excel.Visible = false;
+            excel.DisplayAlerts = false;
+            Worksheet excelWorkSheet = (Microsoft.Office.Interop.Excel.Worksheet)book.ActiveSheet;
+            excelWorkSheet.Name = table.TableName;
+            
+            //progressBar1.Maximum = table.Columns.Count;
+            for (int i = 1; i < table.Columns.Count + 1; i++) // Creating Header Column In Excel  
+            {
+                excelWorkSheet.Cells[1, i] = table.Columns[i - 1].ColumnName;
+
+            }
+
+
+            //progressBar1.Maximum = table.Rows.Count;
+            for (int j = 0; j < table.Rows.Count; j++) // Exporting Rows in Excel  
+            {
+                for (int k = 0; k < table.Columns.Count; k++)
+                {
+                    excelWorkSheet.Cells[j + 2, k + 1] = table.Rows[j].ItemArray[k].ToString();
+                }
+
+            }
+
+
+            book.SaveAs("Xlfile");
+            book.Close(true);
+            excel.Quit();
+
+            Marshal.ReleaseComObject(book);
+            Marshal.ReleaseComObject(book);
+            Marshal.ReleaseComObject(excel);
+
         }
 
     }
