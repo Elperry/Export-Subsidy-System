@@ -9,7 +9,12 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Threading.Tasks;
 using System.Threading;
-
+using Microsoft.Win32;
+using System.Windows.Shapes;
+using System.IO;
+using System.Drawing;
+using System.Text;
+using Image = System.Drawing.Image;
 
 namespace Memo
 {
@@ -266,11 +271,182 @@ namespace Memo
             return c;
         }
     }
+    public class Committee : INotifyPropertyChanged
+    {
+        private string _id;
+        private string _name;
+        public event PropertyChangedEventHandler PropertyChanged;
+        private Window window { get; set; }
+        public string id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("id"));
+            }
+        }
+        public string name
+        {
+            get
+            {
+                if (_name != "") return _name;
+                else { return " "; }
+            }
+            set
+            {
+                _name = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("name"));
+            }
+        }
+        public Committee(Window W = null)
+        {
+            window = W;
+        }
+        public Committee(string ID, Window W = null)
+        {
+            window = W;
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `committee` Where id = " + ID;
+            DataTable dt = sql.Select(q);
+            DataRow r = dt.Rows[0];
+            this.id = r["id"].ToString();
+            this.name = r["name"].ToString();
+        }
+        public void complete(string ID)
+        {
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `committee` Where id = " + ID;
+            DataTable dt = sql.Select(q);
+            DataRow r = dt.Rows[0];
+            this.id = r["id"].ToString();
+            this.name = r["name"].ToString();
+        }
+        public Committee clone()
+        {
+            Committee temp = new Committee();
+            temp.id = this._id;
+            temp.name = this._name;
+            return temp;
+        }
+        public void selectItem(object sender, MouseButtonEventArgs e)
+        {
+            this.id = ((Committee)((ListViewItem)sender).Content).id;
+            this.name = ((Committee)((ListViewItem)sender).Content).name;
+        }
+        public void add(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (name == string.Empty)
+                {
+                    MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
+                }
+                Mysqldb sql = new Mysqldb();
+                string q = "INSERT INTO  uniexport.`committee` (`id`,`name`,`company`) VALUES ( NULL,'" + name + "','" + Global.company.id + "');";
+                id = (sql.nextAutoIncrement("committee")).ToString();
+
+                if (sql.Select(q) != null)
+                {
+                    Global.committees.Add(clone());
+                    clear();
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.ToString());
+            }
+        }
+        public void edit(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (name == string.Empty)
+                {
+                    MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
+                }
+                Mysqldb sql = new Mysqldb();
+                string q = "UPDATE uniexport.`committee` SET   `name` = '" + name + "' WHERE `committee`.`id` = " + this.id;
+                sql.Select(q);
+                foreach (Committee c in Global.committees)
+                {
+                    if (c.id == _id)
+                    {
+                        Global.committees[Global.committees.IndexOf(c)] = clone(); return;
+                    }
+                }
+                clear();
+            }
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.ToString());
+            }
+        }
+        public void del(object sender, RoutedEventArgs e)
+        {
+            Mysqldb sql = new Mysqldb();
+            string q = "DELETE FROM  uniexport.`committee` WHERE `committee`.`id` = " + id;
+            sql.Select(q);
+            foreach (Committee temp in Global.committees)
+            {
+                if (temp.id == _id)
+                {
+                    Global.committees.Remove(temp); return;
+                }
+            }
+            clear();
+        }
+        public void close(object sender, RoutedEventArgs e)
+        {
+            Global.removeWindow(window); window.Close();
+        }
+        public void clear()
+        {
+            id = null;
+            name = null;
+        }
+        public static ObservableCollection<object> getTable()
+        {
+            ObservableCollection<object> c = new ObservableCollection<object>();
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `committee` where company =" + Global.company.id;
+            DataTable dt = sql.Select(q);
+            if (dt.Rows.Count == 0)
+            {
+                Committee tmp = new Committee(); c.Add(tmp); return c;
+            }
+            foreach (DataRow r in dt.Rows)
+            {
+                Committee temp = new Committee();
+                temp.id = r["id"].ToString();
+                temp.name = r["name"].ToString();
+                //MessageBox.Show(temp.name);
+                c.Add(temp);
+            }
+            return c;
+        }
+    }
     public class Brand : INotifyPropertyChanged
     {
         private string _id;
         private string _name;
         private BrandCat _brandCat;
+        private Committee _committee;
+        public ObservableCollection<object> committees
+        {
+            get { return Global.committees; }
+            set
+            {
+                Global.committees = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("committees"));
+            }
+        }
         private string _supportPercentage;
         public event PropertyChangedEventHandler PropertyChanged;
         private Window window { get; set; }
@@ -308,6 +484,16 @@ namespace Memo
                     this.PropertyChanged(this, new PropertyChangedEventArgs("brandCat"));
             }
         }
+        public Committee committee
+        {
+            get { return _committee; }
+            set
+            {
+                _committee = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("committee"));
+            }
+        }
         public ObservableCollection<object> brandCats
         {
             get { return Global.brandCats; }
@@ -331,6 +517,7 @@ namespace Memo
         public Brand(Window W = null)
         {
             window = W;
+            committees = Committee.getTable();
         }
         public Brand(string ID, Window W = null)
         {
@@ -352,6 +539,7 @@ namespace Memo
             this.id = r["id"].ToString();
             this.name = r["name"].ToString();
             this.brandCat = new BrandCat(r["brandCat"].ToString());
+            this.committee = new Committee(r["committee"].ToString());
             this.supportPercentage = r["supportPercentage"].ToString();
         }
         public void complete(string ID)
@@ -363,6 +551,7 @@ namespace Memo
             this.id = r["id"].ToString();
             this.name = r["name"].ToString();
             this.brandCat = new BrandCat(r["brandCat"].ToString());
+            this.committee = new Committee(r["committee"].ToString());
             this.supportPercentage = r["supportPercentage"].ToString();
         }
         public Brand clone()
@@ -371,6 +560,7 @@ namespace Memo
             temp.id = this._id;
             temp.name = this._name;
             temp.brandCat = this._brandCat.clone();
+            temp.committee = this.committee.clone();
             temp.supportPercentage = this._supportPercentage;
             return temp;
         }
@@ -380,6 +570,7 @@ namespace Memo
             this.name = ((Brand)((ListViewItem)sender).Content).name;
             //this.brandCat = ((Brand)((ListViewItem)sender).Content).brandCat.clone();
             this.brandCat = (BrandCat)Global.brandCats.Where(x => ((BrandCat)x).name == ((Brand)((ListViewItem)sender).Content).brandCat.name).First();
+            this.committee = (Committee)Global.committees.Where(x => ((Committee)x).name == ((Brand)((ListViewItem)sender).Content).committee.name).First();
             this.supportPercentage = ((Brand)((ListViewItem)sender).Content).supportPercentage;
         }
         public void add(object sender, RoutedEventArgs e)
@@ -391,7 +582,7 @@ namespace Memo
                     MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
                 }
                 Mysqldb sql = new Mysqldb();
-                string q = "INSERT INTO  uniexport.`brand` (`id`,`name`,`brandCat`,`supportPercentage`) VALUES ( NULL,'" + name + "','" + brandCat.id + "','" + supportPercentage + "');";
+                string q = "INSERT INTO  uniexport.`brand` (`id`,`name`,`brandCat`,`committee`,`supportPercentage`) VALUES ( NULL,'" + name + "','" + brandCat.id + "','" + committee.id + "','" + supportPercentage + "');";
                 id = (sql.nextAutoIncrement("brand")).ToString();
                 ;
                 if (sql.Select(q) != null) { Global.brands.Add(clone()); clear(); }
@@ -410,7 +601,7 @@ namespace Memo
                 MessageBox.Show(translate.trans("Please Enter A Valid DAta !!!"));
             }
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE uniexport.`brand` SET   `name` = '" + name + "' ,`brandCat` = '" + brandCat.id + "' ,`supportPercentage` = '" + supportPercentage + "' WHERE `Brand`.`id` = " + this.id;
+            string q = "UPDATE uniexport.`brand` SET   `name` = '" + name + "' ,`brandCat` = '" + brandCat.id + "',`committee` = '" + committee.id + "' ,`supportPercentage` = '" + supportPercentage + "' WHERE `Brand`.`id` = " + this.id;
             sql.Select(q);
             foreach (Brand c in Global.brands)
             {
@@ -446,12 +637,13 @@ namespace Memo
             name = null;
             brandCat = null;
             supportPercentage = null;
+            committee = null;
         }
         public static ObservableCollection<object> getTable(BrandCat bc = null)
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT * from brand INNER JOIN brandcat as bc on (bc.id = brand.brandCat)WHERE bc.company = " + Global.company.id;
+            string q = "SELECT * from brand INNER JOIN brandcat as bc on (bc.id = brand.brandCat) WHERE bc.company = " + Global.company.id;
             if (bc != null)
             {
                 q = "SELECT * FROM `brand` where brandCat = " + bc.id;
@@ -467,6 +659,7 @@ namespace Memo
                 temp.id = r["id"].ToString();
                 temp.name = r["name"].ToString();
                 temp.brandCat = new BrandCat(r["brandCat"].ToString());
+                temp.committee = new Committee(r["committee"].ToString());
                 temp.supportPercentage = r["supportPercentage"].ToString();
                 c.Add(temp);
             }
@@ -2211,7 +2404,16 @@ namespace Memo
             //this.egpVal = r["egpVal"].ToString();
             //this.PTREgp = r["PTREgp"].ToString();
             //this.totalEgp = r["totalEgp"].ToString();
-            this.manualWork = Convert.ToBoolean((r["manualWork"].ToString()== "")?"0": r["manualWork"]);
+            try
+            {
+                this.manualWork = Convert.ToBoolean((r["manualWork"].ToString()== "")?"0": r["manualWork"]);
+            }
+            catch (Exception)
+            {
+
+                this.manualWork = false;
+            }
+            
             this.receiptDate = r["receiptDate"].ToString();
         }
         public void complete(string ID)
@@ -2486,10 +2688,11 @@ namespace Memo
             }
             foreach (DataRow r in dt.Rows)
             {
+
                 ExportCertificate temp = new ExportCertificate();
                 temp.id = r["id"].ToString();
                 temp.num = r["export"].ToString();
-                temp.company = (Company)Global.company.clone();
+                temp.company = (Company)Global.company;
                 temp.dat = r["exportDate"].ToString();
                 temp.country = new Country(r["country"].ToString());
                 temp.port = new Port(r["port"].ToString());
@@ -3190,11 +3393,21 @@ namespace Memo
     }
     public class FileNo : INotifyPropertyChanged
     {
+        private bool _rowSelected;
         private string _id;
         private string _num;
         private string _dat;
-        private ObservableCollection<object> _exportCertificates;
-        private ExportCertificate _exportCertificate;
+        private Committee _committee;
+        public ObservableCollection<object> committees
+        {
+            get { return Global.committees; }
+            set
+            {
+                Global.committees = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("committees"));
+            }
+        }
         public event PropertyChangedEventHandler PropertyChanged;
         private Window window { get; set; }
         public string id
@@ -3227,32 +3440,21 @@ namespace Memo
                     this.PropertyChanged(this, new PropertyChangedEventArgs("dat"));
             }
         }
-        public ExportCertificate exportCertificate
+        public Committee committee
         {
-            get { return _exportCertificate; }
+            get { return _committee; }
             set
             {
-                _exportCertificate = value;
+                _committee = value;
                 if (this.PropertyChanged != null)
-                    this.PropertyChanged(this, new PropertyChangedEventArgs("exportCertificate"));
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("committee"));
             }
         }
-        public ObservableCollection<object> exportCertificates
-        {
-            get { return _exportCertificates; }
-            set
-            {
-                _exportCertificates = value;
-                if (this.PropertyChanged != null)
-                    this.PropertyChanged(this, new PropertyChangedEventArgs("exportCertificate"));
-            }
-        }
-      
+
         public FileNo(Window W = null)
         {
             window = W;
-            _exportCertificates = new ObservableCollection<object>();
-
+            committees = Committee.getTable();
             Thread thread = new Thread(() =>
             {   
                 Mysqldb sql = new Mysqldb();
@@ -3263,10 +3465,11 @@ namespace Memo
                     ExportCertificate temp = new ExportCertificate();
                     temp.id = r["id"].ToString();
                     temp.num = r["num"].ToString();
-                    exportCertificates.Add(temp);
+                   // exportCertificates.Add(temp);
                 }
             });
             thread.Start();
+            
             //thread.Join();
         }
         public FileNo(string ID, Window W = null)
@@ -3279,7 +3482,6 @@ namespace Memo
             this.id = r["id"].ToString();
             this.num = r["num"].ToString();
             this.dat = r["dat"].ToString();
-            this.exportCertificate = new ExportCertificate(r["exportCertificate"].ToString());
         }
         public void complete(string ID)
         {
@@ -3290,7 +3492,6 @@ namespace Memo
             this.id = r["id"].ToString();
             this.dat = r["dat"].ToString();
             this.dat = r["dat"].ToString();
-            this.exportCertificate = new ExportCertificate(r["exportCertificate"].ToString());
         }
         public FileNo clone()
         {
@@ -3298,7 +3499,7 @@ namespace Memo
             temp.id = this._id;
             temp.num = this._num;
             temp.dat = this._dat;
-            temp.exportCertificate = this._exportCertificate.clone();
+            temp.committee = this.committee.clone();
             return temp;
         }
         public void selectItem(object sender, MouseButtonEventArgs e)
@@ -3306,17 +3507,17 @@ namespace Memo
             this.id = ((FileNo)((ListViewItem)sender).Content).id;
             this.num = ((FileNo)((ListViewItem)sender).Content).num;
             this.dat = ((FileNo)((ListViewItem)sender).Content).dat;
-            this.exportCertificate = (ExportCertificate)Global.exportCertificates.Where(x => ((ExportCertificate)x).num == ((FileNo)((ListViewItem)sender).Content).exportCertificate.num).First();
+            this.committee = (Committee)committees.Where(x => ((Committee)x).id == ((FileNo)((ListViewItem)sender).Content).committee.id).First();
+            _rowSelected = true;
         }
         public void add(object sender, RoutedEventArgs e)
         {
             try
             {
                 Mysqldb sql = new Mysqldb();
-                string q = "INSERT INTO  uniexport.`fileno` (`id`,`num`,`company`,`dat`,`exportCertificate`) VALUES ( NULL ,'" + num + "','" + Global.company.id + "'," + Global.dateFormate(dat) + ",'" + exportCertificate.id + "');";
+                string q = "INSERT INTO  uniexport.`fileno` (`id`,`num`,`company`,`dat`,`committee`) VALUES ( NULL ,'" + num + "','" + Global.company.id + "'," + Global.dateFormate(dat) + ",'"+committee.id+"');";
                 id = (sql.nextAutoIncrement("fileno")).ToString();
                 if (sql.Select(q) != null) { Global.fileNos.Add(clone()); clear(); }
-                exportCertificates.Remove(exportCertificates.Where(ex=> ((ExportCertificate)ex).num == num).First());
             }
             catch (Exception ex)
             {
@@ -3327,7 +3528,7 @@ namespace Memo
         public void edit(object sender, RoutedEventArgs e)
         {
             Mysqldb sql = new Mysqldb();
-            string q = "UPDATE uniexport.`fileno` SET `num` = '" + num + "' ,`dat` = " + Global.dateFormate(dat) + ",`exportCertificate` = '" + exportCertificate.id + "'  WHERE `FileNo`.`id` = " + id + " ;";
+            string q = "UPDATE uniexport.`fileno` SET `num` = '" + num + "' ,`dat` = " + Global.dateFormate(dat) + " , `committee` = '"+committee.id+"'  WHERE `FileNo`.`id` = " + id + " ;";
             sql.Select(q);
             foreach (FileNo c in Global.fileNos)
             {
@@ -3338,20 +3539,6 @@ namespace Memo
             }
             clear();
         }
-        public void del(object sender, RoutedEventArgs e)
-        {
-            Mysqldb sql = new Mysqldb();
-            string q = "DELETE FROM  uniexport.`fileno` WHERE `fileno`.`id` = " + id;
-            sql.Select(q);
-            foreach (FileNo temp in Global.fileNos)
-            {
-                if (temp.id == _id)
-                {
-                    Global.fileNos.Remove(temp); clear(); return;
-                }
-            }
-
-        }
         public void close(object sender, RoutedEventArgs e)
         {
             Global.removeWindow(window); window.Close();
@@ -3360,6 +3547,46 @@ namespace Memo
         {
             id = null;
             dat = null;
+            _rowSelected = false;
+        }
+        public void openFileNoData(object sender, RoutedEventArgs e)
+        {
+            if (!_rowSelected) { MessageBox.Show(translate.trans("Please Select Record first!!")); return; }
+            foreach (Window w in Global.windows)
+            {
+                if (w.Title == translate.trans("FileNoData"))
+                {
+                    w.Activate(); return;
+                }
+            }
+            template t = new template();
+            object W = new Window();
+            object fileNoData = new FileNoData(this, (Window)W);
+            Global.fileNoDatas = FileNoData.getTable(this);
+            ((FileNoData)fileNoData).exportCertificates = new ObservableCollection<object>();
+            foreach (FileNoData b in Global.fileNoDatas)
+            {
+                ((FileNoData)fileNoData).exportCertificates.Add(b.exportCertificate);
+            }
+            List<Property> P = new List<Property>()
+            {
+                new Property("txtFileNo","txt" , _readOnly:true),
+                new Property("exportCertificate","cmb",_displayPath:"num" , _action:"select"),
+            };
+            List<TableCol> tbcs = new List<TableCol>()
+            {
+                //new TableCol("id","id"),
+                new TableCol("exportCertificate","exportCertificate.num"),
+                new TableCol("chck","chck",new Property("chck","bool",_action:"chckClicked")),
+            };
+            t.Moderntemplate(W, ref fileNoData, translate.trans("FileNoData"), P, new List<string>() { "save", "close" }, Global.fileNoDatas, tbcs, 0, 0, false);
+            Global.addWindow((Window)W);
+
+            if (((FileNoData)Global.fileNoDatas[0]).id == string.Empty || ((FileNoData)Global.fileNoDatas[0]).id == "" || ((FileNoData)Global.fileNoDatas[0]).id == null)
+            {
+                Global.fileNoDatas.RemoveAt(0);
+            }
+            ((Window)W).Show();
         }
         public static ObservableCollection<object> getTable()
         {
@@ -3376,12 +3603,249 @@ namespace Memo
                 temp.id = r["id"].ToString();
                 temp.num = r["num"].ToString();
                 temp.dat = r["dat"].ToString();
-                temp.exportCertificate = new ExportCertificate(r["exportCertificate"].ToString());
+                temp.committee = new Committee(r["committee"].ToString());
                 c.Add(temp);
             }
             return c;
         }
     }
+
+    public class FileNoData : INotifyPropertyChanged
+    {
+        private string _id;
+        private FileNo _fileNo;
+        private ExportCertificate _exportCertificate;
+        private ObservableCollection<object> _exportCertificates;
+        private bool _chck;
+        public event PropertyChangedEventHandler PropertyChanged;
+        private Window window { get; set; }
+        public string id
+        {
+            get { return _id; }
+            set
+            {
+                _id = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("id"));
+            }
+        }
+        public string txtFileNo
+        {
+            get { return fileNo.num; }
+            set
+            {
+                //_id = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("txtFileNo"));
+            }
+        }
+        public FileNo fileNo
+        {
+            get { return _fileNo; }
+            set
+            {
+                _fileNo = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("fileNo"));
+            }
+        }
+        public ExportCertificate exportCertificate
+        {
+            get { return _exportCertificate; }
+            set
+            {
+                _exportCertificate = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("exportCertificate"));
+            }
+        }
+        public string txtfileNo
+        {
+            get { return _fileNo.num; }
+            set
+            {
+                //_fileNo = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("txtfileNo"));
+            }
+        }
+
+        public bool chck
+        {
+            get { return _chck; }
+            set
+            {
+                _chck = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("chck"));
+            }
+        }
+
+        public ObservableCollection<object> fileNos
+        {
+            get { return Global.fileNos; }
+            set
+            {
+                Global.fileNos = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("fileNos"));
+            }
+        }
+        public ObservableCollection<object> exportCertificates
+        {
+            get { return _exportCertificates; }
+            set
+            {
+                _exportCertificates = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("exportCertificates"));
+            }
+        }
+        public FileNoData(Window W = null)
+        {
+            window = W;
+        }
+        public FileNoData(FileNo b, Window W = null)
+        {
+            this.fileNo = b;
+            window = W;
+        }
+        public FileNoData(string ID, Window W = null)
+        {
+            window = W;
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `fileNoData` Where id = " + ID;
+            DataTable dt = sql.Select(q);
+            DataRow r = dt.Rows[0];
+            this.id = r["id"].ToString();
+            this.fileNo = new FileNo(r["fileNo"].ToString());
+            this.exportCertificate = new ExportCertificate(r["exportCertificate"].ToString());
+        }
+        public void complete(string ID)
+        {
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT * FROM `filenodata` Where id = " + ID;
+            DataTable dt = sql.Select(q);
+            DataRow r = dt.Rows[0];
+            this.id = r["id"].ToString();
+            this.fileNo = new FileNo(r["fileNo"].ToString());
+            this.exportCertificate = new ExportCertificate(r["exportCertificate"].ToString());
+        }
+        public FileNoData clone()
+        {
+            FileNoData temp = new FileNoData();
+            temp.id = this._id;
+            temp.fileNo = this._fileNo.clone();
+            temp.exportCertificate = this.exportCertificate.clone();
+            return temp;
+        }
+        public void selectItem(object sender, MouseButtonEventArgs e)
+        {
+            this.id = ((FileNoData)((ListViewItem)sender).Content).id;
+            this.fileNo = (FileNo)Global.fileNos.Where(x => ((FileNo)x).id == ((FileNoData)((ListViewItem)sender).Content).fileNo.id).First();
+            //this.exportCertificate = (ExportCertificate)Global.exportCertificates.Where(x => ((ExportCertificate)x).id == ((FileNoData)((ListViewItem)sender).Content).exportCertificate.id).First();
+        }
+        public void save(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Mysqldb sql = new Mysqldb();
+                string q = "DELETE FROM  uniexport.`filenodata` WHERE `filenodata`.`fileNo` = " + fileNo.id;
+                sql.Select(q);
+                foreach (object obj in Global.fileNoDatas)
+                {
+                    if (!((FileNoData)obj).chck) break;
+                    q = "INSERT INTO  uniexport.`filenodata` (`id`, `fileNo`, `exportCertificate`) VALUES (NULL, '" + fileNo.id + "', '" + ((FileNoData)obj).exportCertificate.id + "');";
+                    sql.Select(q);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+
+
+        }
+        public void chckClicked(object sender, RoutedEventArgs e)
+        {
+            CheckBox c = (CheckBox)sender;
+            FileNoData b = (FileNoData)c.DataContext;
+            int i = Global.fileNoDatas.IndexOf(Global.fileNoDatas.Where(x => ((FileNoData)x).exportCertificate == b.exportCertificate).First());
+            if (c.IsChecked == true)
+            {
+                Global.fileNoDatas.Move(i, 0);
+            }
+            else
+            {
+                Global.fileNoDatas.Move(i, Global.fileNoDatas.Count - 1);
+            }
+
+        }
+        public void select(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                string export = ((ComboBox)sender).Text;
+                object temp = Global.fileNoDatas.Where(x => ((FileNoData)x).exportCertificate.num == export).First();
+                ((FileNoData)temp).chck = true;
+                int i = Global.fileNoDatas.IndexOf(temp);
+                Global.fileNoDatas.Move(i, 0);
+            }
+            else
+            {
+                return;
+            }
+
+        }
+        public void close(object sender, RoutedEventArgs e)
+        {
+            Global.removeWindow(window); window.Close();
+        }
+        public void clear()
+        {
+            id = null;
+            fileNo = null;
+            exportCertificate = null;
+
+        }
+        public static ObservableCollection<object> getTable(FileNo fn)
+        {
+            ObservableCollection<object> c = new ObservableCollection<object>();
+            Mysqldb sql = new Mysqldb();
+            string q = "SELECT `id`,`exportCertificate` FROM filenodata WHERE fileNo = " + fn.id + " ;";
+            DataTable dt = sql.Select(q);
+
+
+            foreach (DataRow r in dt.Rows)
+            {
+                if (r[0].ToString() == "") break;
+                FileNoData temp = new FileNoData();
+                temp.id = r["id"].ToString();
+                temp.fileNo = fn;
+                temp.exportCertificate = new ExportCertificate(r["exportCertificate"].ToString());
+                temp.chck = true;
+                c.Add(temp);
+            }
+            q = "SELECT `id`,`export` FROM alldetailed WHERE committee = '"+fn.committee.name+"' and company = '" + Global.company.name + "'  and alldetailed.id not in(select filenodata.exportCertificate from filenodata where committee = '"+fn.committee.name+"') GROUP by(id)";
+            dt = sql.Select(q);
+            foreach (DataRow r in dt.Rows)
+            {
+                if (r[0].ToString() == "") break;
+                FileNoData temp = new FileNoData();
+                temp.id = "null";
+                temp.fileNo = fn;
+                temp.exportCertificate = new ExportCertificate(r["id"].ToString());
+                temp.chck = false;
+                c.Add(temp);
+            }
+            if (c.Count == 0)
+            {
+                FileNoData tmp = new FileNoData(); c.Add(tmp);
+            }
+            return c;
+        }
+}
+
     public class Activation : INotifyPropertyChanged
     {
         private string _hwKey;
@@ -3597,6 +4061,7 @@ namespace Memo
                     this.dat = temp.dat;
                     this.country = (Country)Global.countrys.Where(cc => ((Country)cc).id == temp.country.id).First();//Global.companys.Where(c=>((Company)c).id = temp.company.id).First();
                     this.usd = temp.usd;
+                    _rowSelected = true;
                 }
                 catch (Exception)
                 {
@@ -4261,6 +4726,8 @@ namespace Memo
         private string _num;
         private string _valueEgp;
         private string _dat;
+        private Image _copy;
+        public string _path;
         public event PropertyChangedEventHandler PropertyChanged;
         private Window window { get; set; }
         public string id
@@ -4313,6 +4780,26 @@ namespace Memo
                     this.PropertyChanged(this, new PropertyChangedEventArgs("dat"));
             }
         }
+        public string path
+        {
+            get { return _path; }
+            set
+            {
+                _path = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("path"));
+            }
+        }
+        public Image copy
+        {
+            get { return _copy; }
+            set
+            {
+                _copy = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("copy"));
+            }
+        }
         public Cheque(Window W = null)
         {
             window = W;
@@ -4330,6 +4817,7 @@ namespace Memo
                 this.num = r["num"].ToString();
                 this.valueEgp = r["valueEgp"].ToString();
                 this.dat = r["dat"].ToString();
+                this._path = r["copy"].ToString();
             }
             catch (Exception ex)
             {
@@ -4346,6 +4834,7 @@ namespace Memo
             this.num = r["num"].ToString();
             this.valueEgp = r["valueEgp"].ToString();
             this.dat = r["dat"].ToString();
+            this._path = r["copy"].ToString();
         }
         public Cheque clone()
         {
@@ -4354,6 +4843,7 @@ namespace Memo
             temp.num = this._num;
             temp.valueEgp = this._valueEgp;
             temp.dat = this._dat;
+            temp._path = this._path;
             return temp;
         }
         public void selectItem(object sender, MouseButtonEventArgs e)
@@ -4363,14 +4853,36 @@ namespace Memo
             this.num = ((Cheque)((ListViewItem)sender).Content).num;
             this.valueEgp = ((Cheque)((ListViewItem)sender).Content).valueEgp;
             this.dat = ((Cheque)((ListViewItem)sender).Content).dat;
+            this.path = Directory.GetCurrentDirectory()+"\\"+((Cheque)((ListViewItem)sender).Content).path;
+            //MessageBox.Show(path);
+            //if(_path != null && _path != "")this.copy = Image.FromFile(this._path);
         }
         public void add(object sender, RoutedEventArgs e)
         {
             try
             {
+
+                string p = "";
                 Mysqldb sql = new Mysqldb();
-                string q = "INSERT INTO  uniexport.`cheque` (`id`,`num`,`company`,`valueEgp`,`dat`) VALUES ( NULL,'" + num + "','" + Global.company.id + "','" + valueEgp + "'," + Global.dateFormate(dat) + ");";
                 id = (sql.nextAutoIncrement("cheque")).ToString();
+                if (copy == null )
+                {
+                    p = "NULL";
+                }
+                else
+                {
+                    p = System.IO.Path.Combine("imgs", id);
+                    if (File.Exists(p))
+                    {
+                        // If file found, delete it    
+                        File.Delete(p);
+                    }
+                    copy.Save(p);
+                    path = p;
+                    p = "'" + p + "'";
+                }
+                string q = "INSERT INTO  uniexport.`cheque` (`id`,`num`,`company`,`valueEgp`,`dat`,`copy`) VALUES ( NULL,'" + num + "','" + Global.company.id + "','" + valueEgp + "'," + Global.dateFormate(dat) + " , "+ p.Replace("\\", "\\\\") + ");";
+                
                 if (sql.Select(q) != null) { Global.cheques.Add(clone()); clear(); }
 
             }
@@ -4382,19 +4894,52 @@ namespace Memo
         }
         public void edit(object sender, RoutedEventArgs e)
         {
-            if (!_rowSelected) { MessageBox.Show(translate.trans("Please Select Record")); return; }
-
-            Mysqldb sql = new Mysqldb();
-            string q = "UPDATE uniexport.`cheque` SET `num` = '" + num + "' ,`valueEgp` = '" + valueEgp + "' ,`dat` = " + Global.dateFormate(dat) + " WHERE `Cheque`.`id` = " + id + ";";
-            sql.Select(q);
-            foreach (Cheque c in Global.cheques)
+            try
             {
-                if (c.id == _id)
+                if (!_rowSelected) { MessageBox.Show(translate.trans("Please Select Record")); return; }
+                string p = "";
+                if (copy == null && (_path == null || _path == ""))
                 {
-                    Global.cheques[Global.cheques.IndexOf(c)] = clone(); return;
+                    p = "NULL";
                 }
+                else
+                {
+                    p = System.IO.Path.Combine("imgs", id);
+                    if(copy == null)
+                    {
+                        p = "'" + p + "'";
+                    }
+                    else
+                    {
+                        
+                        if (File.Exists(p))
+                        {
+                            // If file found, delete it    
+                            File.Delete(p);
+                        }
+                        copy.Save(p);
+                        path = p;
+                        p = "'" + path + "'";
+                    }
+
+                }
+                Mysqldb sql = new Mysqldb();
+                string q = "UPDATE uniexport.`cheque` SET `num` = '" + num + "' ,`valueEgp` = '" + valueEgp + "' ,`dat` = " + Global.dateFormate(dat) + " , `copy` = "+ p.Replace("\\", "\\\\") + "  WHERE `Cheque`.`id` = " + id + ";";
+                sql.Select(q);
+                foreach (Cheque c in Global.cheques)
+                {
+                    if (c.id == _id)
+                    {
+                        Global.cheques[Global.cheques.IndexOf(c)] = clone();clear(); return;
+                    }
+                }
+                
             }
-            clear();
+            catch (Exception ex)
+            {
+
+                MessageBox.Show(ex.ToString());
+            }
         }
         public void del(object sender, RoutedEventArgs e)
         {
@@ -4404,6 +4949,11 @@ namespace Memo
             sql.Select(q);
             q = "DELETE FROM `chequedata` WHERE `cheque` = " + id;
             sql.Select(q);
+            if (File.Exists(System.IO.Path.Combine("imgs", id)))
+            {
+                // If file found, delete it    
+                File.Delete(System.IO.Path.Combine("imgs", id));
+            }
             foreach (Cheque temp in Global.cheques)
             {
                 if (temp.id == _id)
@@ -4463,6 +5013,45 @@ namespace Memo
             valueEgp = null;
             dat = null;
             _rowSelected = false;
+            path = "";
+            copy.Dispose();
+        }
+        public void chooseCopy(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.InitialDirectory = "c:\\";
+            dlg.Filter = "Image files (*.jpg)|*.jpg|All Files (*.*)|*.*";
+            dlg.RestoreDirectory = true;
+            if (dlg.ShowDialog() == true)
+            {
+                string selectedFileName = dlg.FileName;
+                 copy = Image.FromFile(selectedFileName);
+                path = selectedFileName;
+                 
+            }
+            ////////////////// TEST
+
+        }
+        public  void downloadImg(object sender, RoutedEventArgs e)
+        {
+            if (_path == null || _path == "") { MessageBox.Show("Image Not Setted"); return; }
+            try
+            {
+                copy = Image.FromFile(_path);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("The file Has been deleted");return;
+            }
+            
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.Filter = "JPeg Image|*.jpg|Bitmap Image|*.bmp|Gif Image|*.gif";
+            dlg.Title = "Save an Image File";
+            dlg.ShowDialog();
+            if (dlg.FileName == "") { return; }
+            string filePath = dlg.FileName;
+            copy.Save(filePath);
+            copy.Dispose();
         }
         public static ObservableCollection<object> getTable()
         {
@@ -4480,6 +5069,7 @@ namespace Memo
                 temp.num = r["num"].ToString();
                 temp.valueEgp = r["valueEgp"].ToString();
                 temp.dat = r["dat"].ToString();
+                temp._path = r["copy"].ToString();
                 c.Add(temp);
             }
             return c;
@@ -5532,6 +6122,7 @@ namespace Memo
         {
             Global.removeWindow(window); window.Close();
         }
+
         public void genSubmissionRepo()
         {
             

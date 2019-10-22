@@ -18,7 +18,8 @@ using System.Windows.Xps.Packaging;
 using CodeReason.Reports;
 using System.Runtime.InteropServices;
 using Microsoft.Office.Interop.Excel;
-using Jeylabs.XmlToExcelConverter;
+using Microsoft.Win32;
+
 namespace Memo
 {
     /// <summary>
@@ -81,13 +82,28 @@ namespace Memo
         private void ExportDataTableToExcel(object sender, KeyEventArgs e)
         {
             System.Data.DataTable table = new System.Data.DataTable();
+
+
+        }
+
+        public void saveAsExcel(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.Filter = "xlsx Excel|*.xlsx|Excel |*.xls";
+            dlg.Title = "Save an Image File";
+            dlg.ShowDialog();
+            if (dlg.FileName == "") { return; }
+            string filePath = dlg.FileName;
+            DataSet ds = new DataSet();
+            System.Data.DataTable table = myReportData.table.Copy();
+
             Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application();
             Workbook book = excel.Application.Workbooks.Add(Type.Missing);
             excel.Visible = false;
             excel.DisplayAlerts = false;
             Worksheet excelWorkSheet = (Microsoft.Office.Interop.Excel.Worksheet)book.ActiveSheet;
             excelWorkSheet.Name = table.TableName;
-            
+
             //progressBar1.Maximum = table.Columns.Count;
             for (int i = 1; i < table.Columns.Count + 1; i++) // Creating Header Column In Excel  
             {
@@ -107,14 +123,13 @@ namespace Memo
             }
 
 
-            book.SaveAs("Xlfile");
+            book.SaveAs(filePath);
             book.Close(true);
             excel.Quit();
 
             Marshal.ReleaseComObject(book);
             Marshal.ReleaseComObject(book);
             Marshal.ReleaseComObject(excel);
-
         }
 
     }

@@ -26,6 +26,7 @@ namespace Memo {
         public static main mainWindow { get; set; }
         public static ObservableCollection<object> countrys{ get; set; }
         public static ObservableCollection<object> brandCats { get; set; }
+        public static ObservableCollection<object> committees { get; set; }
         public static ObservableCollection<object> brands { get; set; }
         public static ObservableCollection<object> ports { get; set; }
         public static ObservableCollection<object> shippingCompanys { get; set; }
@@ -34,6 +35,7 @@ namespace Memo {
         public static ObservableCollection<object> invoices { get; set; }
         public static ObservableCollection<object> invoiceDatas { get; set; }
         public static ObservableCollection<object> fileNos { get; set; }
+        public static ObservableCollection<object> fileNoDatas { get; set; }
         public static ObservableCollection<object> users { get; set; }
         public static ObservableCollection<object> bankReceipts { get; set; }
         public static ObservableCollection<object> bankReceiptDatas { get; set; }
@@ -110,6 +112,20 @@ namespace Memo {
                 return "NULL";
             }
         }
+        public static string stringFrmBytes(byte[] data)
+        {
+            if (data == null)
+            {
+                return "NULL";
+            }
+            string o = "'";
+            foreach ( byte b in data)
+            {
+                o = o + b.ToString() + ",";
+            }
+            o = o.Substring(0, o.Length - 1);
+            return o+"'";
+        }
         public static void refreshMenu()
         {
             if (Global.usr.admin)
@@ -125,6 +141,7 @@ namespace Memo {
                             new MenuItemViewModel { Header =  translate.trans("Clients"),Command = new CommandViewModel(mainWindow.openClient) },
                             new MenuItemViewModel { Header =  translate.trans("Brand Categories"),Command = new CommandViewModel(mainWindow.openBrandCat) },
                             new MenuItemViewModel { Header =  translate.trans("Brands"),Command = new CommandViewModel(mainWindow.openBrand) },
+                            new MenuItemViewModel { Header =  translate.trans("Committees"),Command = new CommandViewModel(mainWindow.openCommittee) },
                             new MenuItemViewModel { Header =  translate.trans("Countries") , Command = new CommandViewModel(mainWindow.openCountry) },
                             new MenuItemViewModel { Header = translate.trans( "Ports"),Command = new CommandViewModel(mainWindow.openPort) },
                             new MenuItemViewModel { Header = translate.trans( "Users"),Command = new CommandViewModel(mainWindow.openUser) },

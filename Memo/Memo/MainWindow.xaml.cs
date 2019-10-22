@@ -1,6 +1,8 @@
 ﻿
+using System;
 using System.Collections.Generic;
-
+using System.Globalization;
+using System.Threading;
 using System.Windows;
 
 namespace Memo
@@ -20,7 +22,13 @@ namespace Memo
         { 
             
             InitializeComponent();
-            if (activation.check()){
+            CultureInfo culture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+            culture.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
+            culture.DateTimeFormat.LongTimePattern = "";
+            Thread.CurrentThread.CurrentCulture = culture;
+            //Console.Write(DateTime.Now + "");// 
+            //MessageBox.Show(DateTime.Now + "");
+            if (!activation.check()){
                
                 Window w = new Window();
                 object A = new Activation(w);

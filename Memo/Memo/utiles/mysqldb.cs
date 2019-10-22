@@ -57,7 +57,18 @@ public static class connString
     }
 
 }
-
+public class Parameter
+{
+    public string name;
+    public object value;
+    public MySqlDbType type;
+    public Parameter(string na , object val , MySqlDbType t)
+    {
+        name = na;
+        value = val;
+        type = t;
+    }
+}
 public class Mysqldb
 {
     private MySqlConnection connection;
@@ -246,7 +257,24 @@ public class Mysqldb
             this.CloseConnection();
         }
     }
+    public void paramQuery(string query, List<Parameter> Vals)
+    {
+        //open connection
+        if (this.OpenConnection() == true)
+        {
+            //create command and assign the query and connection from the constructor
+            MySqlCommand cmd = new MySqlCommand(query, connection);
+            foreach(Parameter v in Vals)
+            {
+                cmd.Parameters.Add(v.name, MySqlDbType.Blob).Value = v.value;
+            }
+            //Execute command
+            cmd.ExecuteNonQuery();
 
+            //close connection
+            this.CloseConnection();
+        }
+    }
     //Update statement
     public void Update(string table, string newV, string condition)
     {

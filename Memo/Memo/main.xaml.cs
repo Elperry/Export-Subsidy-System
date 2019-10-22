@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.Windows;
 
 using System.Collections.ObjectModel;
-
-
+using System.Globalization;
 
 namespace Memo
 {
@@ -247,6 +246,50 @@ namespace Memo
             }
             ((Window)W).Show();
         }
+        public void openCommittee()
+        {
+
+            foreach (Window w in Global.windows)
+            {
+                if (w.Title == translate.trans("Committees"))
+                {
+                    w.Activate(); return;
+                }
+            }
+            template t = new template();
+            object W = new Window();
+            object brandCat = new Committee((Window)W);
+            if (Global.companys == null)
+            {
+                Global.companys = Company.getTable();
+            }
+            if (Global.usr.admin)
+            {
+                InputDialogSample inputDialog = new InputDialogSample(translate.trans("Please Select Company :"), Global.companys);
+                if (inputDialog.ShowDialog() == true)
+                {
+                    Global.company = (Company)inputDialog.Answer;
+                }
+                else
+                {
+                    return;
+                }
+                if (Global.company == null)
+                {
+                    return;
+                }
+
+            }
+            Global.brandCats = Committee.getTable();
+            t.template1(W, ref brandCat, translate.trans("Committees"), new List<string>() { "name", "add", "edit", "del", "close" }, Global.brandCats, 0, 0, false);
+            Global.addWindow((Window)W);
+
+            if (((Committee)Global.brandCats[0]).id == string.Empty || ((Committee)Global.brandCats[0]).id == "" || ((Committee)Global.brandCats[0]).id == null)
+            {
+                Global.brandCats.RemoveAt(0);
+            }
+            ((Window)W).Show();
+        }
         public void openBrand()
         {
 
@@ -283,7 +326,7 @@ namespace Memo
             }
             Global.brands = Brand.getTable();
             Global.brandCats = BrandCat.getTable();
-            t.template1(W, ref brand, translate.trans("Brands"), new List<string>() { "name","brandCat", "supportPercentage", "add", "edit", "del", "close" }, Global.brands, 0, 0, false);
+            t.template1(W, ref brand, translate.trans("Brands"), new List<string>() { "name","brandCat","committee", "supportPercentage", "add", "edit", "del", "close" }, Global.brands, 0, 0, false);
             Global.addWindow((Window)W);
 
             if (((Brand)Global.brands[0]).id == string.Empty || ((Brand)Global.brands[0]).id == "" || ((Brand)Global.brands[0]).id == null)
@@ -432,21 +475,21 @@ namespace Memo
             object W = new Window();
             object fileNo = new FileNo((Window)W);
             Global.fileNos = FileNo.getTable();
-            //Global.exportCertificates = ExportCertificate.getTable();
+
 
             List<Property> P = new List<Property>()
             {
                 new Property("num","txt"),
                 new Property("dat","date"),
-                new Property("exportCertificate","cmb",_displayPath : "num"),
+                new Property("committee","cmb",_displayPath : "name"),
             };
             List<TableCol> tbcs = new List<TableCol>()
             {
                 new TableCol("num","num"),
                 new TableCol("dat","dat"),
-                new TableCol("exportCertificate","exportCertificate.num"),
+                new TableCol("committee","committee.name"),
             };
-            t.Moderntemplate(W, ref fileNo, translate.trans("FileNo"), P,new List<string>() {"add", "edit", "del", "close" }, Global.fileNos, tbcs,0, 0, false);
+            t.Moderntemplate(W, ref fileNo, translate.trans("FileNo"), P,new List<string>() {"add", "edit", "del", "openFileNoData", "close" }, Global.fileNos, tbcs,0, 0, false);
             Global.addWindow((Window)W);
 
             if (((FileNo)Global.fileNos[0]).id == string.Empty || ((FileNo)Global.fileNos[0]).id == "" || ((FileNo)Global.fileNos[0]).id == null)
@@ -560,6 +603,7 @@ namespace Memo
                 new Property("num","txt"),
                 new Property("valueEgp","num"),
                 new Property("dat","date"),
+                new Property("copy","image"),
             };
             List<TableCol> tbcs = new List<TableCol>()
             {

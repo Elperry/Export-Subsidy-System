@@ -15,6 +15,8 @@ using System.Text.RegularExpressions;
 using System.Reflection;
 using System.ComponentModel;
 using System.Windows.Media.Imaging;
+using Microsoft.Win32;
+//using System.Windows.Media.Imaging;
 
 namespace Memo
 {
@@ -82,6 +84,11 @@ namespace Memo
         }
         public static List<dic> lst = new List<dic>() {
             new dic("clear","تصفير الخانات","Clear Fields"),
+            new dic("committee","اللجنة","Committee"),
+            new dic("supportpercentage","نسبة الدعم","Support Percentage"),
+            new dic("filenodata","بيانات رقم الملف","File Number Data"),
+            new dic("openfilenodata","تتبع رقم الملف","Open File Num data"),
+            new dic("committees","اللجان","Committees"),
             new dic("manualwork","العمل اليدوى","Manual Work"),
             new dic("repounderpreparing","تحت التجهيز","Under Preparing"),
             new dic("repoemptybankreceipt","إشعارات بنكية خالية","Empty Bank Receipt"),
@@ -798,8 +805,7 @@ namespace Memo
             if(height != 0) { s.Height = height; }
             if (width != 0) { s.Width = width; } 
             return s;
-        }
-        
+        }     
         public StackPanel tableView (ref object obj, ref ObservableCollection<object> dt , int startPos)
         {
             StackPanel stp = vStack(true);
@@ -1345,10 +1351,40 @@ namespace Memo
                         {
                             stp.Children.Add(lbl(ref obj, p));
                             stp.Children.Add(cmb(ref obj, p, sizes.fieldWidth(width) - 10));
-                        }else if (p.type == "date")
+                        }
+                        else if (p.type == "date")
                         {
                             stp.Children.Add(lbl(ref obj, p));
                             stp.Children.Add(datePicker(ref obj, p, sizes.fieldWidth(width) - 10));
+                        }
+                        else if (p.type == "image")
+                        {
+                            StackPanel temp1 = hStack();
+                            StackPanel temp2 = vStack();
+                            var method = obj.GetType().GetMethod("chooseCopy");
+                            Button b = btn(translate.trans("Upload Image"), sizes.fieldWidth(width)-100);
+                            RoutedEventHandler e = (RoutedEventHandler)Delegate.CreateDelegate(
+                            typeof(RoutedEventHandler), obj, method);
+                            b.Click += e;
+                            temp2.Children.Add(b);
+                            method = obj.GetType().GetMethod("downloadImg");
+                            Button b2 = btn(translate.trans("Download Image"), sizes.fieldWidth(width)-100);
+                            RoutedEventHandler e2 = (RoutedEventHandler)Delegate.CreateDelegate(
+                            typeof(RoutedEventHandler), obj, method);
+                            b2.Click += e2;
+                            temp2.Children.Add(b2);
+                            //temp2.Width = 100;
+                            temp1.Children.Add(temp2);
+                            //BitmapImage bImg = new BitmapImage(new Binding()));
+                            Image copy = new Image ();
+                            Binding binding = new Binding { Path = new PropertyPath("path"), Source = obj };
+                            //binding.Converter = new Convert();
+                            copy.SetBinding(Image.SourceProperty, binding);
+                            copy.Width = 100;
+                            copy.Height = 100;
+                            temp1.Children.Add(copy);
+                            stp.Children.Add(temp1);
+                            //copy.bi
                         }
                         if(p.visiblityBind != "")
                         {
@@ -1652,5 +1688,6 @@ namespace Memo
     ((Window)form).Content = stk;
 
         }
+
     }
 }

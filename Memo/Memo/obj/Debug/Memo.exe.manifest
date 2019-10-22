@@ -102,14 +102,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Memo.exe" size="36463032">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Memo.exe" size="36487608">
       <assemblyIdentity name="Memo" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>LoIMesQG4DhnRrLxwrsGu29D/vz8fbGq6qUhhbx1npM=</dsig:DigestValue>
+        <dsig:DigestValue>u1MIJCYn/mhULn1Q6vB+yKy9Df7/yTh75OjuqWev0u4=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

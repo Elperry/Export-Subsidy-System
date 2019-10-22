@@ -8,6 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("repotemplates/reporttemplate1.xml")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("icons/excel.png")]
 
 

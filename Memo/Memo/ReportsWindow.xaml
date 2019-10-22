@@ -1,15 +1,84 @@
-﻿<Window x:Class="Memo.ReportsWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Memo"
-        mc:Ignorable="d"
         xmlns:c="clr-namespace:CodeReason.Reports.Controls;assembly=CodeReason.Reports"
+       xmlns:Documents="clr-namespace:System.Windows.Documents;assembly=PresentationUI" x:Class="Memo.ReportsWindow"
+        mc:Ignorable="d"
        Title="Reports Window Copy Right 2019" Height="600" Width="600" WindowState="Maximized" Activated="Window_Activated" Topmost="True">
+    <Window.Resources>
+        <Style x:Key="DocumentViewerStyle1" BasedOn="{x:Null}" TargetType="{x:Type DocumentViewer}">
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.WindowTextBrushKey}}"/>
+            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="ContextMenu" Value="{DynamicResource {ComponentResourceKey ResourceId=PUIDocumentViewerContextMenu, TypeInTargetAssembly={x:Type Documents:PresentationUIStyleResources}}}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DocumentViewer}">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Focusable="False">
+                            <Grid Background="{TemplateBinding Background}" KeyboardNavigation.TabNavigation="Local">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <ContentControl Grid.Column="0" Focusable="{TemplateBinding Focusable}" Grid.Row="0" Style="{DynamicResource ContentControlStyle1}" TabIndex="0"/>
+                                <ScrollViewer x:Name="PART_ContentHost" CanContentScroll="true" Grid.Column="0" Focusable="{TemplateBinding Focusable}" HorizontalScrollBarVisibility="Auto" IsTabStop="true" Grid.Row="1" TabIndex="1"/>
+                                <DockPanel Grid.Row="1">
+                                    <FrameworkElement DockPanel.Dock="Right" Width="{DynamicResource {x:Static SystemParameters.VerticalScrollBarWidthKey}}"/>
+                                    <Rectangle Height="10" Visibility="Visible" VerticalAlignment="top">
+                                        <Rectangle.Fill>
+                                            <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                                                <LinearGradientBrush.GradientStops>
+                                                    <GradientStopCollection>
+                                                        <GradientStop Color="#66000000" Offset="0"/>
+                                                        <GradientStop Color="Transparent" Offset="1"/>
+                                                    </GradientStopCollection>
+                                                </LinearGradientBrush.GradientStops>
+                                            </LinearGradientBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                </DockPanel>
+                                <ContentControl x:Name="PART_FindToolBarHost" Grid.Column="0" Focusable="{TemplateBinding Focusable}" Grid.Row="2" TabIndex="2"/>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ContentControlStyle1" TargetType="{x:Type ContentControl}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ContentControl}">
+                        <ToolBar Focusable="{TemplateBinding Focusable}" ToolBarTray.IsLocked="True" Language="en-us" KeyboardNavigation.TabNavigation="Continue" Uid="ToolBar_2">
+                            <Button x:Name="PrintButton" Background="{DynamicResource {ComponentResourceKey ResourceId=PUIDocumentViewerPrintButton, TypeInTargetAssembly={x:Type Documents:PresentationUIStyleResources}}}" CommandTarget="{Binding TemplatedParent, RelativeSource={RelativeSource TemplatedParent}}" Command="ApplicationCommands.Print" IsTabStop="True" Margin="2" Padding="2" Style="{DynamicResource {ComponentResourceKey ResourceId=PUIDocumentViewerButtonStyle, TypeInTargetAssembly={x:Type Documents:PresentationUIStyleResources}}}" ToolTipService.ShowOnDisabled="True" TabIndex="0" ToolTip="Print (Ctrl+P)" Uid="Button_14" VerticalAlignment="Center" Width="24"/>
+                            <Button x:Name="CopyButton" Background="{DynamicResource {ComponentResourceKey ResourceId=PUIDocumentViewerCopyButton, TypeInTargetAssembly={x:Type Documents:PresentationUIStyleResources}}}" CommandTarget="{Binding TemplatedParent, RelativeSource={RelativeSource TemplatedParent}}" Command="ApplicationCommands.Copy" IsTabStop="True" Margin="2" Padding="2" Style="{DynamicResource {ComponentResourceKey ResourceId=PUIDocumentViewerButtonStyle, TypeInTargetAssembly={x:Type Documents:PresentationUIStyleResources}}}" ToolTipService.ShowOnDisabled="True" TabIndex="1" ToolTip="Copy (Ctrl+C)" Uid="Button_15" VerticalAlignment="Center" Width="24"/>
+                            <Separator Uid="Separator_110"/>
+                            <Button x:Name="ZoomInButton" Background="{DynamicResource {ComponentResourceKey ResourceId=PUIDocumentViewerZoomInButton, TypeInTargetAssembly={x:Type Documents:PresentationUIStyleResources}}}" CommandTarget="{Binding TemplatedParent, RelativeSource={RelativeSource TemplatedParent}}" Command="NavigationCommands.IncreaseZoom" IsTabStop="True" Margin="2" Padding="2" Style="{DynamicResource {ComponentResourceKey ResourceId=PUIDocumentViewerButtonStyle, TypeInTargetAssembly={x:Type Documents:PresentationUIStyleResources}}}" ToolTipService.ShowOnDisabled="True" TabIndex="3" ToolTip="Increase the size of the content (Ctrl +)" Uid="Button_16" VerticalAlignment="Center" Width="24"/>
+                            <Button x:Name="ZoomOutButton" Background="{DynamicResource {ComponentResourceKey ResourceId=PUIDocumentViewerZoomOutButton, TypeInTargetAssembly={x:Type Documents:PresentationUIStyleResources}}}" CommandTarget="{Binding TemplatedParent, RelativeSource={RelativeSource TemplatedParent}}" Command="NavigationCommands.DecreaseZoom" IsTabStop="True" Margin="2" Padding="2" Style="{DynamicResource {ComponentResourceKey ResourceId=PUIDocumentViewerButtonStyle, TypeInTargetAssembly={x:Type Documents:PresentationUIStyleResources}}}" ToolTipService.ShowOnDisabled="True" TabIndex="4" ToolTip="Decrease the size of the content (Ctrl -)" Uid="Button_17" VerticalAlignment="Center" Width="24"/>
+                            <Separator Uid="Separator_111"/>
+                            <Button x:Name="ActualSizeButton" Background="{DynamicResource {ComponentResourceKey ResourceId=PUIDocumentViewerActualSizeButton, TypeInTargetAssembly={x:Type Documents:PresentationUIStyleResources}}}" CommandTarget="{Binding TemplatedParent, RelativeSource={RelativeSource TemplatedParent}}" CommandParameter="100.0" Command="NavigationCommands.Zoom" IsTabStop="True" Margin="2" Padding="2" Style="{DynamicResource {ComponentResourceKey ResourceId=PUIDocumentViewerButtonStyle, TypeInTargetAssembly={x:Type Documents:PresentationUIStyleResources}}}" ToolTipService.ShowOnDisabled="True" TabIndex="5" ToolTip="100% (Ctrl+1)" Uid="Button_18" VerticalAlignment="Center" Width="24"/>
+                            <Button x:Name="PageWidthButton" Background="{DynamicResource {ComponentResourceKey ResourceId=PUIDocumentViewerPageWidthButton, TypeInTargetAssembly={x:Type Documents:PresentationUIStyleResources}}}" CommandTarget="{Binding TemplatedParent, RelativeSource={RelativeSource TemplatedParent}}" Command="DocumentViewer.FitToWidthCommand" IsTabStop="True" Margin="2" Padding="2" Style="{DynamicResource {ComponentResourceKey ResourceId=PUIDocumentViewerButtonStyle, TypeInTargetAssembly={x:Type Documents:PresentationUIStyleResources}}}" ToolTipService.ShowOnDisabled="True" TabIndex="6" ToolTip="Page Width (Ctrl+2)" Uid="Button_19" VerticalAlignment="Center" Width="24"/>
+                            <Button x:Name="WholePageButton" Background="{DynamicResource {ComponentResourceKey ResourceId=PUIDocumentViewerWholePageButton, TypeInTargetAssembly={x:Type Documents:PresentationUIStyleResources}}}" CommandTarget="{Binding TemplatedParent, RelativeSource={RelativeSource TemplatedParent}}" CommandParameter="1" Command="DocumentViewer.FitToMaxPagesAcrossCommand" IsTabStop="True" Margin="2" Padding="2" Style="{DynamicResource {ComponentResourceKey ResourceId=PUIDocumentViewerButtonStyle, TypeInTargetAssembly={x:Type Documents:PresentationUIStyleResources}}}" ToolTipService.ShowOnDisabled="True" TabIndex="7" ToolTip="Whole Page (Ctrl+3)" Uid="Button_20" VerticalAlignment="Center" Width="24"/>
+                            <Button x:Name="TwoPagesButton" Background="{DynamicResource {ComponentResourceKey ResourceId=PUIDocumentViewerTwoPagesButton, TypeInTargetAssembly={x:Type Documents:PresentationUIStyleResources}}}" CommandTarget="{Binding TemplatedParent, RelativeSource={RelativeSource TemplatedParent}}" CommandParameter="2" Command="DocumentViewer.FitToMaxPagesAcrossCommand" IsTabStop="True" Margin="2" Padding="2" Style="{DynamicResource {ComponentResourceKey ResourceId=PUIDocumentViewerButtonStyle, TypeInTargetAssembly={x:Type Documents:PresentationUIStyleResources}}}" ToolTipService.ShowOnDisabled="True" TabIndex="8" ToolTip="Two Pages (Ctrl+4)" Uid="Button_21" VerticalAlignment="Center" Width="24"/>
+                            <Button x:Name="saveToExcel"  Click="saveAsExcel"  Margin="2" Padding="0"  ToolTipService.ShowOnDisabled="True" TabIndex="9" ToolTip="Save To Excel" Uid="Button_22" VerticalAlignment="Center" Width="24">
+                                    <Image Source="icons/excel.png"  Width="24" Height="24"/>
+                            </Button>
+                        </ToolBar>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
-        <c:BusyDecorator Name="busyDecorator" IsBusyIndicatorHidden="False">
-            <DocumentViewer Name="documentViewer" />
+        <c:BusyDecorator x:Name="busyDecorator" IsBusyIndicatorHidden="False">
+
+            <DocumentViewer x:Name="documentViewer" Style="{DynamicResource DocumentViewerStyle1}" />
         </c:BusyDecorator>
     </Grid>
 </Window>
