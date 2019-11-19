@@ -84,6 +84,7 @@ namespace Memo
         }
         public static List<dic> lst = new List<dic>() {
             new dic("clear","تصفير الخانات","Clear Fields"),
+            new dic("performa","Proforma Invoice","Proforma Invoice"),
             new dic("committee","اللجنة","Committee"),
             new dic("supportpercentage","نسبة الدعم","Support Percentage"),
             new dic("filenodata","بيانات رقم الملف","File Number Data"),
@@ -131,8 +132,8 @@ namespace Memo
             new dic("egpval" , "السعر بالجنيه", "Price (EGP)" ),
             new dic("port" , "الميناء", "Port" ),
             new dic("ptregp" , "الدعم بالجنيه", "Support (EGP)" ),
-            new dic("brandcat" , "تصنيف", "Entity" ),
-            new dic("brand" , "براند", "Brand" ),
+            new dic("brandcat" , "التصنيف", "Category" ),
+            new dic("brand" , "البراند", "Brand" ),
             new dic("invoices" , "الفواتير", "Invoices" ),
             new dic("invoice" , "الفاتورة", "Invoice" ),
             new dic("exportcertificate" , "شهادة الصادر", "Export Certificate" ),
@@ -472,6 +473,45 @@ namespace Memo
                 Binding b = new Binding {Path = new PropertyPath(name), Source=obj, Mode = BindingMode.TwoWay , UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
                 t.IsReadOnly = false;
                 t.SetBinding(TextBox.TextProperty, b);
+                //t.TextChanged += T_TextChanged;
+                //MessageBox.Show("mainObj." + name);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+
+            return t;
+        }
+
+        public PasswordBox pass(ref object obj, string name, int width)
+        {
+            PasswordBox t = new PasswordBox();
+            try
+            {
+                t.DataContext = obj;
+                t.Background = bgColor2;
+                t.Foreground = fColor2;
+                t.BorderBrush = borderColor;
+                t.Width = width;
+                if (translate.lang == "EN")
+                {
+                    t.FlowDirection = FlowDirection.LeftToRight;
+                    t.HorizontalAlignment = HorizontalAlignment.Left;
+                }
+                else
+                {
+                    t.FlowDirection = FlowDirection.RightToLeft;
+                    t.HorizontalAlignment = HorizontalAlignment.Right;
+                }
+
+                t.Margin = new Thickness(5, 0, 5, 5);
+                Binding b = new Binding { Path = new PropertyPath(name), Source = obj, Mode = BindingMode.TwoWay, UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged };
+                //t.IsReadOnly = false;
+                //t.SetBinding(PasswordBox.PasswordProperty, b);
+                RoutedEventHandler e = (RoutedEventHandler)Delegate.CreateDelegate(
+                typeof(RoutedEventHandler), obj, obj.GetType().GetMethod("passChanged"));
+                t.PasswordChanged += e;
                 //t.TextChanged += T_TextChanged;
                 //MessageBox.Show("mainObj." + name);
             }
@@ -854,7 +894,11 @@ namespace Memo
                     prop.PropertyType.ToString() == "System.String" ||
                     prop.PropertyType.ToString() == "System.Boolean")
                 {
-                    grdvc.Header = translate.trans(prop.Name.ToString());
+                    if (obj.GetType().Name.ToLower() == "brand" && prop.Name.ToString().ToLower() == "name")
+                    {
+                        grdvc.Header = translate.trans("brand");
+                    }
+                    else { grdvc.Header = translate.trans(prop.Name.ToString()); }
                     grdvc.DisplayMemberBinding = new Binding(prop.Name.ToString());
                     //MessageBox.Show(prop.Name.ToString());
                 }
@@ -1001,7 +1045,6 @@ namespace Memo
 
             return btn;
         }
-
         public void close(object sender, EventArgs e)
         {
             Global.removeWindow(((Window)sender)); ((Window)sender).Close();
@@ -1155,7 +1198,11 @@ namespace Memo
                 }
                 else if (prop.PropertyType.ToString() == "System.Boolean")
                 {
-                    stp.Children.Add(lbl(translate.trans(prop.Name)));
+                    if(obj.GetType().Name.ToLower() == "brand" && prop.Name.ToLower() == "name")
+                    {
+                        stp.Children.Add(lbl(translate.trans("brand")));
+                    }
+                    else { stp.Children.Add(lbl(translate.trans(prop.Name))); }
                     stp.Children.Add(chb(ref obj,prop.Name));
                 }
                 else
@@ -1610,7 +1657,15 @@ namespace Memo
                    prop.PropertyType.ToString() == "System.String")
                 {
                     stp.Children.Add(lbl(translate.trans(prop.Name)));
-                    stp.Children.Add(txt(ref obj, prop.Name.ToString(), sizes.fieldWidth(width) - 10));
+                    if(prop.Name == "pass" || prop.Name == "password")
+                    {
+                        stp.Children.Add(pass(ref obj, prop.Name.ToString(), sizes.fieldWidth(width) - 10));
+                    }
+                    else
+                    {
+                        stp.Children.Add(txt(ref obj, prop.Name.ToString(), sizes.fieldWidth(width) - 10));
+                    }
+                    
                 }
                 else if (prop.PropertyType.ToString() == "System.Boolean")
                 {

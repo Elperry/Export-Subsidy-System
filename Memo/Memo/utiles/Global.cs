@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
 using System.Globalization;
+using System.Threading;
 
 namespace Memo {
     public static class Global
@@ -98,6 +99,15 @@ namespace Memo {
             DateTime theDate;
             if(s.Length < 10)
             {
+                try
+                {
+                    DateTime conv = DateTime.FromOADate(Convert.ToDouble(s));
+                    return "'" + conv.ToString("yyyy-MM-dd") + "'";
+                }
+                catch (Exception)
+                {
+
+                }
                 return "NULL";
             }
             if (DateTime.TryParseExact(s.Substring(0,10), "dd/MM/yyyy",
@@ -131,7 +141,7 @@ namespace Memo {
             if (Global.usr.admin)
             {
                 MainMenu = new ObservableCollection<MenuItemViewModel> {
-               new MenuItemViewModel
+                new MenuItemViewModel
                 {
                     Header =  translate.trans("Basic Info"),
                     MenuItems = new ObservableCollection<MenuItemViewModel>
@@ -165,6 +175,13 @@ namespace Memo {
 
                                 }
                 },
+                new MenuItemViewModel { Header =  translate.trans("Import/Export"),
+                    MenuItems = new ObservableCollection<MenuItemViewModel>
+                    {
+                        new MenuItemViewModel { Header =  translate.trans("Import From Excel") , Command = new CommandViewModel(mainWindow.import) },
+
+                    }
+                },
                 new MenuItemViewModel
                 {
                     Header =  translate.trans("Opened Windows"),
@@ -172,7 +189,7 @@ namespace Memo {
 
                 },
 
-            };
+                };
             }
             else
             {
@@ -294,5 +311,42 @@ namespace Memo {
                 return 0.00;
             }
         }
+        public static LoadingWait Busy(Window w)
+        {
+           
+                LoadingWait ld = new LoadingWait();
+                ld.Width = w.Width - 100;
+                ld.Height = w.Height - 100;
+                ld.Top = w.Top + 50;
+                ld.Left = w.Left + 50;
+                ld.Show();
+                
+
+            return ld;
+        }
+
+        public static string getValue(Microsoft.Office.Interop.Excel.Worksheet sheet , int i , int j)
+        {
+
+            try
+            {
+                if (sheet.Cells[i, j].Value2 == null) 
+                {
+                    return " ";
+                }
+                else
+                {
+                    return sheet.Cells[i, j].Value2.ToString();
+                }
+            }
+            catch (Exception)
+            {
+
+                return null;
+            }
+
+           
+        }
+
     }
 }

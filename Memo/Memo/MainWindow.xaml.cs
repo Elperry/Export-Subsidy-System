@@ -28,7 +28,7 @@ namespace Memo
             Thread.CurrentThread.CurrentCulture = culture;
             //Console.Write(DateTime.Now + "");// 
             //MessageBox.Show(DateTime.Now + "");
-            if (!activation.check()){
+            if (activation.check()){
                
                 Window w = new Window();
                 object A = new Activation(w);

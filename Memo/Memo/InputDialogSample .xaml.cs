@@ -30,6 +30,17 @@ namespace Memo
             txtAnswer.Visibility = Visibility.Visible;
 
         }
+        public InputDialogSample(string question)
+        {
+            InitializeComponent();
+            lblQuestion.Content = question;
+            //txtAnswer.Text = defaultAnswer;
+            cmb.Visibility = Visibility.Hidden;
+            txtAnswer.Visibility = Visibility.Hidden;
+            btnDialogOk.Content = "YES";
+            
+
+        }
         public InputDialogSample(string question, ObservableCollection<object> lst, string path = "name")
         {
             InitializeComponent();

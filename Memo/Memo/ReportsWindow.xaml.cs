@@ -90,7 +90,7 @@ namespace Memo
         {
             SaveFileDialog dlg = new SaveFileDialog();
             dlg.Filter = "xlsx Excel|*.xlsx|Excel |*.xls";
-            dlg.Title = "Save an Image File";
+            dlg.Title = "Save an Excel File";
             dlg.ShowDialog();
             if (dlg.FileName == "") { return; }
             string filePath = dlg.FileName;
