@@ -13,6 +13,7 @@ using System.Threading;
 namespace Memo {
     public static class Global
     {
+        public static CultureInfo culture { get; set; }
         public static double tempsum { get; set; }
         public static double tempsum2 { get; set; }
         public static List<Window> windows { get; set; }
@@ -45,6 +46,7 @@ namespace Memo {
         public static ObservableCollection<object> chequeDatas { get; set; }
         public static ObservableCollection<object> exportCertificates { get; set; }
         public static ObservableCollection<object> estivas { get; set; }
+        public static ObservableCollection<object> bankReceiptInvoices { get; set; }
         public static ObservableCollection<MenuItemViewModel> MainMenu { get; set; }
         public static ObservableCollection<MenuItemViewModel> getOpenWin()
         {
@@ -69,7 +71,7 @@ namespace Memo {
         {
             windows.Add(o);
             refreshMenu();
-            Menu m = (Menu)((DockPanel)mainWindow.Content).Children[0];
+            Menu m = (Menu)((DockPanel)((Grid)mainWindow.Content).Children[1]).Children[0];
             m.ItemsSource = MainMenu;
         }
         public static void removeWindow(Window o)
@@ -80,7 +82,7 @@ namespace Memo {
                 {  
                     windows.Remove(w);
                     refreshMenu();
-                    Menu m = (Menu)((DockPanel)mainWindow.Content).Children[0];
+                    Menu m = (Menu)((DockPanel)((Grid)mainWindow.Content).Children[1]).Children[0];
                     m.ItemsSource = MainMenu;
                     //MessageBox.Show(MainMenu.Count.ToString());
                     return;
@@ -115,6 +117,14 @@ namespace Memo {
             {
                 // the string was successfully parsed into theDate  2019-08-11
                 return "'"+theDate.ToString("yyyy-MM-dd")+"'";
+            }
+            else if (DateTime.TryParseExact(s.Substring(0, 10), "yyyy-MM-dd",CultureInfo.InvariantCulture, DateTimeStyles.None, out theDate))
+            {
+                return "'" + theDate.ToString("yyyy-MM-dd") + "'";
+            }
+                else if (DateTime.TryParse(s, out theDate))
+            {
+                return "'" + theDate.ToString("yyyy-MM-dd") + "'";
             }
             else
             {
@@ -313,14 +323,9 @@ namespace Memo {
         }
         public static LoadingWait Busy(Window w)
         {
-           
-                LoadingWait ld = new LoadingWait();
-                ld.Width = w.Width - 100;
-                ld.Height = w.Height - 100;
-                ld.Top = w.Top + 50;
-                ld.Left = w.Left + 50;
-                ld.Show();
-                
+
+            LoadingWait ld = (LoadingWait)((Grid)w.Content).Children[0];
+            ld.Start();    
 
             return ld;
         }

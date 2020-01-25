@@ -13,7 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace Memo
+namespace test
 {
     /// <summary>
     /// Interaction logic for LoadingWait.xaml

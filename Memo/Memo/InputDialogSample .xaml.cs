@@ -21,6 +21,7 @@ namespace Memo
     public partial class InputDialogSample : Window
     {
         ObservableCollection<object> lst = null;
+        bool res = false;
         public InputDialogSample(string question, string defaultAnswer = "")
         {
             InitializeComponent();
@@ -37,6 +38,7 @@ namespace Memo
             //txtAnswer.Text = defaultAnswer;
             cmb.Visibility = Visibility.Hidden;
             txtAnswer.Visibility = Visibility.Hidden;
+            txtAnswer.Text = "";
             btnDialogOk.Content = "YES";
             
 
@@ -54,6 +56,7 @@ namespace Memo
         private void btnDialogOk_Click(object sender, RoutedEventArgs e)
         {
             this.DialogResult = true;
+            res = true;
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
@@ -65,13 +68,17 @@ namespace Memo
         {
             get
             {
-                if (lst == null)
+                if (cmb.SelectedItem != null)
                 {
                     return cmb.SelectedItem;
                 }
-                else
+                else if(txtAnswer.Text != string.Empty && txtAnswer != null && txtAnswer.Text != "")
                 {
                     return txtAnswer.Text;
+                }
+                else
+                {
+                    return res;
                 }
             }
         }

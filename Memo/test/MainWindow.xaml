@@ -5,29 +5,34 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         x:Class="test.MainWindow"
         mc:Ignorable="d"
+        xmlns:l="clr-namespace:test"
         Title="MainWindow" Height="450" Width="800" >
     <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <l:BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
     </Window.Resources>
-    <Grid Background="White" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-
-        <StackPanel x:Name="stk" Orientation="Vertical" HorizontalAlignment="Right" FlowDirection="RightToLeft">
-            <TextBox Text="{Binding MyString}" KeyDown="TextBox_KeyDown"/>
-            <Button Content="Count my clicks" Click="Button_Click"/>
-            <CheckBox Visibility="{Binding V, Converter={StaticResource BoolToVis}}" />
-            <Button Content="Toggle" Click="Button_Click_1" />
-            <ComboBox x:Name="comboBox" SelectionChanged="ComboBox_SelectionChanged"/>
-            <Label  Content="ffdf" HorizontalAlignment="Left" FlowDirection="RightToLeft" HorizontalContentAlignment="Right" RenderTransformOrigin="-5.855,0.57"  />
-        </StackPanel>
-
+    <StackPanel>
+        <Button x:Name="button" Content="Button" Height="40"  Click="Button_Click"/>
+        <Grid x:Name="grd1">
+        <ListBox x:Name="fieldsListBox">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="{Binding Name}" VerticalAlignment="Center"/>
+                        <TextBox Width="{Binding Length}" Margin="5,0,0,0"/>
+                        <Label Content="*" Visibility="{Binding Required, Converter={StaticResource BoolToVisConverter}}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" 
+                           Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=ActualHeight}"
+                           Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=ActualWidth}"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+           
+        </ListBox> 
     </Grid>
-
-    <!--Grid>
-        <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Click="Button_Click" Margin="450,113,0,0" VerticalAlignment="Top" Width="75"/>
-        <TextBox x:Name="textBox" Text="{Binding S}" HorizontalAlignment="Left" Height="23" Margin="195,110,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="212,331,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" RenderTransformOrigin="0.949,-9.136"/>
-        <Button x:Name="button1" Content="Button" HorizontalAlignment="Left" Click="Button1_Click" Margin="450,183,0,0" VerticalAlignment="Top" Width="75"/>
-        <TextBox x:Name="textBox1" HorizontalAlignment="Left" Height="23" Margin="195,157,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="120"/>
-
-    </Grid-->
+    </StackPanel>
+    
 </Window>

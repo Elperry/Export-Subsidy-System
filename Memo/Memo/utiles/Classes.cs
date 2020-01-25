@@ -17,7 +17,18 @@ using System.Text;
 using Image = System.Drawing.Image;
 
 namespace Memo
-{
+{   
+    public class twoFields : INotifyPropertyChanged
+    {
+        public string id { get; set; }
+        public string name { get; set; }
+        public event PropertyChangedEventHandler PropertyChanged;
+        public twoFields(string i ="", string n="")
+        {
+            this.id = i;
+            this.name = n;
+        }
+    }
     public class Sol
     {
         public List<int> lst;
@@ -2868,7 +2879,7 @@ namespace Memo
             temp.id = this.id;
             temp.num = this.num;
             temp.company = Global.company.clone();
-            temp.dat = this.dat;
+            temp.dat = dat;
             temp.country = this.country.clone();
             temp.port = this.port.clone();
             temp.shippingCompany = this._shippingCompany.clone();
@@ -2883,7 +2894,7 @@ namespace Memo
             temp.PTREgp = this._PTREgp;
             temp.totalEgp = this.totalEgp;
             temp.manualWork = this.manualWork;
-            temp.receiptDate = this.receiptDate;
+            temp.receiptDate = receiptDate;
             temp.notes = this.notes;
             return temp;
         }
@@ -2913,6 +2924,7 @@ namespace Memo
         {
             try
             {
+                Thread.CurrentThread.CurrentCulture = Global.culture;
                 if (nolon == null || nolon == string.Empty || nolon == " " || nolon == "")
                 {
                     nolon = "0";
@@ -2936,7 +2948,7 @@ namespace Memo
                         exportCertificates.Add(clone());
                         i = exportCertificates.Count;
                         exportCertificates.Move(i - 1, 0);
-                        clear(sender, e);
+                        if(window!=null)clear(sender, e);
                     }
 
                     
@@ -2955,31 +2967,39 @@ namespace Memo
         }
         public void edit(object sender, RoutedEventArgs e)
         {
-            string query = "select country from client inner join invoice on (invoice.client = client.id )where invoice.`exportCertificate` = " + id;
-            Mysqldb sql = new Mysqldb();
-            DataTable dt = sql.Select(query);
-            if (dt != null && dt.Rows.Count > 0 && dt.Rows[0][0].ToString() != country.id)
+            try
             {
-                MessageBox.Show(translate.trans("errcountry")); return;
-            }
-            string q = "UPDATE uniexport.`exportcertificate` SET `num` = '" + num + "' ,`company` = '" + Global.company.id + "' ,`dat` = " + Global.dateFormate(dat) + " ,`country` = '" + country.id + "' ,`port` = '" + port.id + "' ,`shippingCompany` = '" + shippingCompany.id + "' ,`boles` = '" + ((boles) ? "1" : "0") + "' ,`nolon` = '" + ((nolon)) + "' ,`manifesto` = '" + ((manifesto) ? "1" : "0") + "'  ,`usdToEgp` = '" + usdToEgp + "' ,`manualWork` = " + ((manualWork) ? "1" : "0") + " ,`receiptDate` = " + Global.dateFormate(receiptDate) + ",`notes` = '" + notes + "' WHERE `ExportCertificate`.`id` = " + id + ";";
-            sql.Select(q);
+                Thread.CurrentThread.CurrentCulture = Global.culture;
+                string query = "select country from client inner join invoice on (invoice.client = client.id )where invoice.`exportCertificate` = " + id;
+                Mysqldb sql = new Mysqldb();
+                DataTable dt = sql.Select(query);
+                if (dt != null && dt.Rows.Count > 0 && dt.Rows[0][0].ToString() != country.id)
+                {
+                   // MessageBox.Show(translate.trans("errcountry")); return;
+                }
+                string q = "UPDATE uniexport.`exportcertificate` SET `num` = '" + num + "' ,`company` = '" + Global.company.id + "' ,`dat` = " + Global.dateFormate(dat) + " ,`country` = '" + country.id + "' ,`port` = '" + port.id + "' ,`shippingCompany` = '" + shippingCompany.id + "' ,`boles` = '" + ((boles) ? "1" : "0") + "' ,`nolon` = '" + ((nolon)) + "' ,`manifesto` = '" + ((manifesto) ? "1" : "0") + "'  ,`usdToEgp` = '" + usdToEgp + "' ,`manualWork` = " + ((manualWork) ? "1" : "0") + " ,`receiptDate` = " + Global.dateFormate(receiptDate) + ",`notes` = '" + notes + "' WHERE `ExportCertificate`.`id` = " + id + ";";
+                sql.Select(q);
 
-            this.manifestoSupport = (Global.ToDouble(PTREgp) * 0.5).ToString();
-            //this.ptr_nolon_man = (Global.ToDouble(nolonSupport)+ Global.ToDouble(manifestoSupport)).ToString();
-            foreach (ExportCertificate c in Global.exportCertificates)
-            {
-                if (c.num == num)
+                this.manifestoSupport = (Global.ToDouble(PTREgp) * 0.5).ToString();
+                //this.ptr_nolon_man = (Global.ToDouble(nolonSupport)+ Global.ToDouble(manifestoSupport)).ToString();
+                foreach (ExportCertificate c in Global.exportCertificates)
                 {
-                    Global.exportCertificates[Global.exportCertificates.IndexOf(c)] = clone(); break;
+                    if (c.num == num)
+                    {
+                        Global.exportCertificates[Global.exportCertificates.IndexOf(c)] = clone(); break;
+                    }
+                }
+                foreach (ExportCertificate c in exportCertificates)
+                {
+                    if (c.num == num)
+                    {
+                        exportCertificates[exportCertificates.IndexOf(c)] = clone(); clear(sender, e); return;
+                    }
                 }
             }
-            foreach (ExportCertificate c in exportCertificates)
+            catch (Exception ex)
             {
-                if (c.num == num)
-                {
-                    exportCertificates[exportCertificates.IndexOf(c)] = clone(); clear(sender, e); return;
-                }
+                MessageBox.Show(ex.ToString());
             }
         }
         public void del(object sender, RoutedEventArgs e)
@@ -2989,29 +3009,30 @@ namespace Memo
             sql.Select(q);
             ////////// Delete invoices and invoicesData
             ///
-            q = "DELETE invoicedata , invoice FROM invoicedata INNER join invoice on (invoice.id = invoicedata.invoice)  WHERE invoice.exportCertificate = " + id;
+            q = "DELETE invoicedata, invoice FROM invoice left join invoicedata on(invoice.id = invoicedata.invoice)  WHERE invoice.exportCertificate = " + id;
             sql.Select(q);
             //////// Delete file NO and bankreceipt and check
             ///
-            q = "DELETE FROM `bankreceiptdata` WHERE `exportCertificate` = " + id;
+            q = "DELETE from `bankreceiptdata` WHERE `exportCertificate` = " + id;
             sql.Select(q);
-            q = "DELETE fileno , chequedata FROM fileno INNER join chequedata on (fileno.id = chequedata.fileNo)  WHERE fileno.exportCertificate = " + id;
+            q = "DELETE fileno , chequedata , fileNoData FROM filenoData inner join fileNo  on (fileNo.id = filenodata.FileNo) left join chequedata on (fileno.id = chequedata.fileNo)  WHERE filenodata.exportCertificate = " + id;
             sql.Select(q);
 
-            foreach (ExportCertificate temp in Global.exportCertificates)
+            for (int i  = Global.exportCertificates.Count-1; i >=0; i--)
             {
-                if (temp.num == _num)
+                if (((ExportCertificate)Global.exportCertificates[i]).num == _num)
                 {
-                    Global.exportCertificates.Remove(temp); clear(sender, e); break;
+                    Global.exportCertificates.RemoveAt(i); 
                 }
             }
-            foreach (ExportCertificate temp in exportCertificates)
+            for(int i = exportCertificates.Count-1; i >= 0; i--)
             {
-                if (temp.num == _num)
+                if (((ExportCertificate)exportCertificates[i]).num == _num)
                 {
-                    exportCertificates.Remove(temp); clear(sender, e); return;
+                    exportCertificates.RemoveAt(i);
                 }
             }
+            clear(sender, e);
         }
         public void openInvoice(object sender, RoutedEventArgs e)
         {
@@ -3379,18 +3400,23 @@ namespace Memo
                     if(Global.invoices != null && window != null)
                     {
                         Global.invoices.Add(clone()); 
-                        clear(sender, e);
+                        
                     }
-                     
+                    q = "SELECT `num` FROM uniexport.`bankreceipt` WHERE `reservedInv` = '" + this.num + "' ;";
+                    DataTable dt = sql.Select(q);
+                    if(dt != null && dt.Rows != null && dt.Rows.Count != 0)
+                    {
+                        MessageBox.Show(translate.trans("This invoice is reserved for Bank receipt No:"+dt.Rows[0]["num"].ToString()));
+                    }
                 }
-
+                if(window != null)clear(sender, e);
             }
             catch (Exception ex)
             {
 
                 MessageBox.Show(ex.ToString());
             }
-
+            
         }
         public void edit(object sender, RoutedEventArgs e)
         {
@@ -4028,6 +4054,7 @@ namespace Memo
                     // exportCertificates.Add(temp);
                 }
             });
+            thread.CurrentCulture = Global.culture;
             thread.Start();
 
             //thread.Join();
@@ -4818,7 +4845,7 @@ namespace Memo
                         bankReceipts.Add(clone());
                         i = bankReceipts.Count;
                         bankReceipts.Move(i - 1, 0);
-                        clear();
+                        clear(sender,e);
                     }
 
                    
@@ -4852,7 +4879,7 @@ namespace Memo
             {
                 if (c.id == _id)
                 {
-                    bankReceipts[bankReceipts.IndexOf(c)] = clone(); clear(); return;
+                    bankReceipts[bankReceipts.IndexOf(c)] = clone(); clear(sender,e); return;
                 }
             }
         }
@@ -4875,7 +4902,7 @@ namespace Memo
             {
                 if (temp.id == _id)
                 {
-                    bankReceipts.Remove(temp); clear(); return;
+                    bankReceipts.Remove(temp); clear(sender,e); return;
                 }
             }
         }
@@ -4908,15 +4935,17 @@ namespace Memo
                 new Property("bankUsd","num" , _readOnly:true),
                 new Property("sum","num" , _readOnly:true),
                 new Property("exportCertificate","cmb",_displayPath:"num" , _action:"select"),
+                new Property("bankReceiptInvoice","cmb",_displayPath:"name" , _action:"selectInvoice"),
             };
             List<TableCol> tbcs = new List<TableCol>()
             {
                 //new TableCol("id","id"),
                 new TableCol("exportCertificate","exportCertificate.num"),
                 new TableCol("exportUsd","exportUsd"),
+                new TableCol("invoices","sInvoices"),
                 new TableCol("chck","chck",new Property("chck","bool",_action:"chckClicked")),
             };
-            t.Moderntemplate(W, ref bankReceiptData, translate.trans("BankReceiptData"), P, new List<string>() { "save", "autoCalc", "close" }, Global.bankReceiptDatas, tbcs, 0, 0, false);
+            t.Moderntemplate(W, ref bankReceiptData, translate.trans("BankReceiptData"), P, new List<string>() { "save", "saveAndPrint", "autoCalc", "close" }, Global.bankReceiptDatas, tbcs, 0, 0, false);
             Global.addWindow((Window)W);
 
             if (((BankReceiptData)Global.bankReceiptDatas[0]).id == string.Empty || ((BankReceiptData)Global.bankReceiptDatas[0]).id == "" || ((BankReceiptData)Global.bankReceiptDatas[0]).id == null)
@@ -4925,7 +4954,7 @@ namespace Memo
             }
             ((Window)W).Show();
         }
-        public void clear()
+        public void clear(object sender, RoutedEventArgs e)
         {
             id = null;
             num = null;
@@ -4941,11 +4970,11 @@ namespace Memo
             string q;
             if (comp != null)
             {
-                q = "SELECT `id`,`company`,`num`,`country`,`usd`,`dat`,if(id in(SELECT bankreceipt from bankreceiptdata),'True','False') as 'notEmpty' FROM `bankreceipt` where company = " + comp.id+ " ORDER BY `id` DESC";
+                q = "SELECT `id`,`company`,`num`,`country`,`usd`,`dat`,if(id in(SELECT bankreceipt from bankreceiptdata),'True','False') as 'notEmpty' FROM `bankreceipt` where company = " + comp.id+ " ORDER BY `notEmpty` ASC , usd DESC";
             }
             else
             {
-                q = "SELECT `id`,`company`,`num`,`country`,`usd`,`dat`,if(id in(SELECT bankreceipt from bankreceiptdata),'True','False') as 'notEmpty' FROM `bankreceipt` ORDER BY `id` DESC";
+                q = "SELECT `id`,`company`,`num`,`country`,`usd`,`dat`,if(id in(SELECT bankreceipt from bankreceiptdata),'True','False') as 'notEmpty' FROM `bankreceipt` ORDER BY `notEmpty` ASC , usd DESC";
             }
             DataTable dt = sql.Select(q);
             if (dt.Rows.Count == 0)
@@ -5098,6 +5127,18 @@ namespace Memo
                     this.PropertyChanged(this, new PropertyChangedEventArgs("expDate"));
             }
         }
+        public string sInvoices { get; set; }
+        public twoFields _bankReceiptInvoice;
+        public ObservableCollection<object> bankReceiptInvoices
+        {
+            get { return Global.bankReceiptInvoices; }
+            set
+            {
+                Global.bankReceiptInvoices = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("bankReceiptInvoices"));
+            }
+        }
         public ObservableCollection<object> bankReceipts
         {
             get { return Global.bankReceipts; }
@@ -5108,6 +5149,17 @@ namespace Memo
                     this.PropertyChanged(this, new PropertyChangedEventArgs("bankReceipts"));
             }
         }
+        public ObservableCollection<twoFields> _invoices;
+        public ObservableCollection<twoFields> invoices
+        {
+            get { return _invoices; }
+            set
+            {
+                _invoices = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("invoices"));
+            }
+        }
         public ObservableCollection<object> exportCertificates
         {
             get { return _exportCertificates; }
@@ -5116,6 +5168,16 @@ namespace Memo
                 _exportCertificates = value;
                 if (this.PropertyChanged != null)
                     this.PropertyChanged(this, new PropertyChangedEventArgs("exportCertificates"));
+            }
+        }
+        public twoFields bankReceiptInvoice
+        {
+            get { return _bankReceiptInvoice; }
+            set
+            {
+                _bankReceiptInvoice = value;
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("bankReceiptInvoice"));
             }
         }
         public BankReceiptData(Window W = null)
@@ -5184,7 +5246,44 @@ namespace Memo
 
 
         }
+        public void saveAndPrint(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Mysqldb sql = new Mysqldb();
+                string q = "DELETE FROM  uniexport.`bankreceiptdata` WHERE `bankreceiptdata`.`bankReceipt` = " + bankReceipt.id;
+                sql.Select(q);
+                DataTable dt = new DataTable("Bank Receipt");
+                dt.Columns.Add(new DataColumn("ExportCerificate", typeof(ulong)));
+                dt.Columns.Add("invoices");
+                dt.Columns.Add("USD");
+                
+                foreach (object obj in Global.bankReceiptDatas)
+                {
+                    if (!((BankReceiptData)obj).chck) break;
+                    q = "INSERT INTO  uniexport.`bankreceiptdata` (`id`, `bankReceipt`, `exportCertificate`) VALUES (NULL, '" + bankReceipt.id + "', '" + ((BankReceiptData)obj).exportCertificate.id + "');";
+                    sql.Select(q);
+                    BankReceiptData b = (BankReceiptData)obj;
+                    dt.Rows.Add(b.exportCertificate.num, b.sInvoices, Global.ToDouble(b.exportUsd));
+                }
 
+                // Here Is the Printing Part
+                // وبيتكتب فوق رقم الاشعار والتاريخ والبلد
+                //وتحت الشهادات والفواتير والمبلغ
+                DataView dv = dt.DefaultView;
+                dv.Sort = "ExportCerificate asc";
+                dt = dv.ToTable();
+                string Header = "<TextBlock Text=\" Bank Receipt Number = " + bankReceipt.num + "&#x0a; Date = " +Global.dateFormate(bankReceipt.dat) + "&#x0a; Country = " + bankReceipt.country.name + "  \"/> ";
+                ReportBuilder rb = new ReportBuilder("Unilever", Global.company.name, Header, dt, "<TextBlock Text=\"Sum of Export Certificates $ = " + sum + "&#x0a; Bank Receipt $ = "+bankReceipt.usd + "  \"/> ", new Col("Portrait"));
+                rb.genReport();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+
+
+        }
         public void add(object sender, RoutedEventArgs e)
         {
             try
@@ -5222,57 +5321,120 @@ namespace Memo
         }
         public void select(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
+            try
             {
-                string export = ((ComboBox)sender).Text;
-                object temp = Global.bankReceiptDatas.Where(x => ((BankReceiptData)x).exportCertificate.num == export).First();
-                ((BankReceiptData)temp).chck = true;
-                int i = Global.bankReceiptDatas.IndexOf(temp);
-                Global.bankReceiptDatas.Move(i, 0);
+                if (e.Key == Key.Enter)
+                {
+                    string export = ((ComboBox)sender).Text;
+                    object temp = Global.bankReceiptDatas.Where(x => ((BankReceiptData)x).exportCertificate.num == export).First();
+                    ((BankReceiptData)temp).chck = true;
+                    int i = Global.bankReceiptDatas.IndexOf(temp);
+                    Global.bankReceiptDatas.Move(i, 0);
+                }
+                else
+                {
+                    return;
+                }
+
             }
-            else
+            catch (Exception)
             {
-                return;
+
+                MessageBox.Show("Not found !!");
+            }
+        }
+        public void selectInvoice(object sender, KeyEventArgs e)
+        {
+            try
+            {
+                if (e.Key == Key.Enter)
+                {
+                    twoFields t = (twoFields)((ComboBox)sender).SelectedItem;
+                    object temp = Global.bankReceiptDatas.Where(x => ((BankReceiptData)x).exportCertificate.id == t.id).First();
+
+                    ((BankReceiptData)temp).chck = true;
+                    int i = Global.bankReceiptDatas.IndexOf(temp);
+                    Global.bankReceiptDatas.Move(i, 0);
+                }
+                else
+                {
+                    return;
+                }
+            }
+            catch (Exception)
+            {
+                try // here I'm gonna ask if the invoice already in other Bank receipt or No and if is it already exists in another country on no
+                {
+                    Mysqldb sql = new Mysqldb();
+                    string q = "SELECT id,export,country FROM alldetailed WHERE alldetailed.Invoice = '"+ ((ComboBox)sender).Text+"';"; // is the invoice already exists ??
+                    DataTable dt = sql.Select(q);
+                    if (dt == null || dt.Rows == null || dt.Rows.Count == 0) // the invouce num not Exist
+                    {
+                         InputDialogSample inputDialog = new InputDialogSample(translate.trans("this invoice not Exist!!! Do you want to Reserve it for this Bank Receipt ?"));
+                        if (inputDialog.ShowDialog() == true)
+                        {
+                            if((bool)inputDialog.Answer == true)
+                            {
+                                q = "UPDATE uniexport.`bankreceipt` SET `reservedInv` = '" + ((ComboBox)sender).Text + "' WHERE `BankReceipt`.`id` = " + this.bankReceipt.id + "; ";
+                                sql.Select(q);
+                            }
+                                       
+                    
+                        }
+                    }
+                    else // the invoice number is exist but it's may be 1- in another bank receipt or -2 it's for another country
+                    {
+                        string expid = dt.Rows[0]["id"].ToString(); // here we got the exportCertification Id
+                        string countr = dt.Rows[0]["country"].ToString(); // here we got the country
+
+                        // same country but registerd within another bank receipt
+                        q = "SELECT `num` FROM `bankreceipt` inner join bankreceiptdata on (bankreceiptdata.bankReceipt = bankreceipt.id) WHERE bankreceiptdata.exportCertificate = "+expid+" ;";
+                        dt = sql.Select(q);
+                        string n = dt.Rows[0]["num"].ToString();
+                        MessageBox.Show(translate.trans("this invoice reserved for receipt no:"+n));
+
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
+                }
+               
             }
 
         }
         public Sol findElementsOfSum(List<double> lst, double target, int index = 0, Sol sols = null)
         {
-            Sol r = new Sol(new List<int>(), Math.Abs(target));
-            if (lst.Count == 0) return r;
+            Sol r = new Sol(new List<int>(), target);
+            if (lst.Count == 0 || lst.Sum() < (target - 5000) || target <= 0) return r;
             for (int i = 0; i < lst.Count; i++)
             {
                 if (lst[i] == 0) continue;
                 if (lst[i] == target)
                 {
-                    r.lst.Add(i + index); r.distance = 0;
+                    r = new Sol(new List<int>(), 0);
+                    r.lst.Add(i + index);                   
                     return r;
                 }
-                else if (lst[i] < target - 3000)
+                else if ((target - lst[i]) >= -5000)
                 {
-                    r = findElementsOfSum(lst.GetRange(i + 1, lst.Count - i - 1), target - lst[i], i + index + 1);
-                    r.lst.Add(i + index);
+                    Sol newr = findElementsOfSum(lst.GetRange(i + 1, lst.Count - i - 1), target - lst[i], i + index + 1);
+                    if(Math.Abs(newr.distance) < Math.Abs(r.distance))
+                    {
+                        newr.lst.Add(i + index);
+                        r = newr;
+                    }
                     if (sols == null) { sols = r; }
-                    else if (sols.distance > r.distance) { sols = r; }
+                    else if (Math.Abs(sols.distance) > Math.Abs(r.distance)) { sols = r; }
                     else { r = sols; }
-                    if (r.distance == 0) return r;
-
+                    if (Math.Abs(sols.distance) <= 1) return sols;
                 }
-                else if (lst[i] < target + 3000)
-                {
-                    r = findElementsOfSum(lst.GetRange(i + 1, lst.Count - i - 1), target - lst[i], i + index + 1);
-                    r.lst.Add(i + index);
-                    if (sols == null) { sols = r; }
-                    else if (sols.distance > r.distance) { sols = r; }
-                    else { r = sols; }
-                    if (r.distance == 0) return r;
-                }
-
-
-
             }
-
-            return r;
+            if (sols == null) { sols = r; }
+            if (Math.Abs(sols.distance) > Math.Abs(r.distance)) { return r; }
+            else { return sols; }
+            
         }
         public void autoCalc(object sender, RoutedEventArgs e)
         {
@@ -5302,8 +5464,12 @@ namespace Memo
                 }
 
                 Sol indeces = findElementsOfSum(lst, Global.ToDouble(bankUsd));// indeces of the export certificates
-                if (indeces.lst.Count == 0)
+                if (indeces.lst.Count == 0 || Math.Abs(indeces.distance) > 5000)
                 {
+                    App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+                    {
+                        ld.Stop();
+                    });
                     MessageBox.Show(translate.trans("There Is no Set of Export Certificates with this sum !!!"));
                     return;
                 }
@@ -5315,30 +5481,30 @@ namespace Memo
                 {
 
                     sum = (Global.ToDouble(sum) + lst[i]).ToString();
-                    object b = Global.bankReceiptDatas.Where(bb => ((BankReceiptData)bb).exportUsd == ((BankReceiptData)sameYear.ElementAt(i)).exportUsd).First();
+                    object b = sameYear.ElementAt(i);
+                    //Global.bankReceiptDatas.Where(bb => ((BankReceiptData)bb).id == ((BankReceiptData)).id).First();
                     int pos = Global.bankReceiptDatas.IndexOf(b);
                     ((BankReceiptData)Global.bankReceiptDatas[pos]).chck = true;
                     l.Add(pos);
 
                 }
+                //
                 App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
                 {
-                    double sum = 0;
+                    double dsum = 0;
                     foreach (int pos in l)
                     {
-                        sum += Convert.ToDouble(((BankReceiptData)Global.bankReceiptDatas[pos]).exportUsd);
-                    }
-                    if (Math.Abs(sum - Convert.ToDouble(bankUsd)) > 5000)
-                    {
-                        MessageBox.Show("Cant't find TRUE answer !!!");return;
+                        dsum += Convert.ToDouble(((BankReceiptData)Global.bankReceiptDatas[pos]).exportUsd);
                     }
                     foreach (int pos in l)
                     {
                         Global.bankReceiptDatas.Move(pos, 0);
-                    } ld.Close();
+                    }
+                    ld.Stop();
                 });
 
             });
+            th.CurrentCulture = Global.culture;
             th.Start();
 
 
@@ -5407,9 +5573,9 @@ namespace Memo
         {
             ObservableCollection<object> c = new ObservableCollection<object>();
             Mysqldb sql = new Mysqldb();
-            string q = "SELECT `id`,`export`,sum(usdVal) as usd , `dat` FROM alldetailed WHERE EXISTS(select * from bankreceiptdata where bankreceiptdata.exportCertificate = alldetailed.id  and bankreceiptdata.bankReceipt = " + br.id + " ) GROUP by(id);";
+            string q = "SELECT `id`,`export`,sum(usdVal) as usd , `dat` FROM alldetailed WHERE alldetailed.id in(select bankreceiptdata.exportCertificate from bankreceiptdata where bankreceiptdata.bankReceipt = " + br.id + " ) GROUP by(id) order by usd DESC;";
             DataTable dt = sql.Select(q);
-
+            Global.bankReceiptInvoices = new ObservableCollection<object>();
             Global.tempsum = 0;
             foreach (DataRow r in dt.Rows)
             {
@@ -5422,10 +5588,22 @@ namespace Memo
                 Global.tempsum += Global.ToDouble(r["usd"].ToString());
                 temp.chck = true;
                 temp.expDate = (DateTime)(r["dat"]);
+                q = "SELECT num FROM `invoice` WHERE `exportCertificate` = "+temp.exportCertificate.id;
+                DataTable tempInvoices = sql.Select(q);
+                temp.invoices = new ObservableCollection<twoFields>();
+                foreach (DataRow rr in tempInvoices.Rows)
+                {
+                    twoFields t = new twoFields(temp.exportCertificate.id, rr[0].ToString());
+                    temp.invoices.Add(t);
+                    Global.bankReceiptInvoices.Add(t);
+                    if (temp.sInvoices == null || temp.sInvoices == "" || temp.sInvoices == string.Empty) { temp.sInvoices = rr[0].ToString(); }
+                    else { temp.sInvoices = temp.sInvoices + " , " + rr[0].ToString(); }
+                    //temp.sInvoices = tempInvoices + " , " + rr[0].ToString();
+                }
                 c.Add(temp);
             }
             q = "SELECT `id`,`export`,sum(usdVal) as usd , `dat`" +
-                " FROM alldetailed WHERE  company = '" + Global.company.name + "'  and alldetailed.id not in(select bankreceiptdata.exportCertificate from bankreceiptdata ) GROUP by(id)";
+                " FROM alldetailed WHERE  company = '" + Global.company.name + "'  and alldetailed.id not in(select bankreceiptdata.exportCertificate from bankreceiptdata union select invoice.exportCertificate from invoice INNER join bankReceipt on(bankreceipt.reservedInv = invoice.num) where bankreceipt.id != " + br.id+" ) GROUP by(id) order by usd DESC";
             dt = sql.Select(q);
             foreach (DataRow r in dt.Rows)
             {
@@ -5437,6 +5615,18 @@ namespace Memo
                 temp.exportUsd = r["usd"].ToString();
                 temp.chck = false;
                 temp.expDate = (DateTime)(r["dat"]);
+                q = "SELECT num FROM `invoice` WHERE `exportCertificate` = "+temp.exportCertificate.id;
+                DataTable tempInvoices = sql.Select(q);
+                temp.invoices = new ObservableCollection<twoFields>();
+                foreach (DataRow rr in tempInvoices.Rows)
+                {
+                    twoFields t = new twoFields(temp.exportCertificate.id, rr[0].ToString());
+                    temp.invoices.Add(t);
+                    Global.bankReceiptInvoices.Add(t);
+                    if (temp.sInvoices == null || temp.sInvoices == "" || temp.sInvoices == string.Empty)  { temp.sInvoices =  rr[0].ToString(); }
+                    else { temp.sInvoices = temp.sInvoices + " , " + rr[0].ToString(); }
+                    //temp.sInvoices = temp.sInvoices + " , " + rr[0].ToString();
+                }
                 c.Add(temp);
             }
             if (c.Count == 0)

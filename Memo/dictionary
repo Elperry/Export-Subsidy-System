@@ -1,0 +1,128 @@
+clear,تصفير الخانات,Clear Fields
+saveAndPrint,حفظ و طباعة,Save And Print
+bankreceiptdata,بيانات الأشعار البنكي,Bank Receipt Data
+performa,Proforma Invoice,Proforma Invoice
+committee,اللجنة,Committee
+supportpercentage,نسبة الدعم,Support Percentage
+filenodata,بيانات رقم الملف,File Number Data
+openfilenodata,تتبع رقم الملف,Open File Num data
+committees,اللجان,Committees
+manualwork,العمل اليدوى,Manual Work
+repounderpreparing,تحت التجهيز,Under Preparing
+repoemptybankreceipt,إشعارات بنكية خالية,Empty Bank Receipt
+addcondition,إضافة شرط,Add Condition
+shipping companies,شركات الشحن,Shipping Companies
+repochequerecieved,تقرير الشيكات المستلمة,Received Bank Check Report
+exportdate,تاريخ التصدير,Export Date
+autocalc,الحساب الأوتوماتيكى,auto Calculate
+chequedate,تاريخ الشيك,Cheque Date
+repoerror,المتابعات,Errors Report
+export,شهادة الصادر,Export Certificate
+repowarning,تحذير بانتهاء مدة الشهادات,Warning Report
+wannaclose,هل تريد إغلاق هذه النافذه ؟,Do you want To close this window ?
+reposubmission,تقرير أجمالي الملفات المُقدمة,Submission Report
+submitdate,تاريخ التقديم,Submit Date
+month,الشهر,Month
+company,الشركة,Company
+id,م,Id
+name,الإسم,Name
+country,الدولة,Country
+gov,المحافظة,Governoment
+city,المدينة,City
+address,العنوان,Address
+email,البريد الإلكترونى,Email
+balance,الرصيد,Balance
+balanceLimit,حد المديونية,Balance Limit
+type,النوع,Type
+notes,ملاحظات,Notes
+canceled,ملغى,Canceled
+fax,فاكس,FAX
+rate,التقييم,Rating
+priceBracket,شريحة السعر,Price Bracket
+balanceDate,تاريخ ,Date
+logo,الشعار,Logo
+usr.City , المدينة , City
+nolon , نولون, Nolon 
+shippingcompany , شركة الشحن , Shipping Company
+manifest , مانيفستو, Manifesto 
+manifesto , مانيفستو, Manifesto 
+usdval , السعر بالدولار, Price (USD) 
+egpval , السعر بالجنيه, Price (EGP) 
+port , ميناء الشحن, Port 
+ptregp , الدعم بالجنيه, Support (EGP) 
+brandcat , التصنيف, Category 
+brand , البراند, Brand 
+invoices , الفواتير, Invoices 
+bankreceiptinvoice , الفواتير, Invoices 
+invoice , الفاتورة, Invoice 
+exportcertificate , شهادة الصادر, Export Certificate 
+dat , التاريخ, Date 
+submitdate , تاريخ التقديم, Submit Date 
+receiptdate , تاريخ الإستلام, Receive Date 
+totalegp , إجمالى الدعم بالجنيه, Total PTR() 
+client , العميل, Client 
+clients , العملاء, Clients 
+countries , الدول, Countries 
+admin , صلاحيات المدير, Administrator Privileges 
+password , كلمة المرور, Password 
+add , إضافة جديد, Add New 
+edit , تعديل, Edit 
+delete , حذف, Delete 
+del , حذف, Delete 
+close , إغلاق, Close 
+openinvoice , فتح الفواتير فى هذه الشهادة, Open Invoices in this Certificate 
+openinvoicedata , البراندات فى هذه الفاتورة, Open Brands in this Invoice 
+fileno , رقم الملف, File Number 
+estiva , إستيفا, Estiva 
+Activateapp , تفعيل البرنامج, Activate The App 
+hwkey , الرقم المميز,Product Id 
+serial , كود التفعيل, License 
+lang , اللغة, Language 
+boles , بوليصة الشحن, Bill of lading 
+bankreciete , اشعار البنك, Bank Receipt 
+ptrnolon_man , النولون + المانيفستو, Nolon + Manifesto 
+ptr_nolon_man , النولون + المانيفستو, Nolon + Manifesto 
+txtbankReceipt , رقم الأشعار البنكي, Bank Receipt Number 
+usd , القيمة بالدولار, USD $ 
+txtbankreceipt , رقم الإشعار البنكى, Bank Receipt Num 
+openchequedata , تتبع هذا الشيك, Track This Cheque 
+chequedatas , الملفات المربوطة بالشيك, fles binded with this Chequq 
+cheque , شيك بنكى, Cheque 
+chequerecieved , وصل شيك بنكى, Cheque Recieved 
+basic info , البيانات الأساسية, Basic Info 
+actions , العمل اليومي, Actions 
+reports , التقارير, Reports 
+opened windows , النوافذ المفتوحة, Opened Windows 
+companies , الشركات, Companies 
+brands , البراندات, Brands 
+shippin gcompany , شركة الشحن , Shipping Company
+shippingcompanies , شركات الشحن , Shipping Companies
+phone , الهاتف , Phone
+brand categories , تصنيفات البراندات, Entities 
+ports , الموانئ, Ports 
+users , المستخدمين, Users 
+export certificates , شهادات الصادر, Export Certificates 
+bankreceipt , اشعار البنك, Bankreceipt 
+booked , محجوزات, Booked 
+openreportviewer , عرض التقارير, Report View 
+openbankreceiptdata , الشهادات المدفوعة بهذا الأشعار البنكى, Export Certificates paid with this Bankreceipt 
+op , أداة المقارنة, Comparator Operator 
+reponame , إسم التقرير, Report Name 
+col , الخانة, Feild 
+value , القيمة, Value 
+pagesetup , إعدادات صفحة التقارير, Page Setup 
+showreport , عرض التقرير, Show Report 
+cond , الشروط, Condtion 
+clear , مسح الخانات, Clear 
+num , رقم, Number 
+exportUsd,قيمة شهادة الصادر بالدولار,USD
+manifestosupport,قيمة دعم المانيفستو,Manifesto Support (EGP)
+nolonsupport,قيمة دعم النولون,Nolon Support (EGP)
+errcountry,خطأ \n  شهادة الصادر هذه تحتوى على عملاء من دولة مختلفة,Error \n This Export Certification Has Clients from Different Country
+Import/Export,استيراد وتصدير من فايل اكسيل,Import & Export from excel
+Import From Excel,استيراد من فايل اكسيل,import from excel
+reposubmissiondetails,الملفات المقدمة بالتفصيل , Submission Details
+repounderpreparingwithmanualwork,شهادات جاهزة عالتقديم,available issues for submitting
+repounderpreparingwithoutmanualwork,شهادات جاهزة وينقصها العمل اليدوي,available issues not preparaing
+repobankreceipt,ارقام الفواتير مع ارقام اشعاراتهم,bank reciept 
+repodata,شهادات الصادر مع فواتيراها,export NO with invoice NO

@@ -48,9 +48,9 @@ public static class connString
             }
             //string []text = File.re
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            //MessageBox.Show("خطأ فى ملف التوصبل أو قاعدة البيانات" + ex.ToString());
+            MessageBox.Show("خطأ فى ملف التوصبل أو قاعدة البيانات" + ex.ToString());
             //throw;
         }
 
@@ -90,13 +90,13 @@ public class Mysqldb
     {
         try
         {
-            connString.host = "127.0.0.1";//"197.56.194.225";
-            connString.port = "3306";
-            connString.database = "uniexport";
-            connString.charset = "utf8";
-            connString.uid = "root";
-            connString.password = "";
-            //if (connString.isNull()) { connString.Init(); }
+            //connString.host = "127.0.0.1";//"197.56.194.225";
+            //connString.port = "3306";
+            //connString.database = "uniexport";
+            //connString.charset = "utf8";
+            //connString.uid = "root";
+            //connString.password = "";
+            if (connString.isNull()) { connString.Init(); }
             server = connString.host;
             database = connString.database;
             uid = connString.uid;

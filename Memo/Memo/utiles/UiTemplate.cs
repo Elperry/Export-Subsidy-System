@@ -82,139 +82,47 @@ namespace Memo
             get { if (Global.Lang == null) return "EN"; else return Global.Lang.id; }
             set { }
         }
-        public static List<dic> lst = new List<dic>() {
-            new dic("clear","تصفير الخانات","Clear Fields"),
-            new dic("performa","Proforma Invoice","Proforma Invoice"),
-            new dic("committee","اللجنة","Committee"),
-            new dic("supportpercentage","نسبة الدعم","Support Percentage"),
-            new dic("filenodata","بيانات رقم الملف","File Number Data"),
-            new dic("openfilenodata","تتبع رقم الملف","Open File Num data"),
-            new dic("committees","اللجان","Committees"),
-            new dic("manualwork","العمل اليدوى","Manual Work"),
-            new dic("repounderpreparing","تحت التجهيز","Under Preparing"),
-            new dic("repoemptybankreceipt","إشعارات بنكية خالية","Empty Bank Receipt"),
-            new dic("addcondition","إضافة شرط","Add Condition"),
-            new dic("shipping companies","شركات الشحن","Shipping Companies"),
-            new dic("repochequerecieved","تقرير الشيكات المستلمة","Received Bank Check Report"),
-            new dic("exportdate","تاريخ التصدير","Export Date"),
-            new dic("chequedate","تاريخ الشيك","Cheque Date"),
-            new dic("repoerror","تقرير الأخطاء","Error Report"),
-            new dic("export","شهادة الصادر","Export Certificate"),
-            new dic("repowarning","تقرير التحذير بقرب مرور عام","Warning Report"),
-            new dic("wannaclose","هل تريد إغلاق هذه النافذه ؟","Do you want To close this window ?"),
-            new dic("reposubmission","تقرير الملفات المُقدمة","Submission Report"),
-            new dic("submitdate","تاريخ التقديم","Submit Date"),
-            new dic("month","الشهر","Month"),
-            new dic("company","الشركة","Company"),
-            new dic("id","م","Id"),
-            new dic("name","الإسم","Name"),
-            new dic("country","الدولة","Country"),
-            new dic("gov","المحافظة","Governoment"),
-            new dic("city","المدينة","City"),
-            new dic("address","العنوان","Address"),
-            new dic("email","البريد الإلكترونى","Email"),
-            new dic("balance","الرصيد","Balance"),
-            new dic("balanceLimit","حد المديونية","Balance Limit"),
-            new dic("type","النوع","Type"),
-            new dic("notes","ملاحظات","Notes"),
-            new dic("canceled","ملغى","Canceled"),
-            new dic("fax","فاكس","FAX"),
-            new dic("rate","التقييم","Rating"),
-            new dic("priceBracket","شريحة السعر","Price Bracket"),
-            new dic("balanceDate","تاريخ ","Date"),
-            new dic("logo","الشعار","Logo"),
-            new dic("usr.City" , "المدينة" , "City"),
-            new dic("nolon" , "نولون", "Nolon" ),
-            new dic("shippingcompany" , "شركة الشحن" , "Shipping Company"),
-            new dic("manifest" , "Manifesto", "Manifesto" ),
-            new dic("manifesto" , "Manifesto", "Manifesto" ),
-            new dic("usdval" , "السعر بالدولار", "Price (USD)" ),
-            new dic("egpval" , "السعر بالجنيه", "Price (EGP)" ),
-            new dic("port" , "الميناء", "Port" ),
-            new dic("ptregp" , "الدعم بالجنيه", "Support (EGP)" ),
-            new dic("brandcat" , "التصنيف", "Category" ),
-            new dic("brand" , "البراند", "Brand" ),
-            new dic("invoices" , "الفواتير", "Invoices" ),
-            new dic("invoice" , "الفاتورة", "Invoice" ),
-            new dic("exportcertificate" , "شهادة الصادر", "Export Certificate" ),
-            new dic("dat" , "التاريخ", "Date" ),
-            new dic("submitdate" , "تاريخ التقديم", "Submit Date" ),
-            new dic("receiptdate" , "تاريخ الإستلام", "Receive Date" ),
-            new dic("totalegp" , "إجمالى الدعم بالجنيه", "Total PTR()" ),
-            new dic("client" , "العميل", "Client" ),
-            new dic("clients" , "العملاء", "Clients" ),
-            new dic("countries" , "الدول", "Countries" ),
-            new dic("admin" , "صلاحيات المدير", "Administrator Privileges" ),
-            new dic("password" , "كلمة المرور", "Password" ),
-            new dic("add" , "إضافة جديد", "Add New" ),
-            new dic("edit" , "تعديل", "Edit" ),
-            new dic("delete" , "حذف", "Delete" ),
-            new dic("del" , "حذف", "Delete" ),
-            new dic("close" , "إغلاق", "Close" ),
-            new dic("openinvoice" , "فتح الفواتير فى هذه الشهادة", "Open Invoices in this Certificate" ),
-            new dic("openinvoicedata" , "البراندات فى هذه الفاتورة", "Open Brands in this Invoice" ),
-            new dic("fileno" , "رقم الملف", "File Number" ),
-            new dic("estiva" , "إستيفا", "Estiva" ),
-            new dic("Activateapp" , "تفعيل البرنامج", "Activate The App" ),
-            new dic("hwkey" , "الرقم المميز","Product Id" ),
-            new dic("serial" , "كود التفعيل", "License" ),
-            new dic("lang" , "اللغة", "Language" ),
-            new dic("boles" , "بوليصة الشحن", "Shipping Policy" ),
-            new dic("bankreciete" , "إيصال البنك", "Bank Receipt" ),
-            new dic("ptrnolon_man" , "النولون + المانيفستو", "Nolon + Manifesto" ),
-            new dic("ptr_nolon_man" , "النولون + المانيفستو", "Nolon + Manifesto" ),
-            new dic("txtbankReceipt" , "إصال البنك", "Bank Receipt Number" ),
-            new dic("usd" , "القيمة بالدولار", "USD $" ),
-            new dic("txtbankreceipt" , "رقم الإشعار البنكى", "Bank Receipt Num" ),
-            new dic("openchequedata" , "تتبع هذا الشيك", "Track This Cheque" ),
-            new dic("chequedatas" , "الملفات المربوطة بالشيك", "fles binded with this Chequq" ),
-            new dic("cheque" , "شيك بنكى", "Cheque" ),
-            new dic("chequerecieved" , "وصل شيك بنكى", "Cheque Recieved" ),
-            new dic("basic info" , "البيانات الأساسية", "Basic Info" ),
-            new dic("actions" , "الحركات", "Actions" ),
-            new dic("reports" , "التقارير", "Reports" ),
-            new dic("opened windows" , "النوافذ المفتوحة", "Opened Windows" ),
-            new dic("companies" , "الشركات", "Companies" ),
-            new dic("brands" , "البراندات", "Brands" ),
-            new dic("shippin gcompany" , "شركة الشحن" , "Shipping Company"),
-            new dic("shippingcompanies" , "شركات الشحن" , "Shipping Companies"),
-            new dic("phone" , "الهاتف" , "Phone"),
-            new dic("brand categories" , "تصنيفات البراندات", "Entities" ),
-            new dic("ports" , "الموانئ", "Ports" ),
-            new dic("users" , "المستخدمين", "Users" ),
-            new dic("export certificates" , "شهادات الصادر", "Export Certificates" ),
-            new dic("bankreceipt" , "الإيصال البنكى", "Bankreceipt" ),
-            new dic("booked" , "محجوزات", "Booked" ),
-            new dic("openreportviewer" , "عرض التقارير", "Report View" ),
-            new dic("openbankreceiptdata" , "الشهادات المدفوعة بهذا الإيصال البنكى", "Export Certificates paid with this Bankreceipt" ),
-            new dic("op" , "أداة المقارنة", "Comparator Operator" ),
-            new dic("reponame" , "إسم التقرير", "Report Name" ),
-            new dic("col" , "الخانة", "Feild" ),
-            new dic("value" , "القيمة", "Value" ),
-            new dic("pagesetup" , "إعدادات صفحة التقارير", "Page Setup" ),
-            new dic("showreport" , "عرض التقرير", "Show Report" ),
-            new dic("cond" , "الشروط", "Condtion" ),
-            new dic("clear" , "مسح الخانات", "Clear" ),
-            new dic("num" , "رقم", "Number" ),
-            new dic("exportUsd","قيمة شهادة الصادر بالدولار","USD"),
-            new dic("manifestosupport","قيمة دعم المانيفستو","Manifesto Support (EGP)"),
-            new dic("nolonsupport","قيمة دعم النولون","Nolon Support (EGP)"),
-            new dic("errcountry","خطأ \n  شهادة الصادر هذه تحتوى على عملاء من دولة مختلفة","Error \n This Export Certification Has Clients from Different Country"),
-        };
+        public static List<dic> lst { get; set; }
         public static string trans(string str)
         {
+            if (lst == null)
+            {
+                try
+                {
+                    lst = new List<dic>();
+                    string filename = "dictionary";
+                    if (System.IO.File.Exists(filename) == true)
+                    {
+                        System.IO.StreamReader reader;
+                        reader = new System.IO.StreamReader(filename);
+                        do
+                        {
+                            string txt = reader.ReadLine();
+                            string[] s = txt.Split(',');
+                            lst.Add(new dic(s[0].ToLower().Replace(" ", string.Empty), s[1], s[2]));
+
+                        } while (reader.Peek() != -1);
+                    }
+                    //string []text = File.re
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("خطأ فى ملف الترجمة" + ex.ToString());
+                    //throw;
+                }
+            }
             foreach (dic d in lst)
             {
                 if (lang == "EN")
                 {
-                    if (d.from == str.ToLower())
+                    if (d.from == str.ToLower().Replace(" ", string.Empty))
                     {
                         return d.to2;
                     }
                 }
                 else if (lang == "AR")
                 {
-                    if (d.from == str.ToLower())
+                    if (d.from == str.ToLower().Replace(" ", string.Empty))
                     {
                         return d.to1;
                     }
@@ -672,8 +580,8 @@ namespace Memo
                 }
                 if(p.displayPath == "")
                 {
-                    t.DisplayMemberPath = ".name";
-                    t.SelectedValuePath = ".id";
+                    t.DisplayMemberPath = "name";
+                    t.SelectedValuePath = "id";
                 }
                 else
                 {
@@ -1273,7 +1181,12 @@ namespace Memo
             {
                 stk.Children.Add(border);
             }
-            ((Window)form).Content = stk;
+            Grid mainGrd = new Grid();
+            LoadingWait ld = new LoadingWait();
+            ld.Name = "loadingWait";
+            mainGrd.Children.Add(ld);
+            mainGrd.Children.Add(stk);
+            ((Window)form).Content = mainGrd;
 
         }
         public void Moderntemplate(object form, ref object obj, string header = "",List<Property> inputs = null ,List<string> buttons = null, ObservableCollection<object> table = null,List<TableCol> tableCols = null, int width = 0, int height = 0, bool parent = true)
@@ -1514,8 +1427,13 @@ namespace Memo
             {
                 stk.Children.Add(border);
             }
-
-          ((Window)form).Content = stk;
+            Grid mainGrd = new Grid();
+            LoadingWait ld = new LoadingWait();
+            ld.Name = "loadingWait";
+            mainGrd.Children.Add(ld);
+            mainGrd.Children.Add(stk);
+            ((Window)form).Content = mainGrd;
+           // ((Window)form).Content = stk;
 
         }
 
@@ -1552,17 +1470,22 @@ namespace Memo
             dock.LastChildFill = true;
             Menu m = ClassicalMenueBar(MenueHeader);
             dock.Children.Add(m);
-
+            DockPanel.SetDock(dock, Dock.Top);
             //Hello , this App Created By Eng: Mohammad Al-Berry Email:Mohammedelpry@yahoo.com Phone:01147264224 
             Label l = lbl("");
-            DockPanel.SetDock(l, Dock.Bottom);
+            
             dock.Children.Add(l);
-
+            DockPanel.SetDock(l, Dock.Bottom);
             //StackPanel b = vStack(false);
             //((Window)form).Content = b;
             //b.Children.Add(miniHeader(width));
-
-            ((Window)form).Content = dock;
+            Grid mainGrd = new Grid();
+            LoadingWait ld = new LoadingWait();
+            ld.Name = "loadingWait";
+            mainGrd.Children.Add(ld);
+            mainGrd.Children.Add(dock);
+            ((Window)form).Content = mainGrd;
+            //((Window)form).Content = dock;
 
         }
         public void template1(object form, object obj, string header = "", List<string> memberLst = null, ObservableCollection<object> table = null, int width = 0, int height = 0, bool parent = true)
@@ -1740,7 +1663,12 @@ namespace Memo
             {
                 stk.Children.Add(border);
             }
-    ((Window)form).Content = stk;
+            Grid mainGrd = new Grid();
+            LoadingWait ld = new LoadingWait();
+            ld.Name = "loadingWait";
+            mainGrd.Children.Add(ld);
+            mainGrd.Children.Add(stk);
+            ((Window)form).Content = mainGrd;
 
         }
 

@@ -22,13 +22,13 @@ namespace Memo
         { 
             
             InitializeComponent();
-            CultureInfo culture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
-            culture.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
-            culture.DateTimeFormat.LongTimePattern = "";
-            Thread.CurrentThread.CurrentCulture = culture;
+            Global.culture = (CultureInfo)CultureInfo.CurrentCulture.Clone();
+            Global.culture.DateTimeFormat.ShortDatePattern = "dd/MM/yyyy";
+            Global.culture.DateTimeFormat.LongTimePattern = "";
+            Thread.CurrentThread.CurrentCulture = Global.culture;
             //Console.Write(DateTime.Now + "");// 
             //MessageBox.Show(DateTime.Now + "");
-            if (activation.check()){
+            if (!activation.check()){
                
                 Window w = new Window();
                 object A = new Activation(w);
